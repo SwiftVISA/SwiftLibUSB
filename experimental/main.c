@@ -3,6 +3,7 @@
 
 #include <libusb-1.0/libusb.h>
 #include <stdio.h>
+#include <string.h>
 
 // Constant variables
 static const char deviceName[256] = "E36103B";
@@ -103,7 +104,7 @@ int operate_primary_device() {
     struct libusb_config_descriptor *primaryConfig;
     libusb_get_active_config_descriptor (primaryDevice,&primaryConfig);
     const struct libusb_interface *interfaces = primaryConfig->interface;
-    printf("%d Interfaces found",primaryConfig->bNumInterfaces);
+    printf("%d Interfaces found\n",primaryConfig->bNumInterfaces);
 
     /*
     printf("Claim Interface\n");
