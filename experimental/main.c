@@ -21,6 +21,41 @@ int list_devices() {
     // For each device, print the port number.
     for (ssize_t i = 0; i < count; i++) {
         printf("Device connected on port %d\n", libusb_get_port_number(devices[i]));
+        struct libusb_device_descriptor desc;
+        int desc_code = libusb_get_device_descriptor(devices[i], &desc);
+        if (desc_code != 0)
+        {
+			printf("Error getting device descriptor, error code: %d, error str: %s\n", 
+			desc_code, libusb_error_name(desc_code));
+		}else
+		{
+			//open devie and obtain a handle
+			struct libusb_device_handle* handle;
+			int open_code = libusb_open(devices[i], &handle);
+			if (open_code != 0)
+			{
+				printf("Error getting device descriptor, error code: %d, error str: %s\n", 
+			open_code, libusb_error_name(open_code));
+			}else
+			{
+				//get descriptor and print string
+				unsigned char str[256];
+				struct libusb_device_descriptor desc;
+				int desc_code = libusb_get_device_descriptor(devices[i], &desc);
+				int desc_ascii_code = libusb_get_string_descriptor_ascii(handle,
+					desc.iProduct, str, 256);
+				if(desc_code != 0)
+				{
+					printf("Error getting device descriptor, error code: %d, error str: %s\n", 
+						desc_ascii_code, libusb_error_name(desc_ascii_code));
+				}else {
+					printf("Device Product Descriptor: %s\n", str);
+				}
+				
+				//close device
+				libusb_close(handle);
+			}
+		}
     }
 
     // Deallocate the device list
