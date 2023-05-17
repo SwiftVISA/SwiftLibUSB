@@ -4,6 +4,11 @@
 #include <libusb-1.0/libusb.h>
 #include <stdio.h>
 
+// Constant variables
+static const char deviceName[256] = "E36103B";
+static libusb_device_handle *primaryDeviceHandle;
+static libusb_device *primaryDevice;
+
 // Prints the port each device is plugged into
 int list_devices() {
     // This will store the list of devices. It is allovated by libusb
@@ -60,12 +65,21 @@ int list_devices() {
 				{
 					printf("Error getting device descriptor string, error code: %d, error str: %s\n", 
 						desc_ascii_code, libusb_error_name(desc_ascii_code));
+                    //close device
+				    libusb_close(handle);
 				}else {
-					printf("Device Product Descriptor: %s\n", str);
+					printf("Device Product Descriptor: '%s'\n", str);
+                    if(!strcmp(str,deviceName)){
+                        printf("Desired Device Found\n");
+                        primaryDeviceHandle = handle;
+                        primaryDevice = devices[i];
+                    }else{
+                        //close device
+				        libusb_close(handle);
+                    }
 				}
 				
-				//close device
-				libusb_close(handle);
+				
 			}
 		}
     }
@@ -76,11 +90,43 @@ int list_devices() {
     return 0;
 }
 
+int operate_primary_device() {
+    if(primaryDeviceHandle == NULL){
+        printf("Cannot Transfer, device handler was not initialised\n");
+        return -1;
+    }
+    printf("Attempting Configuration\n");
+    int returned; 
+    returned = libusb_set_configuration(primaryDeviceHandle,0); // This may not need to happen, or if it does return 0 other behavior might need changing
+    printf("Returned value %d\n",returned);
+    printf("Getting config_descriptor\n");
+    struct libusb_config_descriptor *primaryConfig;
+    libusb_get_active_config_descriptor (primaryDevice,&primaryConfig);
+    const struct libusb_interface *interfaces = primaryConfig->interface;
+    printf("%d Interfaces found",primaryConfig->bNumInterfaces);
+
+    /*
+    printf("Claim Interface\n");
+    returned = libusb_claim_interface(primaryDeviceHandle,0);
+    printf("Returned value %d\n",returned);
+    */
+
+    /*printf("Attempting Transfer of message\n");
+    unsigned char endpoint = 0;
+    unsigned char *data = "*IDN?";
+    int transfered = 0;
+    returned = libusb_control_transfer(primaryDeviceHandle,0,0,0,0,data,sizeof(data),0);
+    printf("Returned value %d\n",returned);
+    printf("Bytes Transfered: %d\n",transfered);
+    libusb_close(primaryDeviceHandle);*/
+}
+
 int main() {
     int error = libusb_init(NULL);
     if (error == 0) {
         printf("Initialized successfully\n");
         list_devices();
+        operate_primary_device();
         libusb_exit(NULL);
         return 0;
     } else {
