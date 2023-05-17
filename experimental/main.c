@@ -34,7 +34,7 @@ int list_devices() {
 			int open_code = libusb_open(devices[i], &handle);
 			if (open_code != 0)
 			{
-				printf("Error getting device descriptor, error code: %d, error str: %s\n", 
+				printf("Error opening device, error code: %d, error str: %s\n", 
 			open_code, libusb_error_name(open_code));
 			}else
 			{
@@ -46,7 +46,7 @@ int list_devices() {
 					desc.iProduct, str, 256);
 				if(desc_code != 0)
 				{
-					printf("Error getting device descriptor, error code: %d, error str: %s\n", 
+					printf("Error getting device descriptor string, error code: %d, error str: %s\n", 
 						desc_ascii_code, libusb_error_name(desc_ascii_code));
 				}else {
 					printf("Device Product Descriptor: %s\n", str);
