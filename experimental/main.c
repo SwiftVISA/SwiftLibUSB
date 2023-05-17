@@ -24,7 +24,8 @@ int list_devices() {
     }
 
     // Deallocate the device list
-    libusb_free_device_list(devices, 0);
+    // Also unref the devices in the list
+    libusb_free_device_list(devices, 1);
     return 0;
 }
 
