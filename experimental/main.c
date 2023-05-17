@@ -132,20 +132,24 @@ int operate_primary_device() {
     int numInterfaces = primaryConfig->bNumInterfaces;
     printf("%d Interfaces found\n",primaryConfig->bNumInterfaces);
     listInterfaces(interfaces,numInterfaces);
-    /*
+    
     printf("Claim Interface\n");
     returned = libusb_claim_interface(primaryDeviceHandle,0);
     printf("Returned value %d\n",returned);
-    */
+    
 
-	/*printf("Attempting Transfer of message\n");
 	unsigned char endpoint = 0;
-	unsigned char *data = "*IDN?";
+	unsigned char *data = "OUTPUT ON\n";
 	int transfered = 0;
-	returned = libusb_control_transfer(primaryDeviceHandle,0,0,0,0,data,sizeof(data),0);
-	printf("Returned value %d\n",returned);
+    int length = strlen(data);
+    printf("Attempting Transfer of message '%s' with length %d\n",data,length);
+	
+	returned = libusb_bulk_transfer(primaryDeviceHandle,1,data,length,&transfered,0);
+	printf("Returned value %d with codename %s\n",returned,libusb_error_name(returned));
 	printf("Bytes Transfered: %d\n",transfered);
-	libusb_close(primaryDeviceHandle);*/
+	libusb_close(primaryDeviceHandle);
+
+    libusb_free_config_descriptor(primaryConfig);
 }
 
 int main() {
