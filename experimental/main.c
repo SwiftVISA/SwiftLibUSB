@@ -119,11 +119,8 @@ int operate_primary_device() {
         printf("Cannot Transfer, device handler was not initialised\n");
         return -1;
     }
-
-    printf("Attempting Configuration\n");
+    
     int returned; 
-    returned = libusb_set_configuration(primaryDeviceHandle,0); // This may not need to happen, or if it does return 0 other behavior might need changing
-    printf("Returned value %d\n",returned);
 
     printf("Getting config_descriptor\n");
     struct libusb_config_descriptor *primaryConfig;
@@ -133,10 +130,10 @@ int operate_primary_device() {
     printf("%d Interfaces found\n",primaryConfig->bNumInterfaces);
     listInterfaces(interfaces,numInterfaces);
     
+    
     printf("Claim Interface\n");
     returned = libusb_claim_interface(primaryDeviceHandle,0);
     printf("Returned value %d\n",returned);
-    
 
 	unsigned char endpoint = 0;
 	unsigned char *data = "*IDN?\n";
@@ -155,7 +152,10 @@ int operate_primary_device() {
 	printf("Response: '%s'\n", response);        
 	libusb_close(primaryDeviceHandle);
 
+    // Clean up
     libusb_free_config_descriptor(primaryConfig);
+    libusb_release_interface(primaryDeviceHandle,0);
+    libusb_close(primaryDeviceHandle);
 }
 
 int main() {
