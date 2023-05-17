@@ -90,21 +90,41 @@ int list_devices() {
     return 0;
 }
 
+int listInterfaces(const struct libusb_interface *interfaces,int numberInterfaces){
+    for(int i = 0; i < numberInterfaces; i++){
+        int numAltSettings = interfaces[i].num_altsetting;
+        printf("%d) Interface with %d altsettings: \n",i,numAltSettings);
+        for(int j = 0; j < numAltSettings; j++){
+            const struct libusb_interface_descriptor *altSetting = interfaces[i].altsetting;
+            printf("Interface Number %d: bLength(%d),bDescriptorType(%d),bInterfaceNumber(%d),bAlternateSetting(%d),bNumEndpoints(%d),bInterfaceClass(%d),bInterfaceSubClass(%d),bInterfaceProtocol(%d),iInterface(%d)\n",
+            i,altSetting->bLength,altSetting->bDescriptorType,altSetting->bInterfaceNumber,altSetting->bAlternateSetting,altSetting->bNumEndpoints,altSetting->bInterfaceClass,altSetting->bInterfaceSubClass,altSetting->bInterfaceProtocol,altSetting->iInterface);
+            const struct libusb_endpoint_descriptor *endpoints = altSetting->endpoint;
+            for(int k = 0; k < altSetting->bNumEndpoints; k++){
+                printf(" - Endpoint %d: Attributes(%d), Address(%d)\n",k,endpoints[k].bmAttributes,endpoints[k].bEndpointAddress);
+            }
+        }
+    }
+}
+
 int operate_primary_device() {
+    printf("Operating device %s\n",deviceName);
     if(primaryDeviceHandle == NULL){
         printf("Cannot Transfer, device handler was not initialised\n");
         return -1;
     }
+
     printf("Attempting Configuration\n");
     int returned; 
     returned = libusb_set_configuration(primaryDeviceHandle,0); // This may not need to happen, or if it does return 0 other behavior might need changing
     printf("Returned value %d\n",returned);
+
     printf("Getting config_descriptor\n");
     struct libusb_config_descriptor *primaryConfig;
     libusb_get_active_config_descriptor (primaryDevice,&primaryConfig);
     const struct libusb_interface *interfaces = primaryConfig->interface;
-    printf("%d Interfaces found",primaryConfig->bNumInterfaces);
-
+    int numInterfaces = primaryConfig->bNumInterfaces;
+    printf("%d Interfaces found\n",primaryConfig->bNumInterfaces);
+    listInterfaces(interfaces,numInterfaces);
     /*
     printf("Claim Interface\n");
     returned = libusb_claim_interface(primaryDeviceHandle,0);
