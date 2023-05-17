@@ -29,7 +29,19 @@ int list_devices() {
 			desc_code, libusb_error_name(desc_code));
 		}else
 		{
-			//open devie and obtain a handle
+                        // Print full descriptor (doesn't require comunicating with device)
+                        printf("  Descriptor type: %d\n", desc.bDescriptorType);
+                        printf("  USB version: %d\n", desc.bcdUSB);
+                        printf("  Class: %d\n", desc.bDeviceClass);
+                        printf("  Subclass: %d\n", desc.bDeviceSubClass);
+                        printf("  Protocol: %d\n", desc.bDeviceProtocol);
+                        printf("  Max packet size: %d\n", desc.bMaxPacketSize0);
+                        printf("  Vendor ID: %d\n", desc.idVendor);
+                        printf("  Product ID: %d\n", desc.idProduct);
+                        printf("  Device version: %d\n", desc.bcdDevice);
+                        printf("  Configurations: %d\n", desc.bNumConfigurations);
+
+			//open device and obtain a handle
 			struct libusb_device_handle* handle;
 			int open_code = libusb_open(devices[i], &handle);
 			if (open_code != 0)
