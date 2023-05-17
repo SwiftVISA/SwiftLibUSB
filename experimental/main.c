@@ -139,7 +139,8 @@ int operate_primary_device() {
     
 
 	unsigned char endpoint = 0;
-	unsigned char *data = "OUTPUT ON\n";
+	unsigned char *data = "*IDN?\n";
+    unsigned char response[256];
 	int transfered = 0;
     int length = strlen(data);
     printf("Attempting Transfer of message '%s' with length %d\n",data,length);
@@ -147,6 +148,11 @@ int operate_primary_device() {
 	returned = libusb_bulk_transfer(primaryDeviceHandle,1,data,length,&transfered,0);
 	printf("Returned value %d with codename %s\n",returned,libusb_error_name(returned));
 	printf("Bytes Transfered: %d\n",transfered);
+        returned = libusb_bulk_transfer(primaryDeviceHandle, 129, response, 255, &transfered, 0);
+	printf("Returned value %d with codename %s\n",returned,libusb_error_name(returned));
+	printf("Bytes Transfered: %d\n",transfered);
+    response[transfered] = 0;
+	printf("Response: '%s'\n", response);        
 	libusb_close(primaryDeviceHandle);
 
     libusb_free_config_descriptor(primaryConfig);
