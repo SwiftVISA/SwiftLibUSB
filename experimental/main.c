@@ -102,6 +102,11 @@ int list_devices()
                         printf("Desired Device Found\n");
                         primaryDeviceHandle = handle; //save to global variable
                         primaryDevice = devices[i];
+                        
+#ifdef __linux__
+						//set auto detach and reattach kernel driver on linux
+						libusb_set_auto_detach_kernel_driver(handle, 1);
+#endif
                     }
                     else
                     {
@@ -187,16 +192,6 @@ int operate_primary_device() {
     printf("%d Interfaces found\n", primaryConfig->bNumInterfaces);
     listInterfaces(interfaces, numInterfaces);
     
-#ifdef __linux__
-	//try to detatch kernel driver on linux in order to claim interface
-	int detach_kd_code = libusb_detach_kernel_driver(primaryDeviceHandle, 0);
-	if(detach_kd_code != 0 && detach_kd_code != LIBUSB_ERROR_NOT_FOUND)
-	{
-		printf("Error detatching kernel driver, error code: , error str: %s\n",
-			detach_kd_code, libusb_error_name(detach_kd_code));
-	}
-#endif
-    
     printf("Claim Interface\n");
     returned = libusb_claim_interface(primaryDeviceHandle, 0);
     printf("Returned value %d\n", returned);
@@ -226,11 +221,6 @@ int operate_primary_device() {
 		Sleep(timeout+1000);
 	#endif
 	*/
-	
-#ifdef __linux__
-	//need to reattach the kernel driver on linux before we free stuff
-	libusb_attach_kernel_driver(primaryDeviceHandle, 0);
-#endif	
 
 	printf("Sleep elapsed, closing\n");
     libusb_close(primaryDeviceHandle);
