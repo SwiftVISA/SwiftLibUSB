@@ -9,18 +9,18 @@
 #include <string.h>
 
 // Constant variables
-static const char* deviceName = "E36103B";
+static const char *deviceName = "E36103B";
 static libusb_device_handle *primaryDeviceHandle;
 static libusb_device *primaryDevice;
 
-const char* TRANSFER_TYPES[4] = {
+const char *TRANSFER_TYPES[4] = {
     "Control",
     "Isochronous",
     "Bulk",
     "Interrupt"
 };
 
-const char* DIRECTIONS[2] = {
+const char *DIRECTIONS[2] = {
     "Out",
     "In"
 };
@@ -29,7 +29,7 @@ const char* DIRECTIONS[2] = {
 int list_devices()
 {
     // This will store the list of devices. It is allocated by libusb
-    libusb_device** devices;
+    libusb_device **devices;
 
     // The first argument could be a context, if we cared about not sharing sessions.
     ssize_t count = libusb_get_device_list(NULL, &devices);
@@ -116,31 +116,39 @@ int list_devices()
     return 0;
 }
 
+int printEndpoint(int index, const struct libusb_endpoint_descriptor endpoint){
+	printf(" - Endpoint %d: Attributes(%d), Address(%d)\n",
+		index, endpoint.bmAttributes, endpoint.bEndpointAddress);
+	printf("      Transfer type: %s\n", TRANSFER_TYPES[endpoint.bmAttributes&3]);
+	printf("      Direction: %s\n", DIRECTIONS[endpoint.bEndpointAddress >> 7]);
+	printf("      Max Packet Size: %d\n", endpoint.wMaxPacketSize);
+	printf("      Polling interval: %d\n", endpoint.bInterval);
+}
+int printAltSetting(int index, const struct libusb_interface_descriptor altSetting){
+	printf("Interface Number %d: bLength: %d\n", index, altSetting.bLength);
+	printf("                     bDescriptorType: %d\n", altSetting.bDescriptorType);
+	printf("                     bInterfaceNumber: %d\n", altSetting.bInterfaceNumber);
+	printf("                     bAlternateSetting: %d\n", altSetting.bAlternateSetting);
+	printf("                     bNumEndpoints: %d\n", altSetting.bNumEndpoints);
+	printf("                     bInterfaceClass: %d\n", altSetting.bInterfaceClass);
+	printf("                     bInterfaceSubClass: %d\n", altSetting.bInterfaceSubClass);
+	printf("                     bInterfaceProtocol: %d\n", altSetting.bInterfaceProtocol);
+	printf("                     iInterface: %d\n", altSetting.iInterface);
+	for(int endpointIndex = 0; endpointIndex < altSetting.bNumEndpoints; endpointIndex++){
+		printEndpoint(endpointIndex,altSetting.endpoint[endpointIndex]);
+	}
+}
+
+int printInterface(int index, const struct libusb_interface interface){
+	int numAltSettings = interface.num_altsetting;
+	printf("%d) Interface with %d altsettings: \n", index, numAltSettings);
+    for(int altsettingIndex = 0; altsettingIndex < numAltSettings; altsettingIndex++){
+		printAltSetting(altsettingIndex, interface.altsetting[altsettingIndex]);
+    }
+}
 int listInterfaces(const struct libusb_interface* interfaces, int numberInterfaces){
-    for (int i = 0; i < numberInterfaces; i++){
-        int numAltSettings = interfaces[i].num_altsetting;
-        printf("%d) Interface with %d altsettings: \n", i, numAltSettings);
-        for(int j = 0; j < numAltSettings; j++){
-            const struct libusb_interface_descriptor *altSetting = interfaces[i].altsetting;
-            printf("Interface Number %d: bLength: %d\n", i, altSetting->bLength);
-            printf("                     bDescriptorType: %d\n", altSetting->bDescriptorType);
-            printf("                     bInterfaceNumber: %d\n", altSetting->bInterfaceNumber);
-            printf("                     bAlternateSetting: %d\n", altSetting->bAlternateSetting);
-            printf("                     bNumEndpoints: %d\n", altSetting->bNumEndpoints);
-            printf("                     bInterfaceClass: %d\n", altSetting->bInterfaceClass);
-            printf("                     bInterfaceSubClass: %d\n", altSetting->bInterfaceSubClass);
-            printf("                     bInterfaceProtocol: %d\n", altSetting->bInterfaceProtocol);
-            printf("                     iInterface: %d\n", altSetting->iInterface);
-            const struct libusb_endpoint_descriptor* endpoints = altSetting->endpoint;
-            for(int k = 0; k < altSetting->bNumEndpoints; k++){
-                printf(" - Endpoint %d: Attributes(%d), Address(%d)\n",
-                       k, endpoints[k].bmAttributes, endpoints[k].bEndpointAddress);
-                printf("      Transfer type: %s\n", TRANSFER_TYPES[endpoints[k].bmAttributes&3]);
-                printf("      Direction: %s\n", DIRECTIONS[endpoints[k].bEndpointAddress >> 7]);
-                printf("      Max Packet Size: %d\n", endpoints[k].wMaxPacketSize);
-                printf("      Polling interval: %d\n", endpoints[k].bInterval);
-            }
-        }
+    for (int interfaceIndex = 0; interfaceIndex < numberInterfaces; interfaceIndex++){
+        printInterface(interfaceIndex,interfaces[interfaceIndex]);
     }
 }
 
