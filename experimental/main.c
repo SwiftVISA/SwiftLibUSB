@@ -13,6 +13,18 @@ static const char* deviceName = "E36103B";
 static libusb_device_handle *primaryDeviceHandle;
 static libusb_device *primaryDevice;
 
+const char *TRANSFER_TYPES[4] = {
+    "Control",
+    "Isochronous",
+    "Bulk",
+    "Interrupt"
+};
+
+const char *DIRECTIONS[2] = {
+    "Out",
+    "In"
+};
+
 // Prints the port each device is plugged into
 int list_devices()
 {
@@ -123,6 +135,9 @@ int listInterfaces(const struct libusb_interface *interfaces, int numberInterfac
             for(int k = 0; k < altSetting->bNumEndpoints; k++){
                 printf(" - Endpoint %d: Attributes(%d), Address(%d)\n",
                        k, endpoints[k].bmAttributes, endpoints[k].bEndpointAddress);
+                printf("      Transfer type: %s\n", TRANSFER_TYPES[endpoints[k].bmAttributes&3]);
+                printf("      Direction: %s\n", DIRECTIONS[endpoints[k].bEndpointAddress >> 7]);
+                printf("      Max Packet Size: %d\n", endpoints[k].wMaxPacketSize);
             }
         }
     }
