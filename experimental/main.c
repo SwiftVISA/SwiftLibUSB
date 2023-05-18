@@ -211,10 +211,18 @@ int operate_primary_device() {
     // Get the list of interfaces on the current configuration
     printf("Getting config_descriptor\n");
     struct libusb_config_descriptor* primaryConfig;
+    
     int config_desc_code = libusb_get_active_config_descriptor (primaryDevice, &primaryConfig);
+    printf("get active config descriptor returned: %d\n", config_desc_code);
+    if(config_desc_code != 0)
+    {
+		printf("Error getting active config descriptor, error str: %s\n",
+			libusb_error_name(config_desc_code));
+			return -1;
+	}
+    
     const struct libusb_interface* interfaces = primaryConfig->interface;
     int numInterfaces = primaryConfig->bNumInterfaces;
-    printf("get active config descriptor returned: %d\n", config_desc_code);
     printf("%d Interfaces found\n", primaryConfig->bNumInterfaces);
     listInterfaces(interfaces, numInterfaces);
     
