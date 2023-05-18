@@ -200,13 +200,13 @@ int operate_primary_device() {
 	callbackReturned = 0;
 	printf("transfer returned %d\n",libusb_submit_transfer(transfer));
 	
+	//libusb_wait_for_event(NULL,NULL);
 	libusb_handle_events_completed(NULL, &callbackReturned);
-
-	Sleep(timeout+1000);
-	printf("Sleep elapsed, closing\n");
-    libusb_close(primaryDeviceHandle);
+	printf("Events handled\n");
 	libusb_release_interface(primaryDeviceHandle,0);
     libusb_free_config_descriptor(primaryConfig);
+    libusb_close(primaryDeviceHandle);
+	printf("Closed connection\n");
 }
 
 int main() {
