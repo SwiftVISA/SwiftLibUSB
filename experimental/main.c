@@ -223,8 +223,9 @@ int operate_primary_device() {
     printf("Returned value %d\n", returned);
 
 	// Activate alt setting
-	libusb_set_interface_alt_setting(primaryDeviceHandle,0,0);
-
+	int alt_error_code = libusb_set_interface_alt_setting(primaryDeviceHandle,0,0);
+	printf("Set interface alt setting, returned %d",alt_error_code);
+	
 	int timeout = 1000;
 	message("OUTPUT ON\n",timeout,1);
 	//perform propor sleep function depending on os
