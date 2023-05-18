@@ -1,0 +1,106 @@
+Initialized successfully
+Device connected on port 0
+  Descriptor type: 1
+  USB version: 784
+  Class: 9
+  Subclass: 0
+  Protocol: 3
+  Max packet size: 9
+  Vendor ID: 7531
+  Product ID: 3
+  Device version: 1539
+  Configurations: 1
+Error opening device, error code: -3, error str: LIBUSB_ERROR_ACCESS
+
+Device connected on port 6
+  Descriptor type: 1
+  USB version: 512
+  Class: 239
+  Subclass: 2
+  Protocol: 1
+  Max packet size: 64
+  Vendor ID: 5967
+  Product ID: 9254
+  Device version: 264
+  Configurations: 1
+Error opening device, error code: -3, error str: LIBUSB_ERROR_ACCESS
+
+Device connected on port 10
+  Descriptor type: 1
+  USB version: 513
+  Class: 224
+  Subclass: 1
+  Protocol: 1
+  Max packet size: 64
+  Vendor ID: 3315
+  Product ID: 58624
+  Device version: 1
+  Configurations: 1
+Error opening device, error code: -3, error str: LIBUSB_ERROR_ACCESS
+
+Device connected on port 1
+  Descriptor type: 1
+  USB version: 512
+  Class: 0
+  Subclass: 0
+  Protocol: 0
+  Max packet size: 64
+  Vendor ID: 10893
+  Product ID: 5634
+  Device version: 256
+  Configurations: 1
+Device Product Descriptor: 'E36103B'
+Desired Device Found
+
+Device connected on port 0
+  Descriptor type: 1
+  USB version: 512
+  Class: 9
+  Subclass: 0
+  Protocol: 1
+  Max packet size: 64
+  Vendor ID: 7531
+  Product ID: 2
+  Device version: 1539
+  Configurations: 1
+Error opening device, error code: -3, error str: LIBUSB_ERROR_ACCESS
+
+Operating device E36103B
+Attempting Configuration
+Returned value -6
+Getting config_descriptor
+1 Interfaces found
+0) Interface with 1 altsettings: 
+Interface Number 0: bLength: 9
+                     bDescriptorType: 4
+                     bInterfaceNumber: 0
+                     bAlternateSetting: 0
+                     bNumEndpoints: 3
+                     bInterfaceClass: 254
+                     bInterfaceSubClass: 3
+                     bInterfaceProtocol: 1
+                     iInterface: 0
+ - Endpoint 0: Attributes(3), Address(130)
+      Transfer type: Interrupt
+      Direction: In
+      Max Packet Size: 8
+      Polling interval: 1
+ - Endpoint 1: Attributes(2), Address(1)
+      Transfer type: Bulk
+      Direction: Out
+      Max Packet Size: 64
+      Polling interval: 1
+ - Endpoint 2: Attributes(2), Address(129)
+      Transfer type: Bulk
+      Direction: In
+      Max Packet Size: 64
+      Polling interval: 1
+Claim Interface
+Returned value -6
+Attempting Transfer of message '*IDN?
+' with length 6
+Returned value -1 with codename LIBUSB_ERROR_IO
+Bytes Transfered: 0
+Returned value -1 with codename LIBUSB_ERROR_IO
+Bytes Transfered: 0
+Response: ''
