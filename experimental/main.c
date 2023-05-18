@@ -162,7 +162,22 @@ void LIBUSB_CALL callback(struct libusb_transfer *info){
 	printf("callback with status %d, %d/%d bytes sent\n",info->status,info->actual_length,info->length);
 	callbackReturned = 1;
 }
-
+int message(unsigned char *data,int timeout){
+	// Generate transfer
+    struct libusb_transfer *transfer = libusb_alloc_transfer(0);
+	unsigned char endpoint = 1;
+    int length = strlen(data);
+    printf("Attempting Transfer of message '%s' with length %d\n",data,length);
+	libusb_fill_bulk_transfer(transfer,primaryDeviceHandle,endpoint,data,length,&callback,0,timeout);
+	
+	// Send Transfer
+	callbackReturned = 0;
+	printf("transfer returned %d\n",libusb_submit_transfer(transfer));
+	
+	//libusb_wait_for_event(NULL,NULL);
+	libusb_handle_events_completed(NULL, &callbackReturned);
+	printf("Events handled\n");
+}
 int operate_primary_device() {
     printf("Operating device %s\n",deviceName);
     if(primaryDeviceHandle == NULL){
@@ -200,35 +215,23 @@ int operate_primary_device() {
     printf("Claim Interface\n");
     returned = libusb_claim_interface(primaryDeviceHandle, 0);
     printf("Returned value %d\n", returned);
-    
-    // Generate transfer
-    struct libusb_transfer *transfer = libusb_alloc_transfer(0);
-	int timeout = 3000;
-	unsigned char endpoint = 1;
-    unsigned char *data = "OUTPUT ON\n";
-    int length = strlen(data);
-    printf("Attempting Transfer of message '%s' with length %d\n",data,length);
-	libusb_fill_bulk_transfer(transfer,primaryDeviceHandle,endpoint,data,length,&callback,0,timeout);
-	
-	// Send Transfer
-	callbackReturned = 0;
-	printf("transfer returned %d\n",libusb_submit_transfer(transfer));
-	
-	//libusb_wait_for_event(NULL,NULL);
-	libusb_handle_events_completed(NULL, &callbackReturned);
-	printf("Events handled\n");
-
-	/*
-	//perform propor sleep function depending on os
-	#ifdef __linux__
-		sleep(timeout+1000);
-	#else
-		Sleep(timeout+1000);
-	#endif
-	*/
-
-	printf("Sleep elapsed, closing\n");
-    libusb_close(primaryDeviceHandle);
+    int timeout = 3000;
+	for(int i = 0; i < 3; i++){
+		message("OUTPut ON",timeout);
+		//perform propor sleep function depending on os
+		#ifdef __linux__
+			sleep(timeout+1000);
+		#else
+			Sleep(timeout+1000);
+		#endif
+		message("OUTPut OFF",timeout);
+		#ifdef __linux__
+			sleep(timeout+1000);
+		#else
+			Sleep(timeout+1000);
+		#endif
+	}
+	printf("Closing\n");
 	libusb_release_interface(primaryDeviceHandle,0);
     libusb_free_config_descriptor(primaryConfig);
     libusb_close(primaryDeviceHandle);
