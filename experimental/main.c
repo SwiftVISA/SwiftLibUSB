@@ -31,7 +31,7 @@ const char *DIRECTIONS[2] = {
 
 void genericSleep(int duration){
 	#ifdef __linux__
-		sleep(duration);
+		sleep(duration / 1000);
 	#else
 		Sleep(duration);
 	#endif
@@ -211,9 +211,10 @@ int operate_primary_device() {
     // Get the list of interfaces on the current configuration
     printf("Getting config_descriptor\n");
     struct libusb_config_descriptor* primaryConfig;
-    libusb_get_active_config_descriptor (primaryDevice, &primaryConfig);
+    int config_desc_code = libusb_get_active_config_descriptor (primaryDevice, &primaryConfig);
     const struct libusb_interface* interfaces = primaryConfig->interface;
     int numInterfaces = primaryConfig->bNumInterfaces;
+    printf("get active config descriptor returned: %d\n", config_desc_code);
     printf("%d Interfaces found\n", primaryConfig->bNumInterfaces);
     listInterfaces(interfaces, numInterfaces);
     
