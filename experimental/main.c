@@ -13,14 +13,14 @@ static const char* deviceName = "E36103B";
 static libusb_device_handle *primaryDeviceHandle;
 static libusb_device *primaryDevice;
 
-const char *TRANSFER_TYPES[4] = {
+const char* TRANSFER_TYPES[4] = {
     "Control",
     "Isochronous",
     "Bulk",
     "Interrupt"
 };
 
-const char *DIRECTIONS[2] = {
+const char* DIRECTIONS[2] = {
     "Out",
     "In"
 };
@@ -29,7 +29,7 @@ const char *DIRECTIONS[2] = {
 int list_devices()
 {
     // This will store the list of devices. It is allocated by libusb
-    libusb_device **devices;
+    libusb_device** devices;
 
     // The first argument could be a context, if we cared about not sharing sessions.
     ssize_t count = libusb_get_device_list(NULL, &devices);
@@ -116,7 +116,7 @@ int list_devices()
     return 0;
 }
 
-int listInterfaces(const struct libusb_interface *interfaces, int numberInterfaces){
+int listInterfaces(const struct libusb_interface* interfaces, int numberInterfaces){
     for (int i = 0; i < numberInterfaces; i++){
         int numAltSettings = interfaces[i].num_altsetting;
         printf("%d) Interface with %d altsettings: \n", i, numAltSettings);
@@ -131,7 +131,7 @@ int listInterfaces(const struct libusb_interface *interfaces, int numberInterfac
             printf("                     bInterfaceSubClass: %d\n", altSetting->bInterfaceSubClass);
             printf("                     bInterfaceProtocol: %d\n", altSetting->bInterfaceProtocol);
             printf("                     iInterface: %d\n", altSetting->iInterface);
-            const struct libusb_endpoint_descriptor *endpoints = altSetting->endpoint;
+            const struct libusb_endpoint_descriptor* endpoints = altSetting->endpoint;
             for(int k = 0; k < altSetting->bNumEndpoints; k++){
                 printf(" - Endpoint %d: Attributes(%d), Address(%d)\n",
                        k, endpoints[k].bmAttributes, endpoints[k].bEndpointAddress);
@@ -161,9 +161,9 @@ int operate_primary_device() {
 
     // Get the list of interfaces on the current configuration
     printf("Getting config_descriptor\n");
-    struct libusb_config_descriptor *primaryConfig;
+    struct libusb_config_descriptor* primaryConfig;
     libusb_get_active_config_descriptor (primaryDevice, &primaryConfig);
-    const struct libusb_interface *interfaces = primaryConfig->interface;
+    const struct libusb_interface* interfaces = primaryConfig->interface;
     int numInterfaces = primaryConfig->bNumInterfaces;
     printf("%d Interfaces found\n", primaryConfig->bNumInterfaces);
     listInterfaces(interfaces, numInterfaces);
