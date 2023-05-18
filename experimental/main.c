@@ -152,13 +152,20 @@ int listInterfaces(const struct libusb_interface* interfaces, int numberInterfac
     }
 }
 
+static int callbackReturned;
+
+void LIBUSB_CALL callback(struct libusb_transfer *info){
+	printf("callback with status %d, %d/%d bytes sent\n",info->status,info->actual_length,info->length);
+	callbackReturned = 1;
+}
+
 int operate_primary_device() {
     printf("Operating device %s\n",deviceName);
     if(primaryDeviceHandle == NULL){
         printf("Cannot Transfer, device handler was not initialised\n");
         return -1;
     }
-
+	
     printf("Attempting Configuration\n");
     int returned; 
     // This may not need to happen, or if it does return 0 other behavior might need changing
@@ -180,25 +187,25 @@ int operate_primary_device() {
     returned = libusb_claim_interface(primaryDeviceHandle, 0);
     printf("Returned value %d\n", returned);
     
-    // Data for the message and response
-    unsigned char endpoint = 0;
-    unsigned char *data = "*IDN?\n";
-    unsigned char response[256];
-    int transferred = 0;
+    // Generate transfer
+    struct libusb_transfer *transfer = libusb_alloc_transfer(0);
+	int timeout = 3000;
+	unsigned char endpoint = 1;
+    unsigned char *data = "OUTPUT ON\n";
     int length = strlen(data);
     printf("Attempting Transfer of message '%s' with length %d\n",data,length);
-    
-    // Attempt to send the message
-    returned = libusb_bulk_transfer(primaryDeviceHandle, 1, data, length, &transferred, 0);
-    printf("Returned value %d with codename %s\n", returned, libusb_error_name(returned));
-    printf("Bytes Transfered: %d\n",transferred);
-    returned = libusb_bulk_transfer(primaryDeviceHandle, 129, response, 255, &transferred, 0);
-    printf("Returned value %d with codename %s\n", returned, libusb_error_name(returned));
-    printf("Bytes Transfered: %d\n",transferred);
-    response[transferred] = 0;
-    printf("Response: '%s'\n", response);        
-    libusb_close(primaryDeviceHandle);
+	libusb_fill_bulk_transfer(transfer,primaryDeviceHandle,endpoint,data,length,&callback,0,timeout);
+	
+	// Send Transfer
+	callbackReturned = 0;
+	printf("transfer returned %d\n",libusb_submit_transfer(transfer));
+	
+	libusb_handle_events_completed(NULL, &callbackReturned);
 
+	Sleep(timeout+1000);
+	printf("Sleep elapsed, closing\n");
+    libusb_close(primaryDeviceHandle);
+	libusb_release_interface(primaryDeviceHandle,0);
     libusb_free_config_descriptor(primaryConfig);
 }
 
@@ -209,8 +216,7 @@ int main() {
         printf("Initialized successfully\n");
         int listerr = list_devices();
         if (listerr != 0)
-        {
-             libusb_exit(NULL);
+		{
              return 1;
         }
         // attempt to communicate with device
