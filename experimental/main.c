@@ -191,6 +191,9 @@ int message(unsigned char *data,int timeout,char endpoint){
 	
 	//libusb_wait_for_event(NULL,NULL);
 	libusb_handle_events_completed(NULL, &callbackReturned);
+	
+	// Clear the transfer
+	libusb_free_transfer(transfer);
 	printf("Events handled\n");
 }
 int operate_primary_device() {
@@ -232,8 +235,8 @@ int operate_primary_device() {
 
 	// Activate alt setting
 	int alt_error_code = libusb_set_interface_alt_setting(primaryDeviceHandle,0,0);
-	printf("Set interface alt setting, returned %d",alt_error_code);
-	
+	printf("Set interface alt setting, returned %d\n",alt_error_code);
+
 	int timeout = 1000;
 	message("OUTPUT ON\n",timeout,1);
 	//perform propor sleep function depending on os
