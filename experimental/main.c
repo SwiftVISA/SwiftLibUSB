@@ -138,6 +138,7 @@ int listInterfaces(const struct libusb_interface *interfaces, int numberInterfac
                 printf("      Transfer type: %s\n", TRANSFER_TYPES[endpoints[k].bmAttributes&3]);
                 printf("      Direction: %s\n", DIRECTIONS[endpoints[k].bEndpointAddress >> 7]);
                 printf("      Max Packet Size: %d\n", endpoints[k].wMaxPacketSize);
+                printf("      Polling interval: %d\n", endpoints[k].bInterval);
             }
         }
     }
