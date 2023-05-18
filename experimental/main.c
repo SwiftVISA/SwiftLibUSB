@@ -8,6 +8,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#ifdef __linux__
+#include <unistd.h>
+#endif
+
 // Constant variables
 static const char *deviceName = "E36103B";
 static libusb_device_handle *primaryDeviceHandle;
@@ -183,6 +187,16 @@ int operate_primary_device() {
     printf("%d Interfaces found\n", primaryConfig->bNumInterfaces);
     listInterfaces(interfaces, numInterfaces);
     
+#ifdef __linux__
+	//try to detatch kernel driver on linux in order to claim interface
+	int detach_kd_code = libusb_detach_kernel_driver(primaryDeviceHandle, 0);
+	if(detach_kd_code != 0 && detach_kd_code != LIBUSB_ERROR_NOT_FOUND)
+	{
+		printf("Error detatching kernel driver, error code: , error str: %s\n",
+			detach_kd_code, libusb_error_name(detach_kd_code));
+	}
+#endif
+    
     printf("Claim Interface\n");
     returned = libusb_claim_interface(primaryDeviceHandle, 0);
     printf("Returned value %d\n", returned);
@@ -202,7 +216,12 @@ int operate_primary_device() {
 	
 	libusb_handle_events_completed(NULL, &callbackReturned);
 
+	//perform propor sleep function depending on os
+#ifdef __linux__
+	sleep(timeout+1000);
+#else
 	Sleep(timeout+1000);
+#endif
 	printf("Sleep elapsed, closing\n");
     libusb_close(primaryDeviceHandle);
 	libusb_release_interface(primaryDeviceHandle,0);
