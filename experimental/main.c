@@ -29,6 +29,13 @@ const char *DIRECTIONS[2] = {
     "In"
 };
 
+void genericSleep(int duration){
+	#ifdef __linux__
+		sleep(duration);
+	#else
+		Sleep(duration);
+	#endif
+}
 // Prints the port each device is plugged into
 int list_devices()
 {
@@ -164,13 +171,16 @@ int listInterfaces(const struct libusb_interface* interfaces, int numberInterfac
 static int callbackReturned;
 
 void LIBUSB_CALL callback(struct libusb_transfer *info){
-	printf("callback with status %d, %d/%d bytes sent\n",info->status,info->actual_length,info->length);
+	printf("callback for command for %d packets of type %d to endpoint %d with status %d, %d/%d bytes sent\n"
+		,info->num_iso_packets,info->type,info->endpoint,info->status,info->actual_length,info->length);
 	callbackReturned = 1;
 }
-int message(unsigned char *data,int timeout){
+int message(unsigned char *data,int timeout,char endpoint){
+	// Clear any haults on the endpoint
+	libusb_clear_halt(primaryDeviceHandle,endpoint);
+
 	// Generate transfer
     struct libusb_transfer *transfer = libusb_alloc_transfer(0);
-	unsigned char endpoint = 1;
     int length = strlen(data);
     printf("Attempting Transfer of message '%s' with length %d\n",data,length);
 	libusb_fill_bulk_transfer(transfer,primaryDeviceHandle,endpoint,data,length,&callback,0,timeout);
@@ -210,22 +220,13 @@ int operate_primary_device() {
     printf("Claim Interface\n");
     returned = libusb_claim_interface(primaryDeviceHandle, 0);
     printf("Returned value %d\n", returned);
-    int timeout = 3000;
-	for(int i = 0; i < 3; i++){
-		message("OUTPut ON",timeout);
-		//perform propor sleep function depending on os
-		#ifdef __linux__
-			sleep(timeout+1000);
-		#else
-			Sleep(timeout+1000);
-		#endif
-		message("OUTPut OFF",timeout);
-		#ifdef __linux__
-			sleep(timeout+1000);
-		#else
-			Sleep(timeout+1000);
-		#endif
-	}
+
+	int timeout = 1000;
+	message("OUTPUT ON\n",timeout,1);
+	//perform propor sleep function depending on os
+	genericSleep(timeout+1000);
+	
+	
 	printf("Closing\n");
 	libusb_release_interface(primaryDeviceHandle,0);
     libusb_free_config_descriptor(primaryConfig);
