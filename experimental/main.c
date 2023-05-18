@@ -226,6 +226,11 @@ int operate_primary_device() {
 		Sleep(timeout+1000);
 	#endif
 	*/
+	
+#ifdef __linux__
+	//need to reattach the kernel driver on linux before we free stuff
+	libusb_attach_kernel_driver(primaryDeviceHandle, 0);
+#endif	
 
 	printf("Sleep elapsed, closing\n");
     libusb_close(primaryDeviceHandle);
