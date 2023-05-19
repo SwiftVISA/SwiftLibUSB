@@ -4,6 +4,26 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+bool parse_num(const char* str, unsigned short *value)
+{
+    *value = 0;
+
+    while (str[0] != 0)
+    {
+        if ('0' <= str[0] && str[0] <= '9')
+        {
+            *value *= 10;
+            *value += (str[0] - '0');
+        }
+        else
+        {
+            return false;
+        }
+        str++;
+    }
+    return true;
+}
+
 int process_args(int argc, char** argv, struct arg_info* ret)
 {
 	if (argc != 7)
@@ -20,12 +40,18 @@ int process_args(int argc, char** argv, struct arg_info* ret)
 	{
 		if(strcmp(argv[i], "-v") == 0 || strcmp(argv[i], "-V") == 0) //vendor id
 		{
-			ret->vendor_id = atoi(argv[i+1]);
-			did_v = true;
+			did_v = parse_num(argv[i+1], &ret->vendor_id);
+			if (!did_v) {
+                            printf("Argument error: vendor id must be a number, not '%s'\n", argv[i+1]);
+                            return ARGPROC_ERROR;
+                        }
 		}else if(strcmp(argv[i], "-p") == 0 || strcmp(argv[i], "-P") == 0) //product id
 		{
-			ret->product_id = atoi(argv[i+1]);
-			did_p = true;
+			did_p = parse_num(argv[i+1], &ret->product_id);
+			if (!did_v) {
+                            printf("Argument error: product id must be a number, not '%s'\n", argv[i+1]);
+                            return ARGPROC_ERROR;
+                        }
 		}else if(strcmp(argv[i], "-c") == 0 || strcmp(argv[i], "-C") == 0) //command
 		{
 			ret->needs_response = false;
