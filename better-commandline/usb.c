@@ -2,6 +2,8 @@
 
 // Constants
 #define timeout 10000 // The amount of time to wait before giving up on a message. Measured in milliseconds.
+#define writeTo 1 // Code to write to a device
+#define readFrom 2 // Code to read from a device
 
 // Private variables //TODO: Integrate into usb.h usb struct.
 int callbackReturned; // Has the callback function been executed or the most recent command
@@ -26,7 +28,7 @@ int raw_write(struct usb_data *usb, const unsigned char *data,char endpoint,unsi
     int length = strlen(data);
 
     // Assign bits
-    int size = 12 + strlen(data);
+    int size = 13 + strlen(data);
     size = size + ((4 - (size % 4)) % 4);
     unsigned char *message = (unsigned char *) malloc(size * sizeof(char));
     memset(message, 0, size);
@@ -39,8 +41,9 @@ int raw_write(struct usb_data *usb, const unsigned char *data,char endpoint,unsi
     message[6] = (length >> 16) & 0xFF;
     message[7] = (length >> 24) & 0xFF;
     message[8] = 1;
-    // 9, 10, 11 are padding
+    // 9, 10, and 11 are padding
     strcpy(message+12,data);
+    message[12+length] = '\n';
     
     libusb_fill_bulk_transfer(transfer,deviceHandle,endpoint,message,size,&callback,0,timeout);
 	
@@ -68,7 +71,7 @@ int usb_connect(unsigned short vendor_id, unsigned short product_id, struct usb_
 }
 
 int usb_write(struct usb_data *usb, const char *message) {
-    return raw_write(usb,message,usb->out_endpoint,1);
+    return raw_write(usb,message,usb->out_endpoint,writeTo);
 }
 
 int usb_read(struct usb_data *usb, char *buffer, unsigned int size) {
