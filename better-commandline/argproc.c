@@ -87,5 +87,5 @@ int process_args(int argc, char** argv, struct arg_info* ret)
 		return ARGPROC_ERROR;
 	}
 	
-	return ARGPROC_SUCESS;
+	return ARGPROC_success;
 }

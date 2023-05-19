@@ -6,7 +6,7 @@
 struct usb_data {
     struct libusb_device_handle *handle;
     unsigned char out_endpoint;
-    unsigned char in_endpoint;
+    unsigned char in_endpoint; 
 };
 
 int usb_connect(unsigned short vendor_id, unsigned short product_id, struct usb_data *usb);
