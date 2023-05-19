@@ -183,18 +183,23 @@ int message(unsigned char *data,int timeout,char endpoint,unsigned char messageT
 
 	// Generate transfer
     struct libusb_transfer *transfer = libusb_alloc_transfer(0);
-    unsigned char length = strlen(data);
+    int length = strlen(data);
 
-    int size = 9 + strlen(data);
+    int size = 12 + strlen(data);
     size = size + ((4 - (size % 4)) % 4);
     unsigned char message[size];
     memset(message, 0, size);
     message[0] = messageType;
     message[1] = messageIndex;
     message[2] = ~messageIndex;
-    message[8] = length;
-    message[7] = 1;
-    strcpy(message+9,data);
+    // message[3] is padding
+    message[4] = length & 0xFF;
+    message[5] = (length >> 8) & 0xFF;
+    message[6] = (length >> 16) & 0xFF;
+    message[7] = (length >> 24) & 0xFF;
+    message[8] = 1;
+    // 9, 10, 11 are padding
+    strcpy(message+12,data);
     for(int i = 0; i < size; i++){
         printf("%d ",message[i]);
     }
