@@ -48,7 +48,7 @@ int process_args(int argc, char** argv, struct arg_info* ret)
 		}else if(strcmp(argv[i], "-p") == 0 || strcmp(argv[i], "-P") == 0) //product id
 		{
 			did_p = parse_num(argv[i+1], &ret->product_id);
-			if (!did_v) {
+			if (!did_p) {
                             printf("Argument error: product id must be a number, not '%s'\n", argv[i+1]);
                             return ARGPROC_ERROR;
                         }
