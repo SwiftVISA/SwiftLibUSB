@@ -41,7 +41,7 @@ int raw_write(struct usb_data *usb, const unsigned char *data,char endpoint,unsi
     
     // Generate transfer
     struct libusb_transfer *transfer = libusb_alloc_transfer(0);
-    int length = strlen(data);
+    int length = strlen(data) + 1;
 
     // Assign bits
     int size = 13 + strlen(data);
@@ -59,7 +59,7 @@ int raw_write(struct usb_data *usb, const unsigned char *data,char endpoint,unsi
     message[8] = 1; // EOF bit
     // 9, 10, and 11 are padding
     strcpy(message+12,data);
-    message[12+length] = '\n';
+    message[11+length] = '\n';
     
     for(int i = 0; i < size; i++){
         printf("%d ",message[i]);
