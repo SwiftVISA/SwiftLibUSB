@@ -60,15 +60,12 @@ int raw_write(struct usb_data *usb, const unsigned char *data,char endpoint,unsi
     // 9, 10, and 11 are padding
     strcpy(message+12,data);
     message[11+length] = '\n';
-    
-    for(int i = 0; i < size; i++){
-        printf("%d ",message[i]);
-    }
 
     libusb_fill_bulk_transfer(transfer,deviceHandle,endpoint,message,size,&callback,0,timeout);
 	
 	// Send Transfer
 	callbackReturned = 0;
+    libusb_submit_transfer(transfer);
 	
 	//libusb_wait_for_event(NULL,NULL);
 	libusb_handle_events_completed(NULL, &callbackReturned);
@@ -147,17 +144,12 @@ int usb_connect(unsigned short vendor_id, unsigned short product_id, struct usb_
             int has_out = 0;
             int has_in = 0;
             const struct libusb_endpoint_descriptor *endpoints = config->interface[0].altsetting->endpoint;
-            printf("Looking for endpoints: Bulk: %d, Out: %d, In: %d\n", LIBUSB_ENDPOINT_TRANSFER_TYPE_BULK, LIBUSB_ENDPOINT_OUT, LIBUSB_ENDPOINT_IN);
             for (int j = 0; j < config->interface[0].altsetting->bNumEndpoints; j++) {
-                printf("DEBUG: endpoint found: attributes: %d, address: %d\n", endpoints[j].bmAttributes, endpoints[j].bEndpointAddress);
                 if ((endpoints[j].bmAttributes & 3) == LIBUSB_ENDPOINT_TRANSFER_TYPE_BULK) {
-                    printf("DEBUG: found bulk transfer endpoint\n");
                     if ((endpoints[j].bEndpointAddress >> 7) == LIBUSB_ENDPOINT_OUT) {
-                        printf("DEBUG: found out endpoint\n");
                         usb->out_endpoint = endpoints[j].bEndpointAddress;
                         has_out = 1;
                     } else {
-                        printf("DEBUG: found in endpoint\n");
                         usb->in_endpoint = endpoints[j].bEndpointAddress;
                         has_in = 1;
                     }
