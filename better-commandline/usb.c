@@ -193,7 +193,7 @@ int usb_write(struct usb_data *usb, const char *message) {
 }
 
 int usb_read(struct usb_data *usb, char *buffer, unsigned int size) {
-    return raw_write(usb,buffer,usb->in_endpoint,2);;
+    return raw_write(usb,buffer,usb->in_endpoint,readFrom);
 }
 
 int usb_close(struct usb_data *usb) {
