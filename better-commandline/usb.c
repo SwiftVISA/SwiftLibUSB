@@ -108,7 +108,7 @@ int usb_connect(unsigned short vendor_id, unsigned short product_id, struct usb_
             }
             
 #ifdef __linux__
-				libusb_detach_kernel_driver(usb->handle, 0);
+			libusb_set_auto_detach_kernel_driver(usb->handle, 1);
 #endif
             
             int configure_code = libusb_set_configuration(usb->handle, 0);
