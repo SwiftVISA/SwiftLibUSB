@@ -179,7 +179,7 @@ void LIBUSB_CALL callback(struct libusb_transfer *info){
 static unsigned char messageIndex = 1;
 int message(unsigned char *data,int timeout,char endpoint,unsigned char messageType){
 	// Clear any haults on the endpoint
-	libusb_clear_halt(primaryDeviceHandle,endpoint);
+	// libusb_clear_halt(primaryDeviceHandle,endpoint);
 
 	// Generate transfer
     struct libusb_transfer *transfer = libusb_alloc_transfer(0);
@@ -265,7 +265,7 @@ int operate_primary_device() {
 	printf("Set interface alt setting, returned %d\n",alt_error_code);
 
 	int timeout = 1000;
-	message("OUTPUT ON\n",timeout,1,2);
+	message("OUTPUT OFF\n",timeout,1,1);
 	//perform propor sleep function depending on os
 	genericSleep(timeout+1000);
 	
