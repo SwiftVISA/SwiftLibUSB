@@ -143,6 +143,7 @@ int usb_connect(unsigned short vendor_id, unsigned short product_id, struct usb_
             int has_in = 0;
             const struct libusb_endpoint_descriptor *endpoints = config->interface[0].altsetting->endpoint;
             for (int j = 0; j < config->interface[0].altsetting->bNumEndpoints; j++) {
+                printf("DEBUG: endpoint found: attributes: %d, address: %d\n", endpoints[j].bmAttributes, endpoints[j].bEndpointAddress);
                 if (endpoints[j].bmAttributes & 3 == LIBUSB_ENDPOINT_TRANSFER_TYPE_BULK) {
                     if (endpoints[j].bEndpointAddress >> 7 == LIBUSB_ENDPOINT_OUT) {
                         usb->out_endpoint = endpoints[j].bEndpointAddress;
@@ -182,7 +183,7 @@ int usb_write(struct usb_data *usb, const char *message) {
 }
 
 int usb_read(struct usb_data *usb, char *buffer, unsigned int size) {
-    return raw_write(usb,buffer,usb->in_endpoint,readFrom);
+    return raw_write(usb,buffer,usb->in_endpoint,2);;
 }
 
 int usb_close(struct usb_data *usb) {
