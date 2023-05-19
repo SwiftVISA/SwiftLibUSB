@@ -61,6 +61,10 @@ int raw_write(struct usb_data *usb, const unsigned char *data,char endpoint,unsi
     strcpy(message+12,data);
     message[12+length] = '\n';
     
+    for(int i = 0; i < size; i++){
+        printf("%d ",message[i]);
+    }
+
     libusb_fill_bulk_transfer(transfer,deviceHandle,endpoint,message,size,&callback,0,timeout);
 	
 	// Send Transfer
