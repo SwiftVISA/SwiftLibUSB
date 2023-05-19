@@ -50,6 +50,7 @@ int main(int argc, char** argv)
 		printf("%s\n", buff);
 	}
 	
+	usb_close(&device);
 	
 	return 0;
 }
