@@ -82,6 +82,11 @@ int raw_write(struct usb_data *usb, const unsigned char *data,char endpoint,unsi
 
 // .h methods
 int usb_connect(unsigned short vendor_id, unsigned short product_id, struct usb_data *usb) {
+    int init_error = libusb_init(NULL);
+    if (init_error != 0) {
+        printf("Failed to initialize libUSB");
+        return -1;
+    }
     libusb_device **devices;
     ssize_t count = libusb_get_device_list(NULL, &devices);
     if (count < 0) {
