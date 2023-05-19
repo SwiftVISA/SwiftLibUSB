@@ -1,5 +1,8 @@
-#include <stdio.h>
 #include "usb.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 // Constants
 #define timeout 10000 // The amount of time to wait before giving up on a message. Measured in milliseconds.
@@ -98,7 +101,7 @@ int usb_connect(unsigned short vendor_id, unsigned short product_id, struct usb_
                 return -1;
             }
 #ifdef __linux__
-            libusb_det_auto_detach_kernel_driver(usb->handle, 1);
+            libusb_set_auto_detach_kernel_driver(usb->handle, 1);
 #endif
             int configure_code = libusb_set_configuration(usb->handle, 0);
             if (configure_code != 0 && configure_code != -12) { // -12 means the OS configures the device
