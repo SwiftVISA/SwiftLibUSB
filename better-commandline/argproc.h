@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include <stdio.h>
 
 #define ARGPROC_SUCESS 0
 #define ARGPROC_ERROR -1
