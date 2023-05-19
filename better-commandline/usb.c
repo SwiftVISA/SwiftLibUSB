@@ -176,6 +176,7 @@ int usb_connect(unsigned short vendor_id, unsigned short product_id, struct usb_
                 libusb_free_device_list(devices, 1);
                 return -1;
             }
+            messageIndex = 1;
             libusb_free_config_descriptor(config);
             libusb_free_device_list(devices, 1);
             return 0;
