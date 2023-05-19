@@ -18,6 +18,18 @@ void LIBUSB_CALL callback(struct libusb_transfer *info){
     }
 }
 
+/* This method does the bulk of the logic for USB communication. 
+It takes the desired command, the endpoint to communicate with and the direction of communication as inputs
+It adds the neccesary header,newline and padding to correctly send messages 
+@Params:
+    usb: The usb device used for the connection. Must be connected first
+    data: The command to send to the device. Example: "OUTPUT ON"
+    endpoint: The address of the endpoint to send to, should be a bulk endpoint
+    messageType: The message type to include in the header. 1 is for sending 2 is for recieving
+@Returns:
+    int: 0 for success, -1 otherwise
+
+*/
 int raw_write(struct usb_data *usb, const unsigned char *data,char endpoint,unsigned char messageType){
 	struct libusb_device_handle *deviceHandle = usb->handle;
     
@@ -38,7 +50,7 @@ int raw_write(struct usb_data *usb, const unsigned char *data,char endpoint,unsi
     message[5] = (length >> 8) & 0xFF;
     message[6] = (length >> 16) & 0xFF;
     message[7] = (length >> 24) & 0xFF;
-    message[8] = 1;
+    message[8] = 1; // EOF bit
     // 9, 10, 11 are padding
     strcpy(message+12,data);
     
@@ -72,7 +84,7 @@ int usb_write(struct usb_data *usb, const char *message) {
 }
 
 int usb_read(struct usb_data *usb, char *buffer, unsigned int size) {
-    return -1;
+    return raw_write(usb,buffer,usb->in_endpoint,2);;
 }
 
 int usb_close(struct usb_data *usb) {
