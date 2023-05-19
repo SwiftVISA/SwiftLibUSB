@@ -51,7 +51,7 @@ int main(int argc, char** argv)
 			return -1;
 		}
 		
-		printf("%s\n", buff);
+		printf("%s\n", &buff[12]);
 	}
 	
 	usb_close(&device);

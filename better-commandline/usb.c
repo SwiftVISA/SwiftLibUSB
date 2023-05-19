@@ -24,44 +24,13 @@ void LIBUSB_CALL callback(struct libusb_transfer *info){
     }
 }
 
-/* This method does the bulk of the logic for USB communication. 
-It takes the desired command, the endpoint to communicate with and the direction of communication as inputs
-It adds the neccesary header,newline and padding to correctly send messages 
-@Params:
-    usb: The usb device used for the connection. Must be connected first
-    data: The command to send to the device. Example: "OUTPUT ON"
-    endpoint: The address of the endpoint to send to, should be a bulk endpoint
-    messageType: The message type to include in the header. 1 is for sending 2 is for recieving
-@Returns:
-    int: 0 for success, -1 otherwise
-
-*/
-int raw_write(struct usb_data *usb, const unsigned char *data,char endpoint,unsigned char messageType){
-	struct libusb_device_handle *deviceHandle = usb->handle;
-    
-    // Generate transfer
-    struct libusb_transfer *transfer = libusb_alloc_transfer(0);
-    int length = strlen(data) + 1;
-
-    // Assign bits
-    int size = 13 + strlen(data);
-    size = size + ((4 - (size % 4)) % 4);
-    unsigned char *message = (unsigned char *) malloc(size * sizeof(char));
-    memset(message, 0, size);
-    message[0] = messageType;
-    message[1] = messageIndex;
-    message[2] = ~messageIndex;
-    // message[3] is padding
-    message[4] = length & 0xFF;
-    message[5] = (length >> 8) & 0xFF;
-    message[6] = (length >> 16) & 0xFF;
-    message[7] = (length >> 24) & 0xFF;
-    message[8] = 1; // EOF bit
-    // 9, 10, and 11 are padding
-    strcpy(message+12,data);
-    message[11+length] = '\n';
-
-    libusb_fill_bulk_transfer(transfer,deviceHandle,endpoint,message,size,&callback,0,timeout);
+int send_transfer(struct libusb_transfer *transfer,
+                  struct libusb_device_handle *handle,
+                  unsigned char endpoint,
+                  char *message,
+                  int size)
+{ 
+    libusb_fill_bulk_transfer(transfer,handle,endpoint,message,size,&callback,0,timeout);
 	
 	// Send Transfer
 	callbackReturned = 0;
@@ -80,6 +49,53 @@ int raw_write(struct usb_data *usb, const unsigned char *data,char endpoint,unsi
 
     return callbackError;
 }
+
+
+/* This method does the bulk of the logic for USB communication. 
+It takes the desired command, the endpoint to communicate with and the direction of communication as inputs
+It adds the neccesary header,newline and padding to correctly send messages 
+@Params:
+    usb: The usb device used for the connection. Must be connected first
+    data: The command to send to the device. Example: "OUTPUT ON"
+    endpoint: The address of the endpoint to send to, should be a bulk endpoint
+    messageType: The message type to include in the header. 1 is for sending 2 is for recieving
+@Returns:
+    int: 0 for success, -1 otherwise
+
+*/
+int raw_write(struct usb_data *usb, const unsigned char *data,char endpoint,unsigned char messageType){
+	struct libusb_device_handle *deviceHandle = usb->handle;
+    
+    // Generate transfer
+    struct libusb_transfer *transfer = libusb_alloc_transfer(0);
+    int length = strlen(data);
+    if (messageType == writeTo) {
+        length += 1;
+    }
+
+    // Assign bits
+    int size = 12 + length;
+    size = size + ((4 - (size % 4)) % 4);
+    unsigned char *message = (unsigned char *) malloc(size * sizeof(char));
+    memset(message, 0, size);
+    message[0] = messageType;
+    message[1] = messageIndex;
+    message[2] = ~messageIndex;
+    // message[3] is padding
+    message[4] = length & 0xFF;
+    message[5] = (length >> 8) & 0xFF;
+    message[6] = (length >> 16) & 0xFF;
+    message[7] = (length >> 24) & 0xFF;
+    message[8] = 1; // EOF bit
+    // 9, 10, and 11 are padding
+    if (messageType == writeTo) {
+        strcpy(message+12,data);
+        message[11+length] = '\n';
+    }
+
+    return send_transfer(transfer, deviceHandle, endpoint, message, size);
+}
+
 
 // .h methods
 int usb_connect(unsigned short vendor_id, unsigned short product_id, struct usb_data *usb) {
@@ -185,7 +201,10 @@ int usb_write(struct usb_data *usb, const char *message) {
 }
 
 int usb_read(struct usb_data *usb, char *buffer, unsigned int size) {
-    return raw_write(usb,buffer,usb->in_endpoint,readFrom);
+    int write_error = raw_write(usb,"",usb->out_endpoint,readFrom);
+
+    struct libusb_transfer *transfer = libusb_alloc_transfer(0);
+    return send_transfer(transfer, usb->handle, usb->in_endpoint, buffer, size);
 }
 
 int usb_close(struct usb_data *usb) {
