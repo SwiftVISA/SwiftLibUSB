@@ -52,6 +52,7 @@ Makefile
 *.vcxproj.user
 *.vcxproj.filters
 .vs/
+.vscode/
 
 # Xcode
 #
