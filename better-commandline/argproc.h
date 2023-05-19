@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define ARGPROC_SUCESS 0
+#define ARGPROC_success 0
 #define ARGPROC_ERROR -1
 
 
@@ -16,6 +16,8 @@ struct arg_info
 	char*    message;
 };
 
+//process arguments and return results in arg_info struct
+//returns 0 on success and -1 on failure 
 int process_args(int argc, char** argv, struct arg_info* ret);
 
 #endif //ARGPROC_H
