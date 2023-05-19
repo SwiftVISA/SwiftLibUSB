@@ -142,6 +142,7 @@ int usb_connect(unsigned short vendor_id, unsigned short product_id, struct usb_
             int has_out = 0;
             int has_in = 0;
             const struct libusb_endpoint_descriptor *endpoints = config->interface[0].altsetting->endpoint;
+            printf("Looking for endpoints: Bulk: %d, Out: %d, In: %d\n", LIBUSB_ENDPOINT_TRANSFER_TYPE_BULK, LIBUSB_ENDPOINT_OUT, LIBUSB_ENDPOINT_IN);
             for (int j = 0; j < config->interface[0].altsetting->bNumEndpoints; j++) {
                 printf("DEBUG: endpoint found: attributes: %d, address: %d\n", endpoints[j].bmAttributes, endpoints[j].bEndpointAddress);
                 if (endpoints[j].bmAttributes & 3 == LIBUSB_ENDPOINT_TRANSFER_TYPE_BULK) {
