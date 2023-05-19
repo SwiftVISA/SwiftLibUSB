@@ -123,7 +123,9 @@ int usb_connect(unsigned short vendor_id, unsigned short product_id, struct usb_
                 return -1;
             }
             
-            libusb_set_auto_detach_kernel_driver(usb->handle, 1);
+#ifdef __linux__
+			libusb_set_auto_detach_kernel_driver(usb->handle, 1);
+#endif
             
             int configure_code = libusb_set_configuration(usb->handle, 0);
             if (configure_code != 0 && configure_code != -12) { // -12 means the OS configures the device
