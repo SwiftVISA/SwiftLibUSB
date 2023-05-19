@@ -18,4 +18,4 @@ struct arg_info
 
 int process_args(int argc, char** argv, struct arg_info* ret);
 
-#endif
+#endif //ARGPROC_H
