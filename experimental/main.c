@@ -175,15 +175,33 @@ void LIBUSB_CALL callback(struct libusb_transfer *info){
 		,info->num_iso_packets,info->type,info->endpoint,info->status,info->actual_length,info->length);
 	callbackReturned = 1;
 }
-int message(unsigned char *data,int timeout,char endpoint){
+
+static unsigned char messageIndex = 1;
+int message(unsigned char *data,int timeout,char endpoint,unsigned char messageType){
 	// Clear any haults on the endpoint
 	libusb_clear_halt(primaryDeviceHandle,endpoint);
 
 	// Generate transfer
     struct libusb_transfer *transfer = libusb_alloc_transfer(0);
-    int length = strlen(data);
-    printf("Attempting Transfer of message '%s' with length %d\n",data,length);
-	libusb_fill_bulk_transfer(transfer,primaryDeviceHandle,endpoint,data,length,&callback,0,timeout);
+    unsigned char length = strlen(data);
+
+    int size = 9 + strlen(data);
+    size = size + ((4 - (size % 4)) % 4);
+    unsigned char message[size];
+    memset(message, 0, size);
+    message[0] = messageType;
+    message[1] = messageIndex;
+    message[2] = ~messageIndex;
+    message[8] = length;
+    message[7] = 1;
+    strcpy(message+9,data);
+    for(int i = 0; i < size; i++){
+        printf("%d ",message[i]);
+    }
+    printf("\n");
+    
+    printf("Attempting Transfer of message '%s' with length %d\n",data,size);
+	libusb_fill_bulk_transfer(transfer,primaryDeviceHandle,endpoint,message,size,&callback,0,timeout);
 	
 	// Send Transfer
 	callbackReturned = 0;
@@ -195,6 +213,10 @@ int message(unsigned char *data,int timeout,char endpoint){
 	// Clear the transfer
 	libusb_free_transfer(transfer);
 	printf("Events handled\n");
+    messageIndex += 1;
+    if(messageIndex == 0){
+        messageIndex +=1 ;
+    }
 }
 int operate_primary_device() {
     printf("Operating device %s\n",deviceName);
@@ -238,7 +260,7 @@ int operate_primary_device() {
 	printf("Set interface alt setting, returned %d\n",alt_error_code);
 
 	int timeout = 1000;
-	message("OUTPUT ON\n",timeout,1);
+	message("OUTPUT ON\n",timeout,1,2);
 	//perform propor sleep function depending on os
 	genericSleep(timeout+1000);
 	
