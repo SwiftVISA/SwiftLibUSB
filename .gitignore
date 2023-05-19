@@ -1,8 +1,8 @@
 experimental/main
 experimental/main.exe
 
-/bin
-/obj
+bin/
+obj/
 
 # Prerequisites
 *.d
@@ -52,6 +52,7 @@ Makefile
 *.vcxproj.user
 *.vcxproj.filters
 .vs/
+.vscode/
 
 # Xcode
 #
