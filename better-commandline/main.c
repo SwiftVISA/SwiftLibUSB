@@ -11,6 +11,7 @@
 
 int main(int argc, char** argv)
 {
-	struct arg_info args = process_args(argc, argv);
+	struct arg_info args;
+	int argproc_code = process_args(argc, argv, &args);
 	return 0;
 }

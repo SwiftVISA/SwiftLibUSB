@@ -3,6 +3,11 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdio.h>
+
+#define ARGPROC_SUCESS 0
+#define ARGPROC_ERROR -1
+
 
 struct arg_info
 {
@@ -12,6 +17,6 @@ struct arg_info
 	char*    message;
 };
 
-struct arg_info process_args(int argc, char** argv);
+int process_args(int argc, char** argv, struct arg_info* ret);
 
 #endif
