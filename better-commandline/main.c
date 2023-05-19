@@ -25,6 +25,8 @@ int main(int argc, char** argv)
 		printf("Error connecting to device.\n");
 		return -1;
 	}
+
+        printf("Connected to device\n");
 	
 	//attempt to send data
 	int send_code = usb_write(&device, args.message);
@@ -34,6 +36,8 @@ int main(int argc, char** argv)
 		printf("Error sending message.\n");
 		return -1;
 	}
+
+        printf("Command sent\n");
 	
 	if(args.needs_response)
 	{
