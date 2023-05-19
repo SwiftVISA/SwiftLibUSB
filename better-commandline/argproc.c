@@ -13,17 +13,17 @@ int process_args(int argc, char** argv, struct arg_info* ret)
 	
 	for(int i = 1; i <= 5; i += 2)
 	{
-		if(strcmp(argv[i], "-v") == 0) //vendor id
+		if(strcmp(argv[i], "-v") == 0 || strcmp(argv[i], "-V") == 0) //vendor id
 		{
 			ret->vendor_id = atoi(argv[i+1]);
-		}else if(strcmp(argv[i], "-p") == 0) //product id
+		}else if(strcmp(argv[i], "-p") == 0 || strcmp(argv[i], "-P") == 0) //product id
 		{
 			ret->product_id = atoi(argv[i+1]);
-		}else if(strcmp(argv[i], "-c") == 0) //command
+		}else if(strcmp(argv[i], "-c") == 0 || strcmp(argv[i], "-C") == 0) //command
 		{
 			ret->needs_response = false;
 			ret->message = argv[i+1];
-		}else if(strcmp(argv[i], "-q") == 0) //query
+		}else if(strcmp(argv[i], "-q") == 0 || strcmp(argv[i], "-Q") == 0) //query
 		{
 			ret->needs_response = true;
 			ret->message = argv[i+1];
