@@ -17,8 +17,8 @@ Neccesary initiliser for usb devices. Will open a connection to the device with 
     unsigned short product_id: The product id to find
     struct usb_data *usb: The usb to connect with 
 @Returns
-    1 if successful
-    0 otherwise
+    0 if successful
+    -1 otherwise
 */
 int usb_connect(unsigned short vendor_id, unsigned short product_id, struct usb_data *usb);
 
@@ -29,8 +29,8 @@ The usb should be connected first before commands are sent
     struct usb_data *usb: The usb to send the write command with
     cost char *message: The message to send 
 @Returns
-    1 if successful
-    0 otherwise
+    0 if successful
+    -1 otherwise
 */
 int usb_write(struct usb_data *usb, const char *message);
 
@@ -42,8 +42,8 @@ The usb should be connected first before commands are sent
     cost char *buffer: the array for data to be loaded to
     int size: the size of the buffer
 @Returns
-    1 if successful
-    0 otherwise
+    0 if successful
+    -1 otherwise
 */
 int usb_read(struct usb_data *usb, char *buffer, unsigned int size);
 
