@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#ifdef __linux__
+#ifndef _Win32
 #include <unistd.h>
 #endif
 
@@ -30,10 +30,10 @@ const char *DIRECTIONS[2] = {
 };
 
 void genericSleep(int duration){
-	#ifdef __linux__
-		sleep(duration / 1000);
+	#ifdef _Win32
+    Sleep(duration);
 	#else
-		Sleep(duration);
+    sleep(duration / 1000);
 	#endif
 }
 // Prints the port each device is plugged into
@@ -235,7 +235,7 @@ int operate_primary_device() {
     // This may not need to happen, or if it does return 0 other behavior might need changing
     // Returning -12 (NOT_SUPPORTED) means the device/OS doesn't support changing the configuration,
     // which would mean we don't have to deal with it.
-    returned = libusb_set_configuration(primaryDeviceHandle, 0); 
+    returned = libusb_set_configuration(primaryDeviceHandle, 1); 
     printf("Returned value %d\n",returned);
 
     // Get the list of interfaces on the current configuration
