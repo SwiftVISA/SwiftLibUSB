@@ -15,7 +15,12 @@ int callbackReturned; // Has the callback function been executed or the most rec
 unsigned char messageIndex; // The message id, always ranges between 1 and 255
 int callbackError; // The error of the most recent callback
 
-// helper methods
+/*
+The callback is the first method called when a usb write returns. It is passed with the transfer
+@Params:
+    struct libusb_transfer *info: The "transfer" object that will be set on callback providing useful information
+@Returns: None
+*/
 void LIBUSB_CALL callback(struct libusb_transfer *info){
 	callbackReturned = 1;
     printf("Transfer status: %d\n", info->status);
@@ -31,6 +36,19 @@ void LIBUSB_CALL callback(struct libusb_transfer *info){
     }
 }
 
+/*
+Creates and sends a transfer with a given message. 
+In addition, handles updating messageIndex and freeing the transfer. 
+@Params:
+    struct libusb_transfer *transfer: The "transfer" object that will handle the sending
+    struct libusb_device_handle *handle: The handle to send with. This represents the connection
+    unsigned char endpoint: The position to send to. Output endpoints should be used for writes  
+    char *message: The message transfered. Should include legal headers and padding. For recieving, send empty. Not null terminated
+    int size: the size of message
+@Returns
+    0 if successful
+    -1 otherwise
+*/
 int send_transfer(struct libusb_transfer *transfer,
                   struct libusb_device_handle *handle,
                   unsigned char endpoint,
@@ -71,8 +89,9 @@ It adds the neccesary header,newline and padding to correctly send messages
     data: The command to send to the device. Example: "OUTPUT ON"
     endpoint: The address of the endpoint to send to, should be a bulk endpoint
     messageType: The message type to include in the header. 1 is for sending 2 is for recieving
-@Returns:
-    int: 0 for success, -1 otherwise
+@Returns
+    0 if successful
+    -1 otherwise
 
 */
 int raw_write(struct usb_data *usb, const unsigned char *data,char endpoint,unsigned char messageType){
