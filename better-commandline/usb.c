@@ -17,6 +17,8 @@ int callbackError; // The error of the most recent callback
 // helper methods
 void LIBUSB_CALL callback(struct libusb_transfer *info){
 	callbackReturned = 1;
+    printf("Transfer status: %d\n", info->status);
+    printf("Bytes sent: %d/%d\n", info->actual_length, info->length);
     if(info->actual_length == info->length){
         callbackError = 0; // Everything was fine
     }else{
@@ -34,10 +36,16 @@ int send_transfer(struct libusb_transfer *transfer,
 	
 	// Send Transfer
 	callbackReturned = 0;
-    libusb_submit_transfer(transfer);
+    int submit_err = libusb_submit_transfer(transfer);
+    if (submit_err != 0) {
+        printf("Submitting transfer failed: %d\n", submit_err);
+        return -1;
+    }
 	
 	//libusb_wait_for_event(NULL,NULL);
-	libusb_handle_events_completed(NULL, &callbackReturned);
+    while (!callbackReturned) {
+        libusb_handle_events_completed(NULL, &callbackReturned);
+    }
 
 	// Clear the transfer
 	libusb_free_transfer(transfer);
@@ -92,6 +100,12 @@ int raw_write(struct usb_data *usb, const unsigned char *data,char endpoint,unsi
         strcpy(message+12,data);
         message[11+length] = '\n';
     }
+    
+    printf("Bytes sent: ");
+    for (int i = 0; i < size; i++) {
+        printf("%d ", message[i]);
+    }
+    printf("\n");
 
     return send_transfer(transfer, deviceHandle, endpoint, message, size);
 }
