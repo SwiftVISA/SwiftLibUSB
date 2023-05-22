@@ -28,9 +28,6 @@ void LIBUSB_CALL callback(struct libusb_transfer *info){
     printf("Endpoint: %d\n", info->endpoint);
     if(info->status == 0 && ((info->actual_length == info->length) || (info->endpoint > 127))){
         callbackError = 0; // Everything was fine
-        if (info->actual_length < info->length) {
-            info->buffer[info->actual_length] = 0;
-        }
     }else{
         callbackError = -1; // Not all the bytes were sent, error
     }
