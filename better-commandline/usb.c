@@ -261,6 +261,7 @@ int usb_close(struct usb_data *usb) {
 #endif
 
 	libusb_close(usb->handle);
+	libusb_exit(NULL);
 	
     return 0;
 }
