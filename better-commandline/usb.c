@@ -20,8 +20,12 @@ void LIBUSB_CALL callback(struct libusb_transfer *info){
 	callbackReturned = 1;
     printf("Transfer status: %d\n", info->status);
     printf("Bytes sent: %d/%d\n", info->actual_length, info->length);
-    if(info->actual_length == info->length){
+    printf("Endpoint: %d\n", info->endpoint);
+    if(info->status == 0 && ((info->actual_length == info->length) || (info->endpoint > 127))){
         callbackError = 0; // Everything was fine
+        if (info->actual_length < info->length) {
+            info->buffer[info->actual_length] = 0;
+        }
     }else{
         callbackError = -1; // Not all the bytes were sent, error
     }
@@ -47,7 +51,7 @@ int send_transfer(struct libusb_transfer *transfer,
     while (!callbackReturned) {
         libusb_handle_events_completed(NULL, &callbackReturned);
     }
-
+    
 	// Clear the transfer
 	libusb_free_transfer(transfer);
     messageIndex += 1;
@@ -247,7 +251,7 @@ int usb_read(struct usb_data *usb, char *buffer, unsigned int size) {
     libusb_handle_events_completed(NULL, &callbackReturned);
     sleep(1);
 
-    libusb_clear_halt(usb->handle, usb->in_endpoint);
+    //libusb_clear_halt(usb->handle, usb->in_endpoint);
     return send_transfer(transfer, usb->handle, usb->in_endpoint, buffer, size);
 }
 
@@ -257,6 +261,7 @@ int usb_close(struct usb_data *usb) {
 #endif
 
 	libusb_close(usb->handle);
+	libusb_exit(NULL);
 	
     return 0;
 }
