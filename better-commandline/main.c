@@ -129,6 +129,8 @@ int main(int argc, char** argv)
 	if(args.do_connect){
 		do_connect(&args);
 	}
+	
+	libusb_exit(NULL);
 	return 0;
 }
 
