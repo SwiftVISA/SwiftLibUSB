@@ -264,7 +264,7 @@ int usb_read(struct usb_data *usb, char *buffer, unsigned int size) {
         messageIndex++;
     }
     printf("Bytes sent: ");
-    for (int i = 0; i < 12; i++) {2
+    for (int i = 0; i < 12; i++) {
         printf("%d ", message[i]); // Display message for clarity
     }
     printf("\n");

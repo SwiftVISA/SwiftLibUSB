@@ -83,7 +83,7 @@ int process_args(int argc, char** argv, struct arg_info* ret)
 	// If you did only display 
 	if(did_disp && !did_v && !did_p && !did_m){
 		ret->do_connect = false;
-		return ARGPROC_success;
+		return ARGPROC_SUCCESS;
 	}
 
 	// If you are not display or specified atleast one argument

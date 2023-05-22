@@ -8,6 +8,7 @@
 #endif
 
 #include "argproc.h"
+#include "usb.h"
 
 int printDevice(struct libusb_device *device, short verbosity){
 	int portNumber = libusb_get_port_number(device);
