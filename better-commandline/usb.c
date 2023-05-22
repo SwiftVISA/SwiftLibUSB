@@ -105,12 +105,14 @@ int raw_write(struct usb_data *usb, const unsigned char *data,char endpoint,unsi
         message[11+length] = '\n';
     }
     
+    // Print the transfer
     printf("Bytes sent: ");
     for (int i = 0; i < size; i++) {
         printf("%d ", message[i]);
     }
     printf("\n");
 
+    // Send the transfer
     int response = send_transfer(transfer, deviceHandle, endpoint, message, size);
     free(message);
     return response;
@@ -220,6 +222,7 @@ int usb_write(struct usb_data *usb, const char *message) {
 }
 
 int usb_read(struct usb_data *usb, char *buffer, unsigned int size) {
+    // Request information to be sent
     sleep(1);
     struct libusb_transfer *transfer = libusb_alloc_transfer(0);
     unsigned char message[12] = {
@@ -240,18 +243,21 @@ int usb_read(struct usb_data *usb, char *buffer, unsigned int size) {
     if (messageIndex == 0) {
         messageIndex++;
     }
+
+    // Print the request transfer
     printf("Bytes sent: ");
     for (int i = 0; i < 12; i++) {
         printf("%d ", message[i]);
     }
     printf("\n");
+
+    // Fill and submit transfer to receive information
     libusb_fill_bulk_transfer(transfer, usb->handle, usb->out_endpoint, message, 12, &callback, 0, timeout);
     callbackReturned = 0;
     libusb_submit_transfer(transfer);
     libusb_handle_events_completed(NULL, &callbackReturned);
     sleep(1);
 
-    //libusb_clear_halt(usb->handle, usb->in_endpoint);
     return send_transfer(transfer, usb->handle, usb->in_endpoint, buffer, size);
 }
 
