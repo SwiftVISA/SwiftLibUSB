@@ -108,17 +108,17 @@ int displayDevices(struct arg_info *commandArguments){
 
 int main(int argc, char** argv)
 {	
+	struct arg_info args;
+	int argproc_code = process_args(argc, argv, &args);
+	
+	if(argproc_code == ARGPROC_ERROR) {return -1; }
+	
 	// Initilise libUSB
 	int init_error = libusb_init(NULL);
     if (init_error != 0) {
         printf("Failed to initialize libUSB");
         return -1;
     }
-
-	struct arg_info args;
-	int argproc_code = process_args(argc, argv, &args);
-	
-	if(argproc_code == ARGPROC_ERROR) {return -1; }
 	
 	// List all devices if flagged to
 	if(args.display_level > 0){
