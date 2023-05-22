@@ -28,6 +28,9 @@ void LIBUSB_CALL callback(struct libusb_transfer *info){
     printf("Endpoint: %d\n", info->endpoint);
     if(info->status == 0 && ((info->actual_length == info->length) || (info->endpoint > 127))){
         callbackError = 0; // Everything was fine
+        if (info->actual_length < info->length) {
+            info->buffer[info->actual_length] = 0;
+        }
     }else{
         callbackError = -1; // Not all the bytes were sent, error
     }
@@ -115,43 +118,39 @@ int raw_write(struct usb_data *usb, const unsigned char *data,char endpoint,unsi
     message[6] = (length >> 16) & 0xFF;
     message[7] = (length >> 24) & 0xFF;
     message[8] = 1; // EOF bit
-    // message[9, 10, 11] are padding
+    // 9, 10, and 11 are padding
     if (messageType == writeTo) {
         strcpy(message+12,data);
-        message[11+length] = '\n'; // the message needs a newline at the end
+        message[11+length] = '\n';
     }
     
-    // Print the transfer
     printf("Bytes sent: ");
     for (int i = 0; i < size; i++) {
         printf("%d ", message[i]);
     }
     printf("\n");
 
-    // Send the transfer
     int response = send_transfer(transfer, deviceHandle, endpoint, message, size);
     free(message);
     return response;
 }
 
 
-// .h methods
-int usb_connect(unsigned short vendor_id, unsigned short product_id, struct usb_data *usb) {  
-    //initalize device list
+// See usb.h
+int usb_connect(unsigned short vendor_id, unsigned short product_id, struct usb_data *usb) {
+    
     libusb_device **devices;
     ssize_t count = libusb_get_device_list(NULL, &devices);
     if (count < 0) {
         printf("Error detecting devices: %d\n", count);
     }
 
-	//loop through all connected devices and try to find the one requested
     for (ssize_t i = 0; i < count; i++) {
         struct libusb_device_descriptor desc;
         int desc_code = libusb_get_device_descriptor(devices[i], &desc);
         if (desc_code != 0) {
             printf("Error getting device descriptor: %d\n", desc_code);
         } else if (desc.idVendor == vendor_id && desc.idProduct == product_id) {
-			//if we have found the target device, open a handle to it
             int open_code = libusb_open(devices[i], &usb->handle);
             if (open_code != 0) {
                 printf("Error connecting to device: %d\n", desc_code);
@@ -163,7 +162,6 @@ int usb_connect(unsigned short vendor_id, unsigned short product_id, struct usb_
 			libusb_detach_kernel_driver(usb->handle, 0);
 #endif
             
-            //configure the device
             int configure_code = libusb_set_configuration(usb->handle, 1);
             if (configure_code != 0 && configure_code != -12) { // -12 means the OS configures the device
                 printf("Error configuring device: %d\n", configure_code);
@@ -171,7 +169,6 @@ int usb_connect(unsigned short vendor_id, unsigned short product_id, struct usb_
                 libusb_free_device_list(devices, 1);
                 return -1;
             }
-
             struct libusb_config_descriptor *config;
             int config_desc_code = libusb_get_active_config_descriptor(devices[i], &config);
             if (config_desc_code != 0) {
@@ -181,7 +178,6 @@ int usb_connect(unsigned short vendor_id, unsigned short product_id, struct usb_
                 return -1;
             }
             
-            //claim interface needed for communication
             int claim_error = libusb_claim_interface(usb->handle, 0);
             if (claim_error != 0) {
                 printf("Error claiming interface: %d\n", claim_error);
@@ -190,7 +186,6 @@ int usb_connect(unsigned short vendor_id, unsigned short product_id, struct usb_
                 libusb_free_device_list(devices, 1);
                 return -1;
             }
-
             int alt_error = libusb_set_interface_alt_setting(usb->handle, 0, 0);
             if (alt_error != 0) {
                 printf("Error setting alternative interface: %d\n", alt_error);
@@ -199,8 +194,6 @@ int usb_connect(unsigned short vendor_id, unsigned short product_id, struct usb_
                 libusb_free_device_list(devices, 1);
                 return -1;
             }
-
-            // Get endpoints for transfer
             int has_out = 0;
             int has_in = 0;
             const struct libusb_endpoint_descriptor *endpoints = config->interface[0].altsetting->endpoint;
@@ -240,16 +233,18 @@ int usb_connect(unsigned short vendor_id, unsigned short product_id, struct usb_
     return -1;
 }
 
+// See usb.h
 int usb_write(struct usb_data *usb, const char *message) {
     libusb_clear_halt(usb->handle, usb->out_endpoint);
     return raw_write(usb,message,usb->out_endpoint,writeTo);
 }
 
+// See usb.h
 int usb_read(struct usb_data *usb, char *buffer, unsigned int size) {
-    // Request information to be sent
-    sleep(1);
+    sleep(1); // To wait for the first write to be done
+
     struct libusb_transfer *transfer = libusb_alloc_transfer(0);
-    unsigned char message[12] = {
+    unsigned char message[12] = { // Add header
         readFrom,
         messageIndex,
         ~messageIndex,
@@ -263,33 +258,34 @@ int usb_read(struct usb_data *usb, char *buffer, unsigned int size) {
         0,
         0
     };
+    // After each message we increment messageIndex
     messageIndex++;
     if (messageIndex == 0) {
         messageIndex++;
     }
-
-    // Print the request transfer
     printf("Bytes sent: ");
-    for (int i = 0; i < 12; i++) {
-        printf("%d ", message[i]);
+    for (int i = 0; i < 12; i++) {2
+        printf("%d ", message[i]); // Display message for clarity
     }
     printf("\n");
-    
-    // Fill and submit transfer to receive information
-    libusb_fill_bulk_transfer(transfer, usb->handle, usb->out_endpoint, message, 12, &callback, 0, timeout);
+    libusb_fill_bulk_transfer(transfer, usb->handle, usb->out_endpoint, message, 12, &callback, 0, timeout); // Read request
     callbackReturned = 0;
-    libusb_submit_transfer(transfer);
+    libusb_submit_transfer(transfer); // Send read request
     libusb_handle_events_completed(NULL, &callbackReturned);
     sleep(1);
 
-    return send_transfer(transfer, usb->handle, usb->in_endpoint, buffer, size);
+    //libusb_clear_halt(usb->handle, usb->in_endpoint);
+    return send_transfer(transfer, usb->handle, usb->in_endpoint, buffer, size); // Send buffer for writeback
 }
 
+// See usb.h
 int usb_close(struct usb_data *usb) {
-#ifdef __linux__ //on linux we must detatch the kernel driver
+#ifdef __linux__
 			libusb_attach_kernel_driver(usb->handle, 0);
 #endif
 
 	libusb_close(usb->handle);
+	libusb_exit(NULL);
+	
     return 0;
 }
