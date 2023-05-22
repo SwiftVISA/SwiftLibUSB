@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#ifdef __linux__
+#ifndef _Win32
 #include <unistd.h>
 #endif
 
@@ -30,10 +30,10 @@ const char *DIRECTIONS[2] = {
 };
 
 void genericSleep(int duration){
-	#ifdef __linux__
-		sleep(duration / 1000);
+	#ifdef _Win32
+    Sleep(duration);
 	#else
-		Sleep(duration);
+    sleep(duration / 1000);
 	#endif
 }
 // Prints the port each device is plugged into
