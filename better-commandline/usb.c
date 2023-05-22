@@ -138,18 +138,21 @@ int raw_write(struct usb_data *usb, const unsigned char *data,char endpoint,unsi
 // .h methods
 int usb_connect(unsigned short vendor_id, unsigned short product_id, struct usb_data *usb) {
     
+    //initalize device list
     libusb_device **devices;
     ssize_t count = libusb_get_device_list(NULL, &devices);
     if (count < 0) {
         printf("Error detecting devices: %d\n", count);
     }
 
+	//loop through all connected devices and try to find the one requested
     for (ssize_t i = 0; i < count; i++) {
         struct libusb_device_descriptor desc;
         int desc_code = libusb_get_device_descriptor(devices[i], &desc);
         if (desc_code != 0) {
             printf("Error getting device descriptor: %d\n", desc_code);
         } else if (desc.idVendor == vendor_id && desc.idProduct == product_id) {
+			//if we have found the target device, open a handle to it
             int open_code = libusb_open(devices[i], &usb->handle);
             if (open_code != 0) {
                 printf("Error connecting to device: %d\n", desc_code);
@@ -161,6 +164,7 @@ int usb_connect(unsigned short vendor_id, unsigned short product_id, struct usb_
 			libusb_detach_kernel_driver(usb->handle, 0);
 #endif
             
+            //configure the device
             int configure_code = libusb_set_configuration(usb->handle, 1);
             if (configure_code != 0 && configure_code != -12) { // -12 means the OS configures the device
                 printf("Error configuring device: %d\n", configure_code);
@@ -177,6 +181,7 @@ int usb_connect(unsigned short vendor_id, unsigned short product_id, struct usb_
                 return -1;
             }
             
+            //claim interface needed for communication
             int claim_error = libusb_claim_interface(usb->handle, 0);
             if (claim_error != 0) {
                 printf("Error claiming interface: %d\n", claim_error);
@@ -278,7 +283,7 @@ int usb_read(struct usb_data *usb, char *buffer, unsigned int size) {
 }
 
 int usb_close(struct usb_data *usb) {
-#ifdef __linux__
+#ifdef __linux__ //on linux we must detatch the kernel driver
 			libusb_attach_kernel_driver(usb->handle, 0);
 #endif
 
