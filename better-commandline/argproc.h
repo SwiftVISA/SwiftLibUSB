@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define ARGPROC_success 0
+#define ARGPROC_SUCCESS 0
 #define ARGPROC_ERROR -1
 
 

@@ -104,5 +104,5 @@ int process_args(int argc, char** argv, struct arg_info* ret)
 		printf("Argument Error: no command or query given\n");
 		return ARGPROC_ERROR;
 	}
-	return ARGPROC_success;
+	return ARGPROC_SUCCESS;
 }
