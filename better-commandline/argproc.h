@@ -13,6 +13,8 @@ struct arg_info
 	uint16_t vendor_id;
 	uint16_t product_id;
 	bool	 needs_response;
+	bool	 do_connect;
+	unsigned short	display_level;
 	char*    message;
 };
 
