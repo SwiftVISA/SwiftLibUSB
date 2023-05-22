@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 // Constants
 #define timeout 10000 // The amount of time to wait before giving up on a message. Measured in milliseconds.
@@ -49,7 +50,6 @@ int send_transfer(struct libusb_transfer *transfer,
 
 	// Clear the transfer
 	libusb_free_transfer(transfer);
-	free(message);
     messageIndex += 1;
     if(messageIndex == 0){
         messageIndex +=1 ;
@@ -107,7 +107,9 @@ int raw_write(struct usb_data *usb, const unsigned char *data,char endpoint,unsi
     }
     printf("\n");
 
-    return send_transfer(transfer, deviceHandle, endpoint, message, size);
+    int response = send_transfer(transfer, deviceHandle, endpoint, message, size);
+    free(message);
+    return response;
 }
 
 
@@ -218,10 +220,38 @@ int usb_write(struct usb_data *usb, const char *message) {
 }
 
 int usb_read(struct usb_data *usb, char *buffer, unsigned int size) {
-    int write_error = raw_write(usb,"",usb->out_endpoint,readFrom);
+    sleep(1);
+    struct libusb_transfer *transfer = libusb_alloc_transfer(0);
+    unsigned char message[12] = {
+        readFrom,
+        messageIndex,
+        ~messageIndex,
+        0,
+        (size - 12) & 0xFF,
+        ((size - 12) >> 8) & 0xFF,
+        ((size - 12) >> 16) & 0xFF,
+        ((size - 12) >> 24) & 0xFF,
+        0,
+        0,
+        0,
+        0
+    };
+    messageIndex++;
+    if (messageIndex == 0) {
+        messageIndex++;
+    }
+    printf("Bytes sent: ");
+    for (int i = 0; i < 12; i++) {
+        printf("%d ", message[i]);
+    }
+    printf("\n");
+    libusb_fill_bulk_transfer(transfer, usb->handle, usb->out_endpoint, message, 12, &callback, 0, timeout);
+    callbackReturned = 0;
+    libusb_submit_transfer(transfer);
+    libusb_handle_events_completed(NULL, &callbackReturned);
+    sleep(1);
 
     libusb_clear_halt(usb->handle, usb->in_endpoint);
-    struct libusb_transfer *transfer = libusb_alloc_transfer(0);
     return send_transfer(transfer, usb->handle, usb->in_endpoint, buffer, size);
 }
 
