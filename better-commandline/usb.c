@@ -115,10 +115,10 @@ int raw_write(struct usb_data *usb, const unsigned char *data,char endpoint,unsi
     message[6] = (length >> 16) & 0xFF;
     message[7] = (length >> 24) & 0xFF;
     message[8] = 1; // EOF bit
-    // 9, 10, and 11 are padding
+    // message[9, 10, 11] are padding
     if (messageType == writeTo) {
         strcpy(message+12,data);
-        message[11+length] = '\n';
+        message[11+length] = '\n'; // the message needs a newline at the end
     }
     
     // Print the transfer
@@ -136,8 +136,7 @@ int raw_write(struct usb_data *usb, const unsigned char *data,char endpoint,unsi
 
 
 // .h methods
-int usb_connect(unsigned short vendor_id, unsigned short product_id, struct usb_data *usb) {
-    
+int usb_connect(unsigned short vendor_id, unsigned short product_id, struct usb_data *usb) {  
     //initalize device list
     libusb_device **devices;
     ssize_t count = libusb_get_device_list(NULL, &devices);
@@ -172,6 +171,7 @@ int usb_connect(unsigned short vendor_id, unsigned short product_id, struct usb_
                 libusb_free_device_list(devices, 1);
                 return -1;
             }
+
             struct libusb_config_descriptor *config;
             int config_desc_code = libusb_get_active_config_descriptor(devices[i], &config);
             if (config_desc_code != 0) {
@@ -190,6 +190,7 @@ int usb_connect(unsigned short vendor_id, unsigned short product_id, struct usb_
                 libusb_free_device_list(devices, 1);
                 return -1;
             }
+
             int alt_error = libusb_set_interface_alt_setting(usb->handle, 0, 0);
             if (alt_error != 0) {
                 printf("Error setting alternative interface: %d\n", alt_error);
@@ -198,6 +199,8 @@ int usb_connect(unsigned short vendor_id, unsigned short product_id, struct usb_
                 libusb_free_device_list(devices, 1);
                 return -1;
             }
+
+            // Get endpoints for transfer
             int has_out = 0;
             int has_in = 0;
             const struct libusb_endpoint_descriptor *endpoints = config->interface[0].altsetting->endpoint;
@@ -271,7 +274,7 @@ int usb_read(struct usb_data *usb, char *buffer, unsigned int size) {
         printf("%d ", message[i]);
     }
     printf("\n");
-
+    
     // Fill and submit transfer to receive information
     libusb_fill_bulk_transfer(transfer, usb->handle, usb->out_endpoint, message, 12, &callback, 0, timeout);
     callbackReturned = 0;
