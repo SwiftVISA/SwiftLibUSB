@@ -48,7 +48,12 @@ The usb should be connected first before commands are sent
 int usb_read(struct usb_data *usb, char *buffer, unsigned int size);
 
 /*
-Close the USB
+    Closes the handle of the given USB
+@Params:
+    struct usb_data *usb: The usb to read the data from
+@Returns
+    0 if successful
+    -1 otherwise
 */
 int usb_close(struct usb_data *usb);
 
