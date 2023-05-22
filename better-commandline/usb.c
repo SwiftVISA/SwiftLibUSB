@@ -213,12 +213,14 @@ int usb_connect(unsigned short vendor_id, unsigned short product_id, struct usb_
 }
 
 int usb_write(struct usb_data *usb, const char *message) {
+    libusb_clear_halt(usb->handle, usb->out_endpoint);
     return raw_write(usb,message,usb->out_endpoint,writeTo);
 }
 
 int usb_read(struct usb_data *usb, char *buffer, unsigned int size) {
     int write_error = raw_write(usb,"",usb->out_endpoint,readFrom);
 
+    libusb_clear_halt(usb->handle, usb->in_endpoint);
     struct libusb_transfer *transfer = libusb_alloc_transfer(0);
     return send_transfer(transfer, usb->handle, usb->in_endpoint, buffer, size);
 }
