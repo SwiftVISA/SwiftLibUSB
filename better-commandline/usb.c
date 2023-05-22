@@ -259,6 +259,8 @@ int usb_close(struct usb_data *usb) {
 #ifdef __linux__
 			libusb_attach_kernel_driver(usb->handle, 0);
 #endif
+
+	libusb_close(usb->handle);
 	
-    return -1;
+    return 0;
 }
