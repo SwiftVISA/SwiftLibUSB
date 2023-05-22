@@ -30,8 +30,57 @@ int printDevice(struct libusb_device *device, short verbosity){
 	}
 }
 
-int displayDevices(struct arg_info commandArguments){
-	short verbosity = commandArguments.display_level;
+int do_connect(struct arg_info *args)
+{
+	printf("Connecting to device with vendor id: %d and product id: %d\n",
+			args->vendor_id, args->product_id);
+	printf("Command: %s\n", args->message);
+		
+	//try to connect to device
+	struct usb_data device;
+	int connection_code = usb_connect(args->vendor_id, args->product_id, 
+		&device);
+	
+	if(connection_code != 0)
+	{
+		printf("Error connecting to device.\n");
+		return -1;
+	}
+
+		printf("Connected to device\n");
+	
+	//attempt to send data
+	int send_code = usb_write(&device, args->message);
+	
+	if(send_code != 0)
+	{
+		printf("Error sending message.\n");
+		return -1;
+	}
+
+		printf("Command sent\n");
+	
+	if(args->needs_response)
+	{
+		printf("Awaiting response.\n");
+		char buff[1024];
+		int read_code = usb_read(&device, buff, 1024);
+		
+		if(read_code != 0)
+		{
+			printf("Error reading response from device.\n");
+			return -1;
+		}
+		
+		//pass in the buffer after the end of the header
+		printf("%s\n", &buff[12]);
+	}
+	
+	usb_close(&device);
+}
+
+int displayDevices(struct arg_info *commandArguments){
+	short verbosity = commandArguments->display_level;
 	
 	// Setup
 
@@ -73,55 +122,12 @@ int main(int argc, char** argv)
 	
 	// List all devices if flagged to
 	if(args.display_level > 0){
-		displayDevices(args);
+		displayDevices(&args);
 	}
 	
 	// If the user wants to connect to a device
 	if(args.do_connect){
-		printf("Connecting to device with vendor id: %d and product id: %d\n",
-			args.vendor_id, args.product_id);
-		printf("Command: %s\n", args.message);
-		
-		//try to connect to device
-		struct usb_data device;
-		int connection_code = usb_connect(args.vendor_id, args.product_id, 
-			&device);
-		
-		if(connection_code != 0)
-		{
-			printf("Error connecting to device.\n");
-			return -1;
-		}
-
-			printf("Connected to device\n");
-		
-		//attempt to send data
-		int send_code = usb_write(&device, args.message);
-		
-		if(send_code != 0)
-		{
-			printf("Error sending message.\n");
-			return -1;
-		}
-
-			printf("Command sent\n");
-		
-		if(args.needs_response)
-		{
-			printf("Awaiting response.\n");
-			char buff[1024];
-			int read_code = usb_read(&device, buff, 1024);
-			
-			if(read_code != 0)
-			{
-				printf("Error reading response from device.\n");
-				return -1;
-			}
-			
-			printf("%s\n", &buff[12]);
-		}
-		
-		usb_close(&device);
+		do_connect(&args);
 	}
 	return 0;
 }
