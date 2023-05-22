@@ -63,7 +63,7 @@ int do_connect(struct arg_info *args)
 	if(args->needs_response)
 	{
 		printf("Awaiting response.\n");
-		char buff[1024];
+		char buff[1024] = {0};
 		int read_code = usb_read(&device, buff, 1024);
 		
 		if(read_code != 0)
