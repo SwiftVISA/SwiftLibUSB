@@ -47,6 +47,8 @@
 		912860E82A1D46EE001AB351 /* SwiftLibUSBUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftLibUSBUITests.swift; sourceTree = "<group>"; };
 		912860EA2A1D46EE001AB351 /* SwiftLibUSBUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftLibUSBUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		91DE961C2A1D5818006D2047 /* Controller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Controller.swift; sourceTree = "<group>"; };
+		DEC603E72A1D66AF00ACE746 /* SwiftLibUSB-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SwiftLibUSB-Bridging-Header.h"; sourceTree = "<group>"; };
+		DEC603EC2A1D68BA00ACE746 /* macOS 13 - Production Templates - Sketch */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "macOS 13 - Production Templates - Sketch"; path = "../../../../../Volumes/macOS-13-Production-Templates-Sketch/macOS 13 - Production Templates - Sketch"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,6 +83,7 @@
 				912860DD2A1D46EE001AB351 /* SwiftLibUSBTests */,
 				912860E72A1D46EE001AB351 /* SwiftLibUSBUITests */,
 				912860CA2A1D46E9001AB351 /* Products */,
+				DEC603EB2A1D68BA00ACE746 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -103,6 +106,7 @@
 				912860D02A1D46EC001AB351 /* Assets.xcassets */,
 				912860D52A1D46EC001AB351 /* SwiftLibUSB.entitlements */,
 				912860D22A1D46EC001AB351 /* Preview Content */,
+				DEC603E72A1D66AF00ACE746 /* SwiftLibUSB-Bridging-Header.h */,
 			);
 			path = SwiftLibUSB;
 			sourceTree = "<group>";
@@ -130,6 +134,14 @@
 				912860EA2A1D46EE001AB351 /* SwiftLibUSBUITestsLaunchTests.swift */,
 			);
 			path = SwiftLibUSBUITests;
+			sourceTree = "<group>";
+		};
+		DEC603EB2A1D68BA00ACE746 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				DEC603EC2A1D68BA00ACE746 /* macOS 13 - Production Templates - Sketch */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -200,6 +212,7 @@
 				TargetAttributes = {
 					912860C82A1D46E8001AB351 = {
 						CreatedOnToolsVersion = 14.2;
+						LastSwiftMigration = 1420;
 					};
 					912860D92A1D46EE001AB351 = {
 						CreatedOnToolsVersion = 14.2;
@@ -419,6 +432,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = SwiftLibUSB/SwiftLibUSB.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -426,15 +440,19 @@
 				DEVELOPMENT_ASSET_PATHS = "\"SwiftLibUSB/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				"HEADER_SEARCH_PATHS[arch=*]" = /usr/local/include;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				"LIBRARY_SEARCH_PATHS[arch=*]" = /usr/local/lib;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = Mines.SwiftLibUSB;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "SwiftLibUSB/SwiftLibUSB-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -444,6 +462,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = SwiftLibUSB/SwiftLibUSB.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -451,15 +470,18 @@
 				DEVELOPMENT_ASSET_PATHS = "\"SwiftLibUSB/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				"HEADER_SEARCH_PATHS[arch=*]" = /usr/local/include;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				"LIBRARY_SEARCH_PATHS[arch=*]" = /usr/local/lib;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = Mines.SwiftLibUSB;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "SwiftLibUSB/SwiftLibUSB-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
