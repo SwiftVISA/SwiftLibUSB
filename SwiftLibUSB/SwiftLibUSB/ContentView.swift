@@ -8,12 +8,11 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State var control = Controller()
     var body: some View {
         VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundColor(.accentColor)
-            Text("Hello, world!")
+            TextField("Command", text: $control.command)
+            Button("Print Command", action: control.printCommand)
         }
         .padding()
     }

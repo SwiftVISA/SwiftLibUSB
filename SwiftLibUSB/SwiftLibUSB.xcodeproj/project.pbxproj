@@ -14,6 +14,7 @@
 		912860DF2A1D46EE001AB351 /* SwiftLibUSBTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 912860DE2A1D46EE001AB351 /* SwiftLibUSBTests.swift */; };
 		912860E92A1D46EE001AB351 /* SwiftLibUSBUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 912860E82A1D46EE001AB351 /* SwiftLibUSBUITests.swift */; };
 		912860EB2A1D46EE001AB351 /* SwiftLibUSBUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 912860EA2A1D46EE001AB351 /* SwiftLibUSBUITestsLaunchTests.swift */; };
+		91DE961D2A1D5818006D2047 /* Controller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91DE961C2A1D5818006D2047 /* Controller.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,6 +46,7 @@
 		912860E42A1D46EE001AB351 /* SwiftLibUSBUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwiftLibUSBUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		912860E82A1D46EE001AB351 /* SwiftLibUSBUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftLibUSBUITests.swift; sourceTree = "<group>"; };
 		912860EA2A1D46EE001AB351 /* SwiftLibUSBUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftLibUSBUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		91DE961C2A1D5818006D2047 /* Controller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Controller.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -97,6 +99,7 @@
 			children = (
 				912860CC2A1D46E9001AB351 /* SwiftLibUSBApp.swift */,
 				912860CE2A1D46E9001AB351 /* ContentView.swift */,
+				91DE961C2A1D5818006D2047 /* Controller.swift */,
 				912860D02A1D46EC001AB351 /* Assets.xcassets */,
 				912860D52A1D46EC001AB351 /* SwiftLibUSB.entitlements */,
 				912860D22A1D46EC001AB351 /* Preview Content */,
@@ -259,6 +262,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				91DE961D2A1D5818006D2047 /* Controller.swift in Sources */,
 				912860CF2A1D46E9001AB351 /* ContentView.swift in Sources */,
 				912860CD2A1D46E9001AB351 /* SwiftLibUSBApp.swift in Sources */,
 			);
