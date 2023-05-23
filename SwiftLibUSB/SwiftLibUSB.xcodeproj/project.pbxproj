@@ -1,0 +1,573 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		912860CD2A1D46E9001AB351 /* SwiftLibUSBApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 912860CC2A1D46E9001AB351 /* SwiftLibUSBApp.swift */; };
+		912860CF2A1D46E9001AB351 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 912860CE2A1D46E9001AB351 /* ContentView.swift */; };
+		912860D12A1D46EC001AB351 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 912860D02A1D46EC001AB351 /* Assets.xcassets */; };
+		912860D42A1D46EC001AB351 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 912860D32A1D46EC001AB351 /* Preview Assets.xcassets */; };
+		912860DF2A1D46EE001AB351 /* SwiftLibUSBTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 912860DE2A1D46EE001AB351 /* SwiftLibUSBTests.swift */; };
+		912860E92A1D46EE001AB351 /* SwiftLibUSBUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 912860E82A1D46EE001AB351 /* SwiftLibUSBUITests.swift */; };
+		912860EB2A1D46EE001AB351 /* SwiftLibUSBUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 912860EA2A1D46EE001AB351 /* SwiftLibUSBUITestsLaunchTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		912860DB2A1D46EE001AB351 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 912860C12A1D46E8001AB351 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 912860C82A1D46E8001AB351;
+			remoteInfo = SwiftLibUSB;
+		};
+		912860E52A1D46EE001AB351 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 912860C12A1D46E8001AB351 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 912860C82A1D46E8001AB351;
+			remoteInfo = SwiftLibUSB;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		912860C92A1D46E9001AB351 /* SwiftLibUSB.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftLibUSB.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		912860CC2A1D46E9001AB351 /* SwiftLibUSBApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftLibUSBApp.swift; sourceTree = "<group>"; };
+		912860CE2A1D46E9001AB351 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		912860D02A1D46EC001AB351 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		912860D32A1D46EC001AB351 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		912860D52A1D46EC001AB351 /* SwiftLibUSB.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SwiftLibUSB.entitlements; sourceTree = "<group>"; };
+		912860DA2A1D46EE001AB351 /* SwiftLibUSBTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwiftLibUSBTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		912860DE2A1D46EE001AB351 /* SwiftLibUSBTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftLibUSBTests.swift; sourceTree = "<group>"; };
+		912860E42A1D46EE001AB351 /* SwiftLibUSBUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwiftLibUSBUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		912860E82A1D46EE001AB351 /* SwiftLibUSBUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftLibUSBUITests.swift; sourceTree = "<group>"; };
+		912860EA2A1D46EE001AB351 /* SwiftLibUSBUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftLibUSBUITestsLaunchTests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		912860C62A1D46E8001AB351 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		912860D72A1D46EE001AB351 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		912860E12A1D46EE001AB351 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		912860C02A1D46E8001AB351 = {
+			isa = PBXGroup;
+			children = (
+				912860CB2A1D46E9001AB351 /* SwiftLibUSB */,
+				912860DD2A1D46EE001AB351 /* SwiftLibUSBTests */,
+				912860E72A1D46EE001AB351 /* SwiftLibUSBUITests */,
+				912860CA2A1D46E9001AB351 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		912860CA2A1D46E9001AB351 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				912860C92A1D46E9001AB351 /* SwiftLibUSB.app */,
+				912860DA2A1D46EE001AB351 /* SwiftLibUSBTests.xctest */,
+				912860E42A1D46EE001AB351 /* SwiftLibUSBUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		912860CB2A1D46E9001AB351 /* SwiftLibUSB */ = {
+			isa = PBXGroup;
+			children = (
+				912860CC2A1D46E9001AB351 /* SwiftLibUSBApp.swift */,
+				912860CE2A1D46E9001AB351 /* ContentView.swift */,
+				912860D02A1D46EC001AB351 /* Assets.xcassets */,
+				912860D52A1D46EC001AB351 /* SwiftLibUSB.entitlements */,
+				912860D22A1D46EC001AB351 /* Preview Content */,
+			);
+			path = SwiftLibUSB;
+			sourceTree = "<group>";
+		};
+		912860D22A1D46EC001AB351 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				912860D32A1D46EC001AB351 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		912860DD2A1D46EE001AB351 /* SwiftLibUSBTests */ = {
+			isa = PBXGroup;
+			children = (
+				912860DE2A1D46EE001AB351 /* SwiftLibUSBTests.swift */,
+			);
+			path = SwiftLibUSBTests;
+			sourceTree = "<group>";
+		};
+		912860E72A1D46EE001AB351 /* SwiftLibUSBUITests */ = {
+			isa = PBXGroup;
+			children = (
+				912860E82A1D46EE001AB351 /* SwiftLibUSBUITests.swift */,
+				912860EA2A1D46EE001AB351 /* SwiftLibUSBUITestsLaunchTests.swift */,
+			);
+			path = SwiftLibUSBUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		912860C82A1D46E8001AB351 /* SwiftLibUSB */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 912860EE2A1D46EE001AB351 /* Build configuration list for PBXNativeTarget "SwiftLibUSB" */;
+			buildPhases = (
+				912860C52A1D46E8001AB351 /* Sources */,
+				912860C62A1D46E8001AB351 /* Frameworks */,
+				912860C72A1D46E8001AB351 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SwiftLibUSB;
+			productName = SwiftLibUSB;
+			productReference = 912860C92A1D46E9001AB351 /* SwiftLibUSB.app */;
+			productType = "com.apple.product-type.application";
+		};
+		912860D92A1D46EE001AB351 /* SwiftLibUSBTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 912860F12A1D46EE001AB351 /* Build configuration list for PBXNativeTarget "SwiftLibUSBTests" */;
+			buildPhases = (
+				912860D62A1D46EE001AB351 /* Sources */,
+				912860D72A1D46EE001AB351 /* Frameworks */,
+				912860D82A1D46EE001AB351 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				912860DC2A1D46EE001AB351 /* PBXTargetDependency */,
+			);
+			name = SwiftLibUSBTests;
+			productName = SwiftLibUSBTests;
+			productReference = 912860DA2A1D46EE001AB351 /* SwiftLibUSBTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		912860E32A1D46EE001AB351 /* SwiftLibUSBUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 912860F42A1D46EE001AB351 /* Build configuration list for PBXNativeTarget "SwiftLibUSBUITests" */;
+			buildPhases = (
+				912860E02A1D46EE001AB351 /* Sources */,
+				912860E12A1D46EE001AB351 /* Frameworks */,
+				912860E22A1D46EE001AB351 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				912860E62A1D46EE001AB351 /* PBXTargetDependency */,
+			);
+			name = SwiftLibUSBUITests;
+			productName = SwiftLibUSBUITests;
+			productReference = 912860E42A1D46EE001AB351 /* SwiftLibUSBUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		912860C12A1D46E8001AB351 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1420;
+				LastUpgradeCheck = 1420;
+				TargetAttributes = {
+					912860C82A1D46E8001AB351 = {
+						CreatedOnToolsVersion = 14.2;
+					};
+					912860D92A1D46EE001AB351 = {
+						CreatedOnToolsVersion = 14.2;
+						TestTargetID = 912860C82A1D46E8001AB351;
+					};
+					912860E32A1D46EE001AB351 = {
+						CreatedOnToolsVersion = 14.2;
+						TestTargetID = 912860C82A1D46E8001AB351;
+					};
+				};
+			};
+			buildConfigurationList = 912860C42A1D46E8001AB351 /* Build configuration list for PBXProject "SwiftLibUSB" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 912860C02A1D46E8001AB351;
+			productRefGroup = 912860CA2A1D46E9001AB351 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				912860C82A1D46E8001AB351 /* SwiftLibUSB */,
+				912860D92A1D46EE001AB351 /* SwiftLibUSBTests */,
+				912860E32A1D46EE001AB351 /* SwiftLibUSBUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		912860C72A1D46E8001AB351 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				912860D42A1D46EC001AB351 /* Preview Assets.xcassets in Resources */,
+				912860D12A1D46EC001AB351 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		912860D82A1D46EE001AB351 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		912860E22A1D46EE001AB351 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		912860C52A1D46E8001AB351 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				912860CF2A1D46E9001AB351 /* ContentView.swift in Sources */,
+				912860CD2A1D46E9001AB351 /* SwiftLibUSBApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		912860D62A1D46EE001AB351 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				912860DF2A1D46EE001AB351 /* SwiftLibUSBTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		912860E02A1D46EE001AB351 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				912860E92A1D46EE001AB351 /* SwiftLibUSBUITests.swift in Sources */,
+				912860EB2A1D46EE001AB351 /* SwiftLibUSBUITestsLaunchTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		912860DC2A1D46EE001AB351 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 912860C82A1D46E8001AB351 /* SwiftLibUSB */;
+			targetProxy = 912860DB2A1D46EE001AB351 /* PBXContainerItemProxy */;
+		};
+		912860E62A1D46EE001AB351 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 912860C82A1D46E8001AB351 /* SwiftLibUSB */;
+			targetProxy = 912860E52A1D46EE001AB351 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		912860EC2A1D46EE001AB351 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.1;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		912860ED2A1D46EE001AB351 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.1;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+		912860EF2A1D46EE001AB351 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = SwiftLibUSB/SwiftLibUSB.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"SwiftLibUSB/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Mines.SwiftLibUSB;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		912860F02A1D46EE001AB351 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = SwiftLibUSB/SwiftLibUSB.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"SwiftLibUSB/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Mines.SwiftLibUSB;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		912860F22A1D46EE001AB351 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Mines.SwiftLibUSBTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SwiftLibUSB.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SwiftLibUSB";
+			};
+			name = Debug;
+		};
+		912860F32A1D46EE001AB351 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Mines.SwiftLibUSBTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SwiftLibUSB.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SwiftLibUSB";
+			};
+			name = Release;
+		};
+		912860F52A1D46EE001AB351 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Mines.SwiftLibUSBUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = SwiftLibUSB;
+			};
+			name = Debug;
+		};
+		912860F62A1D46EE001AB351 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Mines.SwiftLibUSBUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = SwiftLibUSB;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		912860C42A1D46E8001AB351 /* Build configuration list for PBXProject "SwiftLibUSB" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				912860EC2A1D46EE001AB351 /* Debug */,
+				912860ED2A1D46EE001AB351 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		912860EE2A1D46EE001AB351 /* Build configuration list for PBXNativeTarget "SwiftLibUSB" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				912860EF2A1D46EE001AB351 /* Debug */,
+				912860F02A1D46EE001AB351 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		912860F12A1D46EE001AB351 /* Build configuration list for PBXNativeTarget "SwiftLibUSBTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				912860F22A1D46EE001AB351 /* Debug */,
+				912860F32A1D46EE001AB351 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		912860F42A1D46EE001AB351 /* Build configuration list for PBXNativeTarget "SwiftLibUSBUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				912860F52A1D46EE001AB351 /* Debug */,
+				912860F62A1D46EE001AB351 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 912860C12A1D46E8001AB351 /* Project object */;
+}
