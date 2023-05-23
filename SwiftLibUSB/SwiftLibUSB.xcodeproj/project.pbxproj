@@ -15,6 +15,7 @@
 		912860E92A1D46EE001AB351 /* SwiftLibUSBUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 912860E82A1D46EE001AB351 /* SwiftLibUSBUITests.swift */; };
 		912860EB2A1D46EE001AB351 /* SwiftLibUSBUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 912860EA2A1D46EE001AB351 /* SwiftLibUSBUITestsLaunchTests.swift */; };
 		91DE961D2A1D5818006D2047 /* Controller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91DE961C2A1D5818006D2047 /* Controller.swift */; };
+		DEC603EF2A1D76CB00ACE746 /* libusb-1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DEC603EE2A1D76CB00ACE746 /* libusb-1.0.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +50,7 @@
 		91DE961C2A1D5818006D2047 /* Controller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Controller.swift; sourceTree = "<group>"; };
 		DEC603E72A1D66AF00ACE746 /* SwiftLibUSB-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SwiftLibUSB-Bridging-Header.h"; sourceTree = "<group>"; };
 		DEC603EC2A1D68BA00ACE746 /* macOS 13 - Production Templates - Sketch */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "macOS 13 - Production Templates - Sketch"; path = "../../../../../Volumes/macOS-13-Production-Templates-Sketch/macOS 13 - Production Templates - Sketch"; sourceTree = "<group>"; };
+		DEC603EE2A1D76CB00ACE746 /* libusb-1.0.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libusb-1.0.a"; path = "../../../../../usr/local/Cellar/libusb/1.0.26/lib/libusb-1.0.a"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +58,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DEC603EF2A1D76CB00ACE746 /* libusb-1.0.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -139,6 +142,7 @@
 		DEC603EB2A1D68BA00ACE746 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				DEC603EE2A1D76CB00ACE746 /* libusb-1.0.a */,
 				DEC603EC2A1D68BA00ACE746 /* macOS 13 - Production Templates - Sketch */,
 			);
 			name = Frameworks;
@@ -446,6 +450,10 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/local/Cellar/libusb/1.0.26/lib,
+				);
 				"LIBRARY_SEARCH_PATHS[arch=*]" = /usr/local/lib;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = Mines.SwiftLibUSB;
@@ -475,6 +483,10 @@
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/local/Cellar/libusb/1.0.26/lib,
 				);
 				"LIBRARY_SEARCH_PATHS[arch=*]" = /usr/local/lib;
 				MARKETING_VERSION = 1.0;

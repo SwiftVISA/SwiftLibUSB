@@ -12,4 +12,8 @@ struct Controller {
     func printCommand() {
         print(command)
     }
+    
+    func initialize() {
+        libusb_init(nil)
+    }
 }
