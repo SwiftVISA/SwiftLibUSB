@@ -18,6 +18,7 @@
 		DEC603EF2A1D76CB00ACE746 /* libusb-1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DEC603EE2A1D76CB00ACE746 /* libusb-1.0.a */; };
 		DEC604392A1E877100ACE746 /* Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC604382A1E877100ACE746 /* Error.swift */; };
 		DEC6043B2A1E881900ACE746 /* Context.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC6043A2A1E881900ACE746 /* Context.swift */; };
+		DEC6043D2A1E903800ACE746 /* DeviceList.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC6043C2A1E903800ACE746 /* DeviceList.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +56,7 @@
 		DEC603EE2A1D76CB00ACE746 /* libusb-1.0.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libusb-1.0.a"; path = "../../../../../usr/local/Cellar/libusb/1.0.26/lib/libusb-1.0.a"; sourceTree = "<group>"; };
 		DEC604382A1E877100ACE746 /* Error.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Error.swift; sourceTree = "<group>"; };
 		DEC6043A2A1E881900ACE746 /* Context.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Context.swift; sourceTree = "<group>"; };
+		DEC6043C2A1E903800ACE746 /* DeviceList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceList.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -108,6 +110,7 @@
 			isa = PBXGroup;
 			children = (
 				DEC6043A2A1E881900ACE746 /* Context.swift */,
+				DEC6043C2A1E903800ACE746 /* DeviceList.swift */,
 				DEC604382A1E877100ACE746 /* Error.swift */,
 				912860CC2A1D46E9001AB351 /* SwiftLibUSBApp.swift */,
 				912860CE2A1D46E9001AB351 /* ContentView.swift */,
@@ -288,6 +291,7 @@
 				DEC604392A1E877100ACE746 /* Error.swift in Sources */,
 				91DE961D2A1D5818006D2047 /* Controller.swift in Sources */,
 				912860CF2A1D46E9001AB351 /* ContentView.swift in Sources */,
+				DEC6043D2A1E903800ACE746 /* DeviceList.swift in Sources */,
 				DEC6043B2A1E881900ACE746 /* Context.swift in Sources */,
 				912860CD2A1D46E9001AB351 /* SwiftLibUSBApp.swift in Sources */,
 			);

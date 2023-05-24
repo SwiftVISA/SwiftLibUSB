@@ -23,4 +23,8 @@ class Context {
     deinit {
         libusb_exit(libContext)
     }
+    
+    func getDeviceList() throws -> DeviceList {
+        return try DeviceList(context: libContext)
+    }
 }
