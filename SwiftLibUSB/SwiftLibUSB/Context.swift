@@ -12,7 +12,7 @@ struct Context {
     
     init() throws {
         var context: OpaquePointer? = nil;
-        let error = libusb_init(UnsafeMutablePointer(&context))
+        let error = withUnsafeMutablePointer(to: &context, libusb_init)
         if (error == 0) {
             libContext = context.unsafelyUnwrapped
         } else {
