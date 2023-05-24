@@ -7,13 +7,20 @@
 
 import Foundation
 
-struct Controller {
+class Controller: ObservableObject {
     var command = ""
+    var context: Context?
+    
     func printCommand() {
         print(command)
     }
     
     func initialize() {
-        libusb_init(nil)
+        do {
+            try context = Context()
+            print("Initialization succeeded")
+        } catch {
+            print("Initialization failed")
+        }
     }
 }

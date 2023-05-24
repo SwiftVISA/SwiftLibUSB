@@ -16,6 +16,8 @@
 		912860EB2A1D46EE001AB351 /* SwiftLibUSBUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 912860EA2A1D46EE001AB351 /* SwiftLibUSBUITestsLaunchTests.swift */; };
 		91DE961D2A1D5818006D2047 /* Controller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91DE961C2A1D5818006D2047 /* Controller.swift */; };
 		DEC603EF2A1D76CB00ACE746 /* libusb-1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DEC603EE2A1D76CB00ACE746 /* libusb-1.0.a */; };
+		DEC604392A1E877100ACE746 /* Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC604382A1E877100ACE746 /* Error.swift */; };
+		DEC6043B2A1E881900ACE746 /* Context.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC6043A2A1E881900ACE746 /* Context.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +53,8 @@
 		DEC603E72A1D66AF00ACE746 /* SwiftLibUSB-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SwiftLibUSB-Bridging-Header.h"; sourceTree = "<group>"; };
 		DEC603EC2A1D68BA00ACE746 /* macOS 13 - Production Templates - Sketch */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "macOS 13 - Production Templates - Sketch"; path = "../../../../../Volumes/macOS-13-Production-Templates-Sketch/macOS 13 - Production Templates - Sketch"; sourceTree = "<group>"; };
 		DEC603EE2A1D76CB00ACE746 /* libusb-1.0.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libusb-1.0.a"; path = "../../../../../usr/local/Cellar/libusb/1.0.26/lib/libusb-1.0.a"; sourceTree = "<group>"; };
+		DEC604382A1E877100ACE746 /* Error.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Error.swift; sourceTree = "<group>"; };
+		DEC6043A2A1E881900ACE746 /* Context.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Context.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -103,6 +107,8 @@
 		912860CB2A1D46E9001AB351 /* SwiftLibUSB */ = {
 			isa = PBXGroup;
 			children = (
+				DEC6043A2A1E881900ACE746 /* Context.swift */,
+				DEC604382A1E877100ACE746 /* Error.swift */,
 				912860CC2A1D46E9001AB351 /* SwiftLibUSBApp.swift */,
 				912860CE2A1D46E9001AB351 /* ContentView.swift */,
 				91DE961C2A1D5818006D2047 /* Controller.swift */,
@@ -279,8 +285,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DEC604392A1E877100ACE746 /* Error.swift in Sources */,
 				91DE961D2A1D5818006D2047 /* Controller.swift in Sources */,
 				912860CF2A1D46E9001AB351 /* ContentView.swift in Sources */,
+				DEC6043B2A1E881900ACE746 /* Context.swift in Sources */,
 				912860CD2A1D46E9001AB351 /* SwiftLibUSBApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
