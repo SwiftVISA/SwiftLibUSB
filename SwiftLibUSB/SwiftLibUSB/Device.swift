@@ -7,9 +7,24 @@
 
 import Foundation
 
+/// Class representing an available USB device
+///
+/// Communicating with the device requires opening the device
 class Device {
     var device: OpaquePointer
     var descriptor: libusb_device_descriptor
+    
+    var productId: Int {
+        get {
+            Int(descriptor.idProduct)
+        }
+    }
+    
+    var vendorId: Int {
+        get {
+            Int(descriptor.idVendor)
+        }
+    }
     
     init(pointer: OpaquePointer) throws {
         device = pointer
