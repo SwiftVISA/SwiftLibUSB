@@ -57,11 +57,4 @@ int usb_read(struct usb_data *usb, char *buffer, unsigned int size);
 */
 int usb_close(struct usb_data *usb);
 
-//need this in the header so it can be called from main
-int send_transfer(struct libusb_transfer *transfer,
-                  struct libusb_device_handle *handle,
-                  unsigned char endpoint,
-                  char *message,
-                  int size);
-
 #endif // USB_H

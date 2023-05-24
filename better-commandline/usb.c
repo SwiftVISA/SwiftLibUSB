@@ -277,13 +277,13 @@ void sendReadRequest(struct usb_data *usb, struct libusb_transfer *transfer, cha
 }
 // See usb.h
 int usb_read(struct usb_data *usb, char *buffer, unsigned int size) {
-    sleep(1); // To wait for the first write to be done
+	libusb_clear_halt(usb->handle, usb->in_endpoint);
+    //sleep(1); // To wait for the first write to be done
 
     struct libusb_transfer *transfer = libusb_alloc_transfer(0);
     sendReadRequest(usb,transfer,buffer,size);
-    sleep(1);
+    //sleep(1);
 
-    //libusb_clear_halt(usb->handle, usb->in_endpoint);
     return send_transfer(transfer, usb->handle, usb->in_endpoint, buffer, size); // Send buffer for writeback
 }
 

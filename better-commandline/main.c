@@ -56,13 +56,6 @@ int do_connect(struct arg_info *args)
 	
 	if(args->needs_response)
 	{
-		char trashBuffer[1024] = {0};
-		struct libusb_transfer *transfer = libusb_alloc_transfer(0);
-		int trash_code = send_transfer(transfer, device.handle, device.in_endpoint, trashBuffer, 1024);
-		
-		printf("Trash stuff code: %d\n", trash_code);
-		
-		//attempt to send data
 		int send_code = usb_write(&device, args->message);
 		
 		if(send_code != 0)
