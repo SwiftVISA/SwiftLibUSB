@@ -10,7 +10,15 @@ import Foundation
 /// Class representing an available USB device
 ///
 /// Communicating with the device requires opening the device
-class Device {
+struct Device: Hashable {
+    static func == (lhs: Device, rhs: Device) -> Bool {
+        lhs.device == rhs.device
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        device.hash(into: &hasher)
+    }
+    
     var device: OpaquePointer
     var descriptor: libusb_device_descriptor
     
@@ -23,6 +31,12 @@ class Device {
     var vendorId: Int {
         get {
             Int(descriptor.idVendor)
+        }
+    }
+    
+    var displayName: String {
+        get {
+            return "Vendor: \(vendorId) Product: \(productId)"
         }
     }
     
