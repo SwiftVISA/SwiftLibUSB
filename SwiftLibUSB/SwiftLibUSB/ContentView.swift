@@ -17,10 +17,12 @@ struct ContentView: View {
             Button("Initialize", action: control.initialize)
             Button("Get Devices", action: control.getDeviceList)
             Picker("Device:", selection: $control.chosenDevice) {
-                ForEach(control.deviceOptions, id: \.self) { item in
-                    Text(item)
+                ForEach($control.devices, id: \.self) { item in
+                    Text(verbatim: item.wrappedValue.displayName)
                 }
             }
+            
+            
             Button("Print Device", action: control.printDevice)
         }
         .padding()

@@ -8,40 +8,28 @@
 import Foundation
 
 class DeviceList {
-    var devices: UnsafeMutablePointer<OpaquePointer?>
+    var devices: [Device]
+    var pointer: UnsafeMutablePointer<OpaquePointer?>?
     let startIndex: Int = 0
     var endIndex: Int
     
     init(context: OpaquePointer) throws {
-        var inner_devices: UnsafeMutablePointer<OpaquePointer?>? = nil
-        let size = libusb_get_device_list(context, &inner_devices)
+        pointer = nil
+        let size = libusb_get_device_list(context, &pointer)
         if size < 0 {
             throw USBError.from(code: Int32(size))
         }
         
-        devices = inner_devices.unsafelyUnwrapped
+        devices = []
+        for i in 0...size {
+            if let dev = pointer?[i] {
+                devices.append(try Device(pointer: dev))
+            }
+        }
         endIndex = size
     }
     
     deinit {
-        libusb_free_device_list(devices, 1)
-    }
-}
-
-extension DeviceList: Collection {
-    func index(after i: Int) -> Int {
-        i + 1
-    }
-    
-    subscript(position: Int) -> Device? {
-        if let dev_pt = devices[position] {
-            do {
-                return try Device(pointer: dev_pt)
-            } catch {
-                print("Error in getting device")
-                return nil
-            }
-        }
-        return nil
+        libusb_free_device_list(pointer, 1)
     }
 }
