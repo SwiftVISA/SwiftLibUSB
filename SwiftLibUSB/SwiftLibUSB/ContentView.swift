@@ -9,12 +9,19 @@ import SwiftUI
 
 struct ContentView: View {
     @State var control = Controller()
+    
     var body: some View {
         VStack {
             TextField("Command", text: $control.command)
             Button("Print Command", action: control.printCommand)
             Button("Initialize", action: control.initialize)
             Button("Get Devices", action: control.getDeviceList)
+            Picker("Device:", selection: $control.chosenDevice) {
+                ForEach(control.deviceOptions, id: \.self) { item in
+                    Text(item)
+                }
+            }
+            Button("Print Device", action: control.printDevice)
         }
         .padding()
     }
