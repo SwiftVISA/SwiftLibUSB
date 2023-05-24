@@ -9,7 +9,6 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject var control = Controller()
-    @State var update = false
     
     var body: some View {
         VStack {
@@ -18,7 +17,6 @@ struct ContentView: View {
             Button("Initialize", action: control.initialize)
             Button("Get Devices", action: { () in
                 control.getDeviceList()
-                update = !update
             })
             Group {
                 if control.devices.count != 0 {
@@ -35,7 +33,7 @@ struct ContentView: View {
                     Button("Print Device", action: control.printDevice)
                 }
             }
-            .id(update)
+            .id(control.devices)
         }
         .padding()
     }
