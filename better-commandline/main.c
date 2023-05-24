@@ -52,21 +52,20 @@ int do_connect(struct arg_info *args)
 		return -1;
 	}
 
-		printf("Connected to device\n");
-	
-	//attempt to send data
-	int send_code = usb_write(&device, args->message);
-	
-	if(send_code != 0)
-	{
-		printf("Error sending message.\n");
-		return -1;
-	}
-
-		printf("Command sent\n");
+	printf("Connected to device\n");
 	
 	if(args->needs_response)
 	{
+		int send_code = usb_write(&device, args->message);
+		
+		if(send_code != 0)
+		{
+			printf("Error sending message.\n");
+			return -1;
+		}
+
+		printf("Command sent\n");
+		
 		printf("Awaiting response.\n");
 		char buff[1024] = {0};
 		int read_code = usb_read(&device, buff, 1024);
@@ -79,6 +78,18 @@ int do_connect(struct arg_info *args)
 		
 		//pass in the buffer after the end of the header
 		printf("%s\n", &buff[12]);
+	}else
+	{
+		//attempt to send data
+		int send_code = usb_write(&device, args->message);
+		
+		if(send_code != 0)
+		{
+			printf("Error sending message.\n");
+			return -1;
+		}
+
+		printf("Command sent\n");
 	}
 	
 	usb_close(&device);
