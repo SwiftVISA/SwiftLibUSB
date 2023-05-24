@@ -13,7 +13,7 @@ struct ContentView: View {
         VStack {
             TextField("Command", text: $control.command)
             Button("Print Command", action: control.printCommand)
-            Button("Initialize USB", action: control.initialize)
+            Button("Initialize", action: control.initialize)
         }
         .padding()
     }
