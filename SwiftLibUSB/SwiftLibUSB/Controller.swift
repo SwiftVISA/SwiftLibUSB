@@ -9,6 +9,8 @@ import Foundation
 
 class Controller: ObservableObject {
     var command = ""
+    var deviceOptions = ["Device 1","Device 2","Device 3","Device 4"]
+    var chosenDevice = ""
     var context: Context?
     
     func printCommand() {
@@ -31,5 +33,9 @@ class Controller: ObservableObject {
         } catch {
             print("Error getting devices")
         }
+    }
+    
+    func printDevice() {
+        print(chosenDevice)
     }
 }
