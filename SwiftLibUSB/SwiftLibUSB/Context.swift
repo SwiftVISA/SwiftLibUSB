@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Context {
+class Context {
     var libContext: OpaquePointer
     
     init() throws {
@@ -18,5 +18,9 @@ struct Context {
         } else {
             throw USBError.from(code: error)
         }
+    }
+    
+    deinit {
+        libusb_exit(libContext)
     }
 }
