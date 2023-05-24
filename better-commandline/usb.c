@@ -6,7 +6,7 @@
 #include <unistd.h>
 
 // Constants
-#define timeout 10000 // The amount of time to wait before giving up on a message. Measured in milliseconds.
+#define timeout 1000 // The amount of time to wait before giving up on a message. Measured in milliseconds.
 #define writeTo 1 // Code to write to a device
 #define readFrom 2 // Code to read from a device
 
@@ -49,6 +49,7 @@ In addition, handles updating messageIndex and freeing the transfer.
     0 if successful
     -1 otherwise
 */
+/*
 int send_transfer(struct libusb_transfer *transfer,
                   struct libusb_device_handle *handle,
                   unsigned char endpoint,
@@ -73,8 +74,7 @@ int send_transfer(struct libusb_transfer *transfer,
 	// Clear the transfer
 	libusb_free_transfer(transfer);
     return callbackError;
-}
-
+}*/
 /*
     The message index must be constrained to 1-255 inclusive and incremented after each message
     This automatically maintains that range
@@ -103,7 +103,7 @@ int raw_write(struct usb_data *usb, const unsigned char *data,char endpoint,unsi
 	struct libusb_device_handle *deviceHandle = usb->handle;
     
     // Generate transfer
-    struct libusb_transfer *transfer = libusb_alloc_transfer(0);
+
     int length = strlen(data);
     if (messageType == writeTo) {
         length += 1;
@@ -135,7 +135,10 @@ int raw_write(struct usb_data *usb, const unsigned char *data,char endpoint,unsi
     }
     printf("\n");
 
-    int response = send_transfer(transfer, deviceHandle, endpoint, message, size);
+    int byteSent = 0;
+    int response = libusb_bulk_transfer(deviceHandle, endpoint, message, size,&byteSent,timeout);
+    printf("sent with responce %d, (%d/%d) bytes sent\n", response, byteSent, size);
+    /*send_transfer(transfer, deviceHandle, endpoint, message, size);*/
     incrementIndex();
     free(message);
     return response;
@@ -245,7 +248,7 @@ int usb_write(struct usb_data *usb, const char *message) {
     return raw_write(usb,message,usb->out_endpoint,writeTo);
 }
 
-void sendReadRequest(struct usb_data *usb, struct libusb_transfer *transfer, char *buffer, unsigned int size){
+void sendReadRequest(struct usb_data *usb, char *buffer, unsigned int size){
     unsigned char message[12] = { // Add header
         readFrom,
         messageIndex,
@@ -270,21 +273,18 @@ void sendReadRequest(struct usb_data *usb, struct libusb_transfer *transfer, cha
         printf("%d ", message[i]); // Display message for clarity
     }
     printf("\n");
-    libusb_fill_bulk_transfer(transfer, usb->handle, usb->out_endpoint, message, 12, &callback, 0, timeout); // Read request
-    callbackReturned = 0;
-    libusb_submit_transfer(transfer); // Send read request
-    libusb_handle_events_completed(NULL, &callbackReturned);
+    int bytesSent = 0;
+    libusb_bulk_transfer(usb->handle, usb->out_endpoint, message, 12, &bytesSent, timeout); // Read request
+
 }
 // See usb.h
 int usb_read(struct usb_data *usb, char *buffer, unsigned int size) {
-	libusb_clear_halt(usb->handle, usb->in_endpoint);
-    //sleep(1); // To wait for the first write to be done
+    libusb_clear_halt(usb->handle, usb->in_endpoint);
 
-    struct libusb_transfer *transfer = libusb_alloc_transfer(0);
-    sendReadRequest(usb,transfer,buffer,size);
-    //sleep(1);
+    sendReadRequest(usb,buffer,size);
 
-    return send_transfer(transfer, usb->handle, usb->in_endpoint, buffer, size); // Send buffer for writeback
+    int transfered = 0;
+    return libusb_bulk_transfer(usb->handle, usb->in_endpoint, buffer, size, &transfered, timeout); // Send buffer for writeback
 }
 
 // See usb.h
