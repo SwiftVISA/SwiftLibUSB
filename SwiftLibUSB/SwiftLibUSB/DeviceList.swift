@@ -20,4 +20,8 @@ class DeviceList {
         devices = inner_devices.unsafelyUnwrapped
         len = size
     }
+    
+    deinit {
+        libusb_free_device_list(devices, 1)
+    }
 }
