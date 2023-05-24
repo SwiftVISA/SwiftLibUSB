@@ -23,4 +23,13 @@ class Controller: ObservableObject {
             print("Initialization failed")
         }
     }
+    
+    func getDeviceList() {
+        do {
+            try context?.getDeviceList()
+            print("Got devives!")
+        } catch {
+            print("Error getting devices")
+        }
+    }
 }

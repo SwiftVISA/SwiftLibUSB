@@ -14,6 +14,7 @@ struct ContentView: View {
             TextField("Command", text: $control.command)
             Button("Print Command", action: control.printCommand)
             Button("Initialize", action: control.initialize)
+            Button("Get Devices", action: control.getDeviceList)
         }
         .padding()
     }
