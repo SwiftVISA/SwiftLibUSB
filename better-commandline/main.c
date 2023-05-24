@@ -56,14 +56,11 @@ int do_connect(struct arg_info *args)
 	
 	if(args->needs_response)
 	{
-		char buff[1024] = {0};
-		int read_code = usb_read(&device, buff, 1024);
+		char trashBuffer[1024] = {0};
+		struct libusb_transfer *transfer = libusb_alloc_transfer(0);
+		int trash_code = send_transfer(transfer, device.handle, device.in_endpoint, trashBuffer, 1024);
 		
-		if(read_code != 0)
-		{
-			printf("Error, code:%d, str:%s\n",read_code, libusb_error_name(read_code));
-			//return -1;
-		}
+		printf("Trash stuff code: %d\n", trash_code);
 		
 		//attempt to send data
 		int send_code = usb_write(&device, args->message);
@@ -77,8 +74,8 @@ int do_connect(struct arg_info *args)
 		printf("Command sent\n");
 		
 		printf("Awaiting response.\n");
-		memset(buff, 0, 1024);
-		read_code = usb_read(&device, buff, 1024);
+		char buff[1024] = {0};
+		int read_code = usb_read(&device, buff, 1024);
 		
 		if(read_code != 0)
 		{
