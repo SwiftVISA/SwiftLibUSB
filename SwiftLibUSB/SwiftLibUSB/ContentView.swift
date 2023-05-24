@@ -18,15 +18,19 @@ struct ContentView: View {
             Button("Initialize", action: control.initialize)
             Button("Get Devices", action: { () in
                 control.getDeviceList()
-                update = true
+                update = !update
             })
             Group {
                 if control.devices.count != 0 {
                     Picker("Device:", selection: $control.chosenDevice) {
                         ForEach($control.devices, id: \.self) { item in
-                            Text(verbatim: item.wrappedValue.displayName)
+                            Text(verbatim: item.wrappedValue.displayName).tag(item.wrappedValue)
                         }
                     }
+                    .id(control.chosenDevice)
+                    
+                    Text(verbatim: $control.chosenDevice.wrappedValue.displayName)
+                        .id(control.chosenDevice)
                     
                     Button("Print Device", action: control.printDevice)
                 }
