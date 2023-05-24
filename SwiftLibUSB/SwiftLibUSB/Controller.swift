@@ -10,7 +10,7 @@ import Foundation
 class Controller: ObservableObject {
     var command = ""
     var deviceOptions = ["Device 1","Device 2","Device 3","Device 4"]
-    var chosenDevice: Device = Device()
+    @Published var chosenDevice: Device = Device()
     var context: Context?
     var deviceList: DeviceList?
     var devices: [Device] = []
