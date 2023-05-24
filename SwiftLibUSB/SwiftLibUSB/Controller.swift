@@ -9,11 +9,10 @@ import Foundation
 
 class Controller: ObservableObject {
     var command = ""
-    var deviceOptions = ["Device 1","Device 2","Device 3","Device 4"]
     @Published var chosenDevice: Device = Device()
     var context: Context?
     var deviceList: DeviceList?
-    var devices: [Device] = []
+    @Published var devices: [Device] = []
     
     func printCommand() {
         print(command)
@@ -32,10 +31,7 @@ class Controller: ObservableObject {
         do {
             deviceList = try context?.getDeviceList()
             if let devList = deviceList {
-                for dev in devList.devices {
-                    devices.append(dev)
-                    chosenDevice = dev
-                }
+                devices = devList.devices
             }
             print("Got devices!")
         } catch {
@@ -44,7 +40,6 @@ class Controller: ObservableObject {
     }
     
     func printDevice() {
-        print(devices[0].displayName)
         print(chosenDevice.displayName)
     }
 }
