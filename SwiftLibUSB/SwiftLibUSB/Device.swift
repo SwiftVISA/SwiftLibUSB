@@ -22,6 +22,11 @@ struct Device: Hashable {
     var device: OpaquePointer
     var descriptor: libusb_device_descriptor
     
+    init() {
+        device = OpaquePointer.init(bitPattern: 4)!
+        descriptor = libusb_device_descriptor()
+    }
+    
     var productId: Int {
         get {
             Int(descriptor.idProduct)
