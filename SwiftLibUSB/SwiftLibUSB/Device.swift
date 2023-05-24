@@ -29,7 +29,7 @@ class Device {
     init(pointer: OpaquePointer) throws {
         device = pointer
         descriptor = libusb_device_descriptor()
-        let error = withUnsafeMutablePointer(to: &descriptor) { (dp) -> Int32 in libusb_get_device_descriptor(device, dp)}
+        let error = libusb_get_device_descriptor(device, &descriptor)
         if error < 0 {
             throw USBError.from(code: error)
         }
