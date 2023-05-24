@@ -14,7 +14,7 @@ class DeviceList {
     
     init(context: OpaquePointer) throws {
         var inner_devices: UnsafeMutablePointer<OpaquePointer?>? = nil
-        let size = withUnsafeMutablePointer(to: &inner_devices) { (dp) -> Int in libusb_get_device_list(context, dp) }
+        let size = libusb_get_device_list(context, &inner_devices)
         if size < 0 {
             throw USBError.from(code: Int32(size))
         }
