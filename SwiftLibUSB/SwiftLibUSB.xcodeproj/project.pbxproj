@@ -22,6 +22,7 @@
 		DEC6043F2A1E965B00ACE746 /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC6043E2A1E965B00ACE746 /* Device.swift */; };
 		DEC604412A1F188C00ACE746 /* DeviceHandle.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC604402A1F188C00ACE746 /* DeviceHandle.swift */; };
 		DEC604432A1FC5D200ACE746 /* ConnectedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC604422A1FC5D200ACE746 /* ConnectedView.swift */; };
+		DEC604452A1FCC4D00ACE746 /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC604442A1FCC4D00ACE746 /* Configuration.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -63,6 +64,7 @@
 		DEC6043E2A1E965B00ACE746 /* Device.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Device.swift; sourceTree = "<group>"; };
 		DEC604402A1F188C00ACE746 /* DeviceHandle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceHandle.swift; sourceTree = "<group>"; };
 		DEC604422A1FC5D200ACE746 /* ConnectedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectedView.swift; sourceTree = "<group>"; };
+		DEC604442A1FCC4D00ACE746 /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -115,6 +117,7 @@
 		912860CB2A1D46E9001AB351 /* SwiftLibUSB */ = {
 			isa = PBXGroup;
 			children = (
+				DEC604442A1FCC4D00ACE746 /* Configuration.swift */,
 				DEC6043A2A1E881900ACE746 /* Context.swift */,
 				DEC6043E2A1E965B00ACE746 /* Device.swift */,
 				DEC6043C2A1E903800ACE746 /* DeviceList.swift */,
@@ -303,6 +306,7 @@
 				912860CF2A1D46E9001AB351 /* ContentView.swift in Sources */,
 				DEC6043D2A1E903800ACE746 /* DeviceList.swift in Sources */,
 				DEC6043B2A1E881900ACE746 /* Context.swift in Sources */,
+				DEC604452A1FCC4D00ACE746 /* Configuration.swift in Sources */,
 				DEC6043F2A1E965B00ACE746 /* Device.swift in Sources */,
 				912860CD2A1D46E9001AB351 /* SwiftLibUSBApp.swift in Sources */,
 				DEC604432A1FC5D200ACE746 /* ConnectedView.swift in Sources */,
