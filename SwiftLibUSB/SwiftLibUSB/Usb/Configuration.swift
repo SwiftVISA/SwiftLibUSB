@@ -10,18 +10,18 @@ import Foundation
 class Configuration {
     var descriptor: UnsafeMutablePointer<libusb_config_descriptor>
     
-    init(_ handle: DeviceHandle, index: Int) throws {
+    init(_ device: Device, index: UInt8) throws {
         var desc: UnsafeMutablePointer<libusb_config_descriptor>? = nil
-        let error = libusb_get_config_descriptor(handle.handle, UInt8(index), &desc)
+        let error = libusb_get_config_descriptor(device.device, index, &desc)
         if error < 0 {
             throw USBError.from(code: error)
         }
         descriptor = desc!
     }
     
-    init(_ handle: DeviceHandle) throws {
+    init(_ device: Device) throws {
         var desc: UnsafeMutablePointer<libusb_config_descriptor>? = nil
-        let error = libusb_get_active_config_descriptor(handle.handle, &desc)
+        let error = libusb_get_active_config_descriptor(device.device, &desc)
         if error < 0 {
             throw USBError.from(code: error)
         }
