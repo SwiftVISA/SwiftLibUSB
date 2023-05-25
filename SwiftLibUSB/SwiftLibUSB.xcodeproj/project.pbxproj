@@ -117,16 +117,12 @@
 		912860CB2A1D46E9001AB351 /* SwiftLibUSB */ = {
 			isa = PBXGroup;
 			children = (
-				DEC604442A1FCC4D00ACE746 /* Configuration.swift */,
-				DEC6043A2A1E881900ACE746 /* Context.swift */,
-				DEC6043E2A1E965B00ACE746 /* Device.swift */,
-				DEC6043C2A1E903800ACE746 /* DeviceList.swift */,
 				DEC604382A1E877100ACE746 /* Error.swift */,
 				912860CC2A1D46E9001AB351 /* SwiftLibUSBApp.swift */,
 				912860CE2A1D46E9001AB351 /* ContentView.swift */,
+				DEC604462A1FCE4200ACE746 /* Usb */,
 				DEC604422A1FC5D200ACE746 /* ConnectedView.swift */,
 				91DE961C2A1D5818006D2047 /* Controller.swift */,
-				DEC604402A1F188C00ACE746 /* DeviceHandle.swift */,
 				912860D02A1D46EC001AB351 /* Assets.xcassets */,
 				912860D52A1D46EC001AB351 /* SwiftLibUSB.entitlements */,
 				912860D22A1D46EC001AB351 /* Preview Content */,
@@ -167,6 +163,18 @@
 				DEC603EC2A1D68BA00ACE746 /* macOS 13 - Production Templates - Sketch */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		DEC604462A1FCE4200ACE746 /* Usb */ = {
+			isa = PBXGroup;
+			children = (
+				DEC604402A1F188C00ACE746 /* DeviceHandle.swift */,
+				DEC6043C2A1E903800ACE746 /* DeviceList.swift */,
+				DEC6043E2A1E965B00ACE746 /* Device.swift */,
+				DEC6043A2A1E881900ACE746 /* Context.swift */,
+				DEC604442A1FCC4D00ACE746 /* Configuration.swift */,
+			);
+			path = Usb;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
