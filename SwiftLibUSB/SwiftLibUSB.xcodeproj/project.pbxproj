@@ -16,6 +16,8 @@
 		912860E92A1D46EE001AB351 /* SwiftLibUSBUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 912860E82A1D46EE001AB351 /* SwiftLibUSBUITests.swift */; };
 		912860EB2A1D46EE001AB351 /* SwiftLibUSBUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 912860EA2A1D46EE001AB351 /* SwiftLibUSBUITestsLaunchTests.swift */; };
 		91DE961D2A1D5818006D2047 /* Controller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91DE961C2A1D5818006D2047 /* Controller.swift */; };
+		91DE965A2A1FECAE006D2047 /* AltSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91DE96592A1FECAE006D2047 /* AltSetting.swift */; };
+		91DE965C2A1FECB8006D2047 /* Endpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91DE965B2A1FECB8006D2047 /* Endpoint.swift */; };
 		DEC603EF2A1D76CB00ACE746 /* libusb-1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DEC603EE2A1D76CB00ACE746 /* libusb-1.0.a */; };
 		DEC604392A1E877100ACE746 /* Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC604382A1E877100ACE746 /* Error.swift */; };
 		DEC6043B2A1E881900ACE746 /* Context.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC6043A2A1E881900ACE746 /* Context.swift */; };
@@ -57,6 +59,8 @@
 		912860E82A1D46EE001AB351 /* SwiftLibUSBUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftLibUSBUITests.swift; sourceTree = "<group>"; };
 		912860EA2A1D46EE001AB351 /* SwiftLibUSBUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftLibUSBUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		91DE961C2A1D5818006D2047 /* Controller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Controller.swift; sourceTree = "<group>"; };
+		91DE96592A1FECAE006D2047 /* AltSetting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AltSetting.swift; sourceTree = "<group>"; };
+		91DE965B2A1FECB8006D2047 /* Endpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Endpoint.swift; sourceTree = "<group>"; };
 		DEC603E72A1D66AF00ACE746 /* SwiftLibUSB-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SwiftLibUSB-Bridging-Header.h"; sourceTree = "<group>"; };
 		DEC603EC2A1D68BA00ACE746 /* macOS 13 - Production Templates - Sketch */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "macOS 13 - Production Templates - Sketch"; path = "../../../../../Volumes/macOS-13-Production-Templates-Sketch/macOS 13 - Production Templates - Sketch"; sourceTree = "<group>"; };
 		DEC603EE2A1D76CB00ACE746 /* libusb-1.0.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libusb-1.0.a"; path = "../../../../../usr/local/Cellar/libusb/1.0.26/lib/libusb-1.0.a"; sourceTree = "<group>"; };
@@ -176,6 +180,8 @@
 				DEC6043A2A1E881900ACE746 /* Context.swift */,
 				DEC604442A1FCC4D00ACE746 /* Configuration.swift */,
 				024F52712A1FE9B700E93233 /* Interface.swift */,
+				91DE96592A1FECAE006D2047 /* AltSetting.swift */,
+				91DE965B2A1FECB8006D2047 /* Endpoint.swift */,
 			);
 			path = Usb;
 			sourceTree = "<group>";
@@ -314,9 +320,11 @@
 				DEC604392A1E877100ACE746 /* Error.swift in Sources */,
 				DEC604412A1F188C00ACE746 /* DeviceHandle.swift in Sources */,
 				91DE961D2A1D5818006D2047 /* Controller.swift in Sources */,
+				91DE965C2A1FECB8006D2047 /* Endpoint.swift in Sources */,
 				912860CF2A1D46E9001AB351 /* ContentView.swift in Sources */,
 				DEC6043D2A1E903800ACE746 /* DeviceList.swift in Sources */,
 				DEC6043B2A1E881900ACE746 /* Context.swift in Sources */,
+				91DE965A2A1FECAE006D2047 /* AltSetting.swift in Sources */,
 				DEC604452A1FCC4D00ACE746 /* Configuration.swift in Sources */,
 				DEC6043F2A1E965B00ACE746 /* Device.swift in Sources */,
 				024F52722A1FE9B700E93233 /* Interface.swift in Sources */,
