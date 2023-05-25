@@ -8,9 +8,9 @@
 import Foundation
 
 class Endpoint {
-    var descriptor: UnsafeMutablePointer<libusb_interface_descriptor>
+    var descriptor: libusb_endpoint_descriptor
     
-    init(pointer : UnsafeMutablePointer<libusb_interface_descriptor>) {
+    init(pointer : libusb_endpoint_descriptor) {
        descriptor = pointer
     }
     

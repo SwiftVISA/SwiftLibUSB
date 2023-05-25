@@ -2,24 +2,30 @@
 //  Interface.swift
 //  SwiftLibUSB
 //
-//  Created by Thomas Applegate (Student) on 5/25/23.
+//  Created by Carole Bouy (Student) on 5/25/23.
 //
 
 import Foundation
 
 class Interface {
-    var descriptor: UnsafeMutablePointer<libusb_interface>
+    var descriptor: libusb_interface
     var claimed = false
+    var altSettings: [AltSetting]
     
-    init(pointer : UnsafeMutablePointer<libusb_interface>) {
-       descriptor = pointer
-    }
-    
-    func claim(){
-      
+    init(pointer : libusb_interface) {
+        descriptor = pointer
+        
+        altSettings = []
+        for i in 0...descriptor.num_altsetting {
+            altSettings.append(AltSetting(pointer: descriptor.altsetting[Int(i)]))
+        }
     }
     
     deinit {
         
+    }
+    
+    func claim(){
+       
     }
 }
