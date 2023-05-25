@@ -12,7 +12,9 @@ import Foundation
 class DeviceHandle {
     /// The pointer that libUSB understands as the actual handle
     var handle: OpaquePointer
-
+    /// The device this handle belongs to
+    var device: Device
+    
     init(device: Device) throws {
         var base_handle: OpaquePointer? = nil
         let error = libusb_open(device.device, &base_handle)
@@ -20,6 +22,7 @@ class DeviceHandle {
             throw USBError.from(code: error)
         }
         handle = base_handle!
+        self.device = device
     }
 
     deinit {

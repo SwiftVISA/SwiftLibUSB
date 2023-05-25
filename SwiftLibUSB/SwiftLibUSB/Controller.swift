@@ -11,6 +11,7 @@ import Foundation
 class Controller: ObservableObject {
     var command = ""
     @Published var chosenDevice: Device
+    @Published var config: Configuration
     var context: Context
     var deviceList: DeviceList
     
@@ -21,6 +22,7 @@ class Controller: ObservableObject {
             throw USBError.other
         }
         chosenDevice = deviceList.devices[0]
+        config = deviceList.devices[0].configurations[0]
     }
     
     /// Print the currently stored command to the terminal
@@ -32,6 +34,8 @@ class Controller: ObservableObject {
     func printDevice() {
         print(chosenDevice.displayName)
     }
+    
+    
 
     /// connect to the chosen device and save the returned handle
     func connect() {

@@ -35,7 +35,7 @@ import Foundation
 ///
 ///     (-11) noMemory: There is not enough memory
 ///
-///     (-12) notSupported: Operation not supported
+///     (-12) notSupported: Operation not supported. For example, setting a configuration when the OS determines configuration
 ///
 ///     (-99) other: An unspecified error occured
 ///
