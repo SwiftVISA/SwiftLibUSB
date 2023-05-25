@@ -10,13 +10,15 @@ import Foundation
 class AltSetting {
     var descriptor: libusb_interface_descriptor
     var endpoints: [Endpoint]
+    var device: Device
     
-    init(pointer : libusb_interface_descriptor) {
+    init(pointer : libusb_interface_descriptor, device: Device) {
         descriptor = pointer
+        self.device = device
         
         endpoints = []
         for i in 0..<descriptor.bNumEndpoints {
-            endpoints.append(Endpoint(pointer: descriptor.endpoint[Int(i)]))
+            endpoints.append(Endpoint(pointer: descriptor.endpoint[Int(i)], device: device))
         }
     }
     
