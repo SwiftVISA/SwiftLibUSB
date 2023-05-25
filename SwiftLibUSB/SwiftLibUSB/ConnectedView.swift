@@ -24,16 +24,16 @@ struct ConnectedView: View {
                 }
             }
 
-            Text(verbatim: $control.chosenDevice.wrappedValue.displayName)
+            //Text(verbatim: $control.chosenDevice.wrappedValue.displayName)
 
-            Button("Print Device", action: control.printDevice)
-
-            Picker("Configuration:", selection: $control.config) {
+            Picker("Configuration:", selection: $control.chosenConfig) {
                 ForEach($control.chosenDevice.configurations, id: \.self) { item in
                     Text(verbatim: item.wrappedValue.displayName).tag(item.wrappedValue)
                 }
             }
             
+            Button("Print Device", action: control.printDevice)
+
             Button("Connect to Device", action: control.connect)
             
             TextField("Command", text: $control.command)
