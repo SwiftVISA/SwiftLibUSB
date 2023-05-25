@@ -9,10 +9,11 @@ import SwiftUI
 
 /// This view displays when libUSB is initilised and devies were found.It shows each device and lets the user pick a device to interact with
 struct ConnectedView: View {
-    @State var control: Controller
+    @StateObject var control: Controller
     
     init() throws {
-        try control = Controller()
+        var cont = try Controller()
+        _control = StateObject(wrappedValue: cont)
     }
     
     var body: some View {
@@ -31,6 +32,7 @@ struct ConnectedView: View {
 
             Button("Connect to Device", action: control.connect)
         }
+        .padding(.horizontal)
     }
 }
 
