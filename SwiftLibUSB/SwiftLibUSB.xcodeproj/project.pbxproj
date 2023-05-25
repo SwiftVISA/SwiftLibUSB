@@ -117,7 +117,6 @@
 		912860CB2A1D46E9001AB351 /* SwiftLibUSB */ = {
 			isa = PBXGroup;
 			children = (
-				DEC604382A1E877100ACE746 /* Error.swift */,
 				912860CC2A1D46E9001AB351 /* SwiftLibUSBApp.swift */,
 				912860CE2A1D46E9001AB351 /* ContentView.swift */,
 				DEC604462A1FCE4200ACE746 /* Usb */,
@@ -168,6 +167,7 @@
 		DEC604462A1FCE4200ACE746 /* Usb */ = {
 			isa = PBXGroup;
 			children = (
+				DEC604382A1E877100ACE746 /* Error.swift */,
 				DEC604402A1F188C00ACE746 /* DeviceHandle.swift */,
 				DEC6043C2A1E903800ACE746 /* DeviceList.swift */,
 				DEC6043E2A1E965B00ACE746 /* Device.swift */,
