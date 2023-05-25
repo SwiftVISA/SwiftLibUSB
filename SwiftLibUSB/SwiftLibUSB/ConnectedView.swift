@@ -31,6 +31,7 @@ struct ConnectedView: View {
 
             Button("Connect to Device", action: control.connect)
         }
+        .padding(.horizontal)
     }
 }
 
