@@ -42,4 +42,13 @@ class Controller: ObservableObject {
     func printDevice() {
         print(chosenDevice.displayName)
     }
+    
+    func connect() {
+        do {
+            let handle = try chosenDevice.openHandle()
+            print("Connected!")
+        } catch {
+            print("Error connecting")
+        }
+    }
 }

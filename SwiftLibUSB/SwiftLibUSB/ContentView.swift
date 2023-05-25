@@ -25,12 +25,12 @@ struct ContentView: View {
                             Text(verbatim: item.wrappedValue.displayName).tag(item.wrappedValue)
                         }
                     }
-                    .id(control.chosenDevice)
-                    
+
                     Text(verbatim: $control.chosenDevice.wrappedValue.displayName)
-                        .id(control.chosenDevice)
-                    
+
                     Button("Print Device", action: control.printDevice)
+
+                    Button("Connect to Device", action: control.connect)
                 }
             }
             .id(control.devices)
