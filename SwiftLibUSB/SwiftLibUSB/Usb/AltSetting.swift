@@ -15,7 +15,7 @@ class AltSetting {
         descriptor = pointer
         
         endpoints = []
-        for i in 0...descriptor.bNumEndpoints {
+        for i in 0..<descriptor.bNumEndpoints {
             endpoints.append(Endpoint(pointer: descriptor.endpoint[Int(i)]))
         }
     }
