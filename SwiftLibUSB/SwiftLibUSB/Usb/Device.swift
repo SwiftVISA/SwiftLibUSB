@@ -21,12 +21,8 @@ struct Device: Hashable {
     
     var device: OpaquePointer
     var descriptor: libusb_device_descriptor
-    
-    init() {
-        device = OpaquePointer.init(bitPattern: 4)!
-        descriptor = libusb_device_descriptor()
-    }
-    
+    var configurations: [Configuration]
+
     var productId: Int {
         get {
             Int(descriptor.idProduct)
@@ -51,6 +47,12 @@ struct Device: Hashable {
         let error = libusb_get_device_descriptor(device, &descriptor)
         if error < 0 {
             throw USBError.from(code: error)
+        }
+        configurations = []
+        for i in 0...descriptor.bNumConfigurations {
+            do {
+                try configurations.append(Configuration(self, index: i))
+            } catch {} // Ignore configurations with errors
         }
     }
 

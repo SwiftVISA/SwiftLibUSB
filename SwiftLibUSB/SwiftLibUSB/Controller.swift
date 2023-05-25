@@ -9,7 +9,7 @@ import Foundation
 
 class Controller: ObservableObject {
     var command = ""
-    @Published var chosenDevice: Device = Device()
+    @Published var chosenDevice: Device
     var context: Context
     var deviceList: DeviceList
     
