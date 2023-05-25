@@ -10,39 +10,26 @@ import Foundation
 class Controller: ObservableObject {
     var command = ""
     @Published var chosenDevice: Device = Device()
-    var context: Context?
-    var deviceList: DeviceList?
-    @Published var devices: [Device] = []
+    var context: Context
+    var deviceList: DeviceList
+    
+    init() throws {
+        try context = Context()
+        try deviceList = context.getDeviceList()
+        if deviceList.devices.isEmpty {
+            throw USBError.other
+        }
+        chosenDevice = deviceList.devices[0]
+    }
     
     func printCommand() {
         print(command)
     }
-    
-    func initialize() {
-        do {
-            try context = Context()
-            print("Initialization succeeded")
-        } catch {
-            print("Initialization failed")
-        }
-    }
-    
-    func getDeviceList() {
-        do {
-            deviceList = try context?.getDeviceList()
-            if let devList = deviceList {
-                devices = devList.devices
-            }
-            print("Got devices!")
-        } catch {
-            print("Error getting devices")
-        }
-    }
-    
+
     func printDevice() {
         print(chosenDevice.displayName)
     }
-    
+
     func connect() {
         do {
             let handle = try chosenDevice.openHandle()

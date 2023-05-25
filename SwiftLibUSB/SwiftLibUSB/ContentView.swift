@@ -8,34 +8,18 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject var control = Controller()
+    @State var refresh = false
     
     var body: some View {
-        VStack {
-            TextField("Command", text: $control.command)
-            Button("Print Command", action: control.printCommand)
-            Button("Initialize", action: control.initialize)
-            Button("Get Devices", action: { () in
-                control.getDeviceList()
-            })
-            Group {
-                if control.devices.count != 0 {
-                    Picker("Device:", selection: $control.chosenDevice) {
-                        ForEach($control.devices, id: \.self) { item in
-                            Text(verbatim: item.wrappedValue.displayName).tag(item.wrappedValue)
-                        }
-                    }
-
-                    Text(verbatim: $control.chosenDevice.wrappedValue.displayName)
-
-                    Button("Print Device", action: control.printDevice)
-
-                    Button("Connect to Device", action: control.connect)
-                }
+        if let v = try? ConnectedView() {
+            v
+        } else {
+            VStack {
+                Text("Unable to find devices")
+                Button("Retry", action: { refresh = !refresh })
             }
-            .id(control.devices)
+            .id(refresh)
         }
-        .padding()
     }
 }
 
