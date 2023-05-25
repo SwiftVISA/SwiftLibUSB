@@ -8,15 +8,15 @@
 import Foundation
 
 class Interface {
-    var descriptor: UnsafeMutablePointer<libusb_interface_descriptor>
+    var descriptor: UnsafeMutablePointer<libusb_interface>
     var claimed = false
     
-    init(pointer : UnsafeMutablePointer<libusb_interface_descriptor>) {
+    init(pointer : UnsafeMutablePointer<libusb_interface>) {
        descriptor = pointer
     }
     
     func claim(){
-       
+      
     }
     
     deinit {
