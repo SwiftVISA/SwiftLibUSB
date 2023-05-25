@@ -25,7 +25,7 @@ struct Device: Hashable {
             throw USBError.from(code: error)
         }
         configurations = []
-        for i in 0...descriptor.bNumConfigurations {
+        for i in 0..<descriptor.bNumConfigurations {
             do {
                 try configurations.append(Configuration(self, index: i))
             } catch {} // Ignore configurations with errors

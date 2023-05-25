@@ -21,7 +21,7 @@ class DeviceList {
         }
         
         devices = []
-        for i in 0...size {
+        for i in 0..<size {
             if let dev = pointer?[i] {
                 devices.append(try Device(pointer: dev))
             }
