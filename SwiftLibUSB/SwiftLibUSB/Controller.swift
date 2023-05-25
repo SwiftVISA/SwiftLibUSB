@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// The primary class for holding the logic of the demonstration UI.
 class Controller: ObservableObject {
     var command = ""
     @Published var chosenDevice: Device
@@ -22,14 +23,17 @@ class Controller: ObservableObject {
         chosenDevice = deviceList.devices[0]
     }
     
+    /// Print the currently stored command to the terminal
     func printCommand() {
         print(command)
     }
 
+    /// Print the currently chosen device to the terminal
     func printDevice() {
         print(chosenDevice.displayName)
     }
 
+    /// connect to the chosen device and save the returned handle
     func connect() {
         do {
             let handle = try chosenDevice.openHandle()

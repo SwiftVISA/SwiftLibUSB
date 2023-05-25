@@ -7,6 +7,8 @@
 
 import Foundation
 
+/// Each device has at least 1 configuration, often more. libUSB keeps track of these with libusb config descriptors.
+/// Each instance manages 1 of these descriptors, inclduing managing the getting and freeing of this discriptor
 class Configuration {
     var descriptor: UnsafeMutablePointer<libusb_config_descriptor>
     
