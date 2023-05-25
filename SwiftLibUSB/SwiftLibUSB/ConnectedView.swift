@@ -8,10 +8,11 @@
 import SwiftUI
 
 struct ConnectedView: View {
-    @State var control: Controller
+    @StateObject var control: Controller
     
     init() throws {
-        try control = Controller()
+        var cont = try Controller()
+        _control = StateObject(wrappedValue: cont)
     }
     
     var body: some View {
