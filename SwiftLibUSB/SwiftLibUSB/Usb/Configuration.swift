@@ -11,6 +11,7 @@ import Foundation
 /// Each instance manages 1 of these descriptors, inclduing managing the getting and freeing of this discriptor
 class Configuration {
     var descriptor: UnsafeMutablePointer<libusb_config_descriptor>
+    var interfaces : [Interface]
     
     init(_ device: Device, index: UInt8) throws {
         var desc: UnsafeMutablePointer<libusb_config_descriptor>? = nil
@@ -19,6 +20,9 @@ class Configuration {
             throw USBError.from(code: error)
         }
         descriptor = desc!
+        interfaces = []
+        
+        getInterfaces()
     }
     
     init(_ device: Device) throws {
@@ -28,6 +32,18 @@ class Configuration {
             throw USBError.from(code: error)
         }
         descriptor = desc!
+        interfaces = []
+        
+        getInterfaces()
+    }
+    
+    func getInterfaces(){
+        let size = Int(descriptor.pointee.bNumInterfaces)
+        for i in 0...size {
+            if var inf = descriptor.pointee.interface?[i] {
+                interfaces.append(Interface(pointer: &inf))
+            }
+        }
     }
     
     deinit {
