@@ -20,6 +20,24 @@ class AltSetting {
         }
     }
     
+    var interfaceClass: ClassCode {
+        get {
+            ClassCode.from(code: UInt32(descriptor.bInterfaceClass))
+        }
+    }
+    
+    var interfaceSubClass: Int {
+        get {
+            Int(descriptor.bInterfaceSubClass)
+        }
+    }
+    
+    var interfaceProtocol: Int {
+        get {
+            Int(descriptor.bInterfaceProtocol)
+        }
+    }
+    
     deinit {
         
     }

@@ -18,6 +18,7 @@
 		91DE961D2A1D5818006D2047 /* Controller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91DE961C2A1D5818006D2047 /* Controller.swift */; };
 		91DE965C2A1FECB8006D2047 /* Endpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91DE965B2A1FECB8006D2047 /* Endpoint.swift */; };
 		91DE965E2A1FF2C8006D2047 /* Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91DE965D2A1FF2C8006D2047 /* Interface.swift */; };
+		91DE96602A1FF85A006D2047 /* ClassCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91DE965F2A1FF85A006D2047 /* ClassCode.swift */; };
 		DEC603EF2A1D76CB00ACE746 /* libusb-1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DEC603EE2A1D76CB00ACE746 /* libusb-1.0.a */; };
 		DEC604392A1E877100ACE746 /* Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC604382A1E877100ACE746 /* Error.swift */; };
 		DEC6043B2A1E881900ACE746 /* Context.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC6043A2A1E881900ACE746 /* Context.swift */; };
@@ -61,6 +62,7 @@
 		91DE961C2A1D5818006D2047 /* Controller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Controller.swift; sourceTree = "<group>"; };
 		91DE965B2A1FECB8006D2047 /* Endpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Endpoint.swift; sourceTree = "<group>"; };
 		91DE965D2A1FF2C8006D2047 /* Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Interface.swift; sourceTree = "<group>"; };
+		91DE965F2A1FF85A006D2047 /* ClassCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassCode.swift; sourceTree = "<group>"; };
 		DEC603E72A1D66AF00ACE746 /* SwiftLibUSB-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SwiftLibUSB-Bridging-Header.h"; sourceTree = "<group>"; };
 		DEC603EC2A1D68BA00ACE746 /* macOS 13 - Production Templates - Sketch */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "macOS 13 - Production Templates - Sketch"; path = "../../../../../Volumes/macOS-13-Production-Templates-Sketch/macOS 13 - Production Templates - Sketch"; sourceTree = "<group>"; };
 		DEC603EE2A1D76CB00ACE746 /* libusb-1.0.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libusb-1.0.a"; path = "../../../../../usr/local/Cellar/libusb/1.0.26/lib/libusb-1.0.a"; sourceTree = "<group>"; };
@@ -180,6 +182,7 @@
 				DEC6043A2A1E881900ACE746 /* Context.swift */,
 				DEC604442A1FCC4D00ACE746 /* Configuration.swift */,
 				024F52712A1FE9B700E93233 /* AltSetting.swift */,
+				91DE965F2A1FF85A006D2047 /* ClassCode.swift */,
 				91DE965D2A1FF2C8006D2047 /* Interface.swift */,
 				91DE965B2A1FECB8006D2047 /* Endpoint.swift */,
 			);
@@ -326,6 +329,7 @@
 				DEC6043B2A1E881900ACE746 /* Context.swift in Sources */,
 				DEC604452A1FCC4D00ACE746 /* Configuration.swift in Sources */,
 				DEC6043F2A1E965B00ACE746 /* Device.swift in Sources */,
+				91DE96602A1FF85A006D2047 /* ClassCode.swift in Sources */,
 				91DE965E2A1FF2C8006D2047 /* Interface.swift in Sources */,
 				024F52722A1FE9B700E93233 /* AltSetting.swift in Sources */,
 				912860CD2A1D46E9001AB351 /* SwiftLibUSBApp.swift in Sources */,
