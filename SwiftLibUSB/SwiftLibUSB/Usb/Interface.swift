@@ -16,7 +16,7 @@ class Interface {
         descriptor = pointer
         
         altSettings = []
-        for i in 0...descriptor.num_altsetting {
+        for i in 0..<descriptor.num_altsetting {
             altSettings.append(AltSetting(pointer: descriptor.altsetting[Int(i)]))
         }
     }
