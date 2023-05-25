@@ -53,4 +53,8 @@ struct Device: Hashable {
             throw USBError.from(code: error)
         }
     }
+
+    func openHandle() throws -> DeviceHandle {
+        return try DeviceHandle(device: self)
+    }
 }
