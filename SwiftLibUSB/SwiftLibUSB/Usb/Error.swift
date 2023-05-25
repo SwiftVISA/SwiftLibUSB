@@ -7,6 +7,38 @@
 
 import Foundation
 
+/// USB Error is a return code given by many libUSB methods. A value of zero indicates the method returned with no errors thrown
+/// Negative values indicate an error with different values indicating type
+///
+///     (0) Success: The libUSB method returned with no issues
+///
+///     (-1) IO: Input/Output Error
+///
+///     (-2) invalidParam: One or more of the given parameters is not valid for the given method
+///
+///     (-3) access: Access was denied, permissions were not sufficient to call the function
+///
+///     (-4) noDevice: The named device could not be found. This tends to be because of disconnection
+///
+///     (-5) notFound: Some entity named as a parameter could not be found
+///
+///     (-6) busy: A required resource is busy
+///
+///     (-7) timeout: The timeout period elapsed without a response
+///
+///     (-8) overflow: An overflow error occured
+///
+///     (-9) pipe: A pipe error occured
+///
+///     (-10) interupted: A system call was interupted. This can be because of the interrupt
+///     signal
+///
+///     (-11) noMemory: There is not enough memory
+///
+///     (-12) notSupported: Operation not supported
+///
+///     (-99) other: An unspecified error occured
+///
 enum USBError: Error {
     case success
     case io

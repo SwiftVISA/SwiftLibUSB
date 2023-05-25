@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// This view displays when libUSB is initilised and devies were found.It shows each device and lets the user pick a device to interact with
 struct ConnectedView: View {
     @State var control: Controller
     

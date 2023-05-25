@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// This is the primary view that holds all ofther views. 
 struct ContentView: View {
     @State var refresh = false
     
