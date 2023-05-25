@@ -9,9 +9,11 @@ import Foundation
 
 class Endpoint {
     var descriptor: libusb_endpoint_descriptor
+    var device: Device
     
-    init(pointer : libusb_endpoint_descriptor) {
-       descriptor = pointer
+    init(pointer : libusb_endpoint_descriptor, device: Device) {
+        descriptor = pointer
+        self.device = device
     }
     
     deinit {

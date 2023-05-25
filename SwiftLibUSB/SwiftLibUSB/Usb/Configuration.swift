@@ -42,7 +42,7 @@ class Configuration: Hashable{
         let size = Int(descriptor.pointee.bNumInterfaces)
         for i in 0..<size {
             if var inf = descriptor.pointee.interface?[i] {
-                interfaces.append(Interface(pointer: inf))
+                interfaces.append(Interface(pointer: inf, device: device))
             }
         }
     }
