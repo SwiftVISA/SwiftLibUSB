@@ -18,8 +18,6 @@ struct ConnectedView: View {
     
     var body: some View {
         VStack {
-            TextField("Command", text: $control.command)
-            Button("Print Command", action: control.printCommand)
             Picker("Device:", selection: $control.chosenDevice) {
                 ForEach($control.deviceList.devices, id: \.self) { item in
                     Text(verbatim: item.wrappedValue.displayName).tag(item.wrappedValue)
@@ -30,7 +28,17 @@ struct ConnectedView: View {
 
             Button("Print Device", action: control.printDevice)
 
+            Picker("Configuration:", selection: $control.config) {
+                ForEach($control.chosenDevice.configurations, id: \.self) { item in
+                    Text(verbatim: item.wrappedValue.displayName).tag(item.wrappedValue)
+                }
+            }
+            
             Button("Connect to Device", action: control.connect)
+            
+            TextField("Command", text: $control.command)
+            Button("Print Command", action: control.printCommand)
+            
         }
         .padding(.horizontal)
     }

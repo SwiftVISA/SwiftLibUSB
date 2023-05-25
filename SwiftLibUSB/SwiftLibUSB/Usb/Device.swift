@@ -9,13 +9,15 @@ import Foundation
 
 /// Class representing an available USB device.
 /// Communicating with the device requires opening the device
-struct Device: Hashable {
+class Device: Hashable {
     /// The device as libUSB understands it. It is managed as a pointer
     var device: OpaquePointer
     /// A C struct containing information about the device
     var descriptor: libusb_device_descriptor
     /// Each device has "configurations" which manage their operation.
     var configurations: [Configuration]
+    
+    var handle: DeviceHandle?
     
     init(pointer: OpaquePointer) throws {
         device = pointer
@@ -30,6 +32,7 @@ struct Device: Hashable {
                 try configurations.append(Configuration(self, index: i))
             } catch {} // Ignore configurations with errors
         }
+        handle = nil
     }
     /// Compares devices by their internal pointer. Two device classes that point to the same libUSB device are considered the same
     static func == (lhs: Device, rhs: Device) -> Bool {
@@ -67,7 +70,9 @@ struct Device: Hashable {
     /// Only one handle should be opened per device
     /// - Returns: The device handle class that will manage communication with this device.
     func openHandle() throws -> DeviceHandle {
-        return try DeviceHandle(device: self)
+        let createdHandle = try DeviceHandle(device: self)
+        handle = createdHandle
+        return createdHandle
     }
     
     /// A hash representation of the device
