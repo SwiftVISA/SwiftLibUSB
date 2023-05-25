@@ -53,6 +53,7 @@ Makefile
 *.vcxproj.filters
 .vs/
 .vscode/
+*.DS_Store
 
 # Xcode
 #
