@@ -68,11 +68,11 @@ class Endpoint {
     /// * `.busy` if libUSB is currently handling events (if you call this from an asynchronous transfer callback, for example)
     /// * `.invalidParam` if the transfer size is larger than the OS or device support
     func sendBulkTransfer(data: inout Data) throws -> Int {
+        libusb_clear_halt(device.handle?.handle, descriptor.bEndpointAddress)
         var sent: Int32 = 0;
+        var data = [UInt8](data)
         let length: Int32 = Int32(data.count)
-        let error = withUnsafeMutableBytes(of: &data) { buffer in
-            libusb_bulk_transfer(device.handle?.handle, descriptor.bEndpointAddress, buffer.baseAddress, length, &sent, 0)
-        }
+        let error = libusb_bulk_transfer(device.handle?.handle, descriptor.bEndpointAddress, &data, length, &sent, 1000)
         if error < 0 {
             throw USBError.from(code: error)
         }
