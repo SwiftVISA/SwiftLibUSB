@@ -7,6 +7,9 @@
 
 import Foundation
 
+/// A group of endpoints
+///
+/// An `AltSetting` determines what functions these endpoints have.
 class Interface {
     var descriptor: libusb_interface
     var claimed = false
@@ -31,6 +34,10 @@ class Interface {
         }
     }
     
+    /// Informs the operating system that this interface will be used.
+    ///
+    /// The parent configuration should be made active before calling this, and this must be called before activating
+    /// an alternate setting.
     func claim(){
         libusb_claim_interface(device.handle?.handle, Int32(index))
         claimed = true
