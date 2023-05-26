@@ -38,8 +38,15 @@ class Interface {
     ///
     /// The parent configuration should be made active before calling this, and this must be called before activating
     /// an alternate setting.
-    func claim(){
-        libusb_claim_interface(device.handle?.handle, Int32(index))
+    ///
+    /// - throws: a USBError is claiming fails
+    /// * `.busy` if another program has claimed the interface
+    /// * `.noDevice` if the device has been disconnected
+    func claim() throws {
+        let error = libusb_claim_interface(device.handle?.handle, Int32(index))
+        if error < 0 {
+            throw USBError.from(code: error)
+        }
         claimed = true
     }
 }
