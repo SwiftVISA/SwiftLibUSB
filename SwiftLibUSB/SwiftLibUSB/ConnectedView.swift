@@ -38,6 +38,7 @@ struct ConnectedView: View {
             
             TextField("Command", text: $control.command)
             Button("Print Command", action: control.printCommand)
+            Button("Send OUTPUT ON", action: control.sendOutputOn)
             
         }
         .padding(.horizontal)
