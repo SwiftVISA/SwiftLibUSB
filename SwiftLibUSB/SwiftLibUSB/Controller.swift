@@ -49,17 +49,15 @@ class Controller: ObservableObject {
     /// Attempts to send an "OUTPUT ON" command to the selected device
     func sendOutputOn() {
         do {
-            let handle = try chosenDevice.openHandle()
-            try chosenConfig.setActive()
             try chosenConfig.interfaces[0].claim()
             try chosenConfig.interfaces[0].altSettings[0].setActive()
             var message = Data([1, 1, 254, 0, 10, 0, 0, 0, 1, 0, 0, 0, 79, 85, 84, 80, 85, 84, 32, 79, 78, 10, 0, 0]) // Raw bytes of OUTPUT ON message
             for endpoint in chosenConfig.interfaces[0].altSettings[0].endpoints {
                 if endpoint.direction == .Out && endpoint.transferType == .bulk {
-                    try endpoint.sendBulkTransfer(data: &message)
+                    let num = try endpoint.sendBulkTransfer(data: &message)
+                    print("Sent \(num) bytes")
                 }
             }
-            print("Sent bytes to \(handle.handle)")
         } catch {
             print("Error sending bytes")
         }
