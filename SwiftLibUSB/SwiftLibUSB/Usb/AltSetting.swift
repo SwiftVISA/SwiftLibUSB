@@ -47,4 +47,18 @@ class AltSetting {
     deinit {
         
     }
+    
+    /// Makes the setting active.
+    ///
+    /// This must be done before sending data through the endpoints. The parent configuration and interface should have been activated and claimed first.
+    ///
+    /// - throws: a USBError if activating the setting fails
+    /// * `.notFound` if the interface was not claimed
+    /// * `.noDevice` if the device was disconnected
+    func setActive() throws {
+        let error = libusb_set_interface_alt_setting(device.handle?.handle, Int32(descriptor.bInterfaceNumber), Int32(descriptor.bAlternateSetting))
+        if error < 0 {
+            throw USBError.from(code: error)
+        }
+    }
 }
