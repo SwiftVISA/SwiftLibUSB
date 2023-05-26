@@ -56,6 +56,28 @@ class Endpoint {
             }
         }
     }
+    
+    /// Sends a message to a bulk out endpoint
+    ///
+    /// This will only work properly if this endpoint is bulk out (`direction == .out` and `.transferType == .bulk`)
+    ///
+    /// - returns: the number of bytes sent
+    /// - throws: a USBError if the transfer fails
+    /// * `.pipe` if the endpoint halts
+    /// * `.noDevice` if the device disconnected
+    /// * `.busy` if libUSB is currently handling events (if you call this from an asynchronous transfer callback, for example)
+    /// * `.invalidParam` if the transfer size is larger than the OS or device support
+    func send_bulk_transfer(data: inout Data) throws -> Int {
+        var sent: Int32 = 0;
+        let length: Int32 = Int32(data.count)
+        let error = withUnsafeMutableBytes(of: &data) { buffer in
+            libusb_bulk_transfer(device.handle?.handle, descriptor.bEndpointAddress, buffer.baseAddress, length, &sent, 0)
+        }
+        if error < 0 {
+            throw USBError.from(code: error)
+        }
+        return Int(sent)
+    }
 }
 
 /// Describes the direction of data transfer on an endpoint.
