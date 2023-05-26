@@ -12,7 +12,7 @@ struct ConnectedView: View {
     @StateObject var control: Controller
     
     init() throws {
-        var cont = try Controller()
+        let cont = try Controller()
         _control = StateObject(wrappedValue: cont)
     }
     
