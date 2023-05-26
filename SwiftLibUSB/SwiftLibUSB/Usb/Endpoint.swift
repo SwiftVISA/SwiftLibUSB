@@ -67,7 +67,7 @@ class Endpoint {
     /// * `.noDevice` if the device disconnected
     /// * `.busy` if libUSB is currently handling events (if you call this from an asynchronous transfer callback, for example)
     /// * `.invalidParam` if the transfer size is larger than the OS or device support
-    func send_bulk_transfer(data: inout Data) throws -> Int {
+    func sendBulkTransfer(data: inout Data) throws -> Int {
         var sent: Int32 = 0;
         let length: Int32 = Int32(data.count)
         let error = withUnsafeMutableBytes(of: &data) { buffer in
