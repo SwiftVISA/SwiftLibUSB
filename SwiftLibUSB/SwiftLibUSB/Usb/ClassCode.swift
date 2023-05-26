@@ -7,6 +7,12 @@
 
 import Foundation
 
+/// A description used by `AltSetting`s to describe the communication method for the interface.
+///
+/// The individual protocols are documented on the [USB website](https://www.usb.org/documents).
+///
+/// Lab equipment commonly implements the *Test and Measurement Class* interface, which is identified by the `.application` class
+/// and subclass `3`.
 enum ClassCode {
     case perInterface
     case audio

@@ -15,6 +15,8 @@ import Foundation
 class Context {
     var libContext: OpaquePointer // The actual context as libUSB understands it
     
+    /// Initializes libUSB
+    /// - throws: A USBError if creating the context fails
     init() throws {
         var context: OpaquePointer? = nil;
         let error = libusb_init(&context)
@@ -31,7 +33,7 @@ class Context {
     
     
     /// This is a getter for the DeviceList of the libUSB context. This step gets all visibile USB devices so that they can be connected to
-    /// - Throws: libUSB error if creating the devicelist for this context results in an error
+    /// - Throws: A USBError if creating the device list for this context results in an error
     /// - Returns: a DeviceList that stores the devices accessable in this context
     func getDeviceList() throws -> DeviceList {
         return try DeviceList(context: libContext)

@@ -7,7 +7,7 @@
 
 import Foundation
 
-/// Each device has one open handle when the device is connected. When a device handle is initlilized, the device is opened
+/// Each device has one open handle when the device is connected. When a device handle is initialized, the device is opened
 /// Device handle manages both the opening and the closing of the handle automatically
 class DeviceHandle {
     /// The pointer that libUSB understands as the actual handle

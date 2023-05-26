@@ -9,55 +9,69 @@ import Foundation
 
 /// USB Error is a return code given by many libUSB methods. A value of zero indicates the method returned with no errors thrown
 /// Negative values indicate an error with different values indicating type
-///
-///     (0) Success: The libUSB method returned with no issues
-///
-///     (-1) IO: Input/Output Error
-///
-///     (-2) invalidParam: One or more of the given parameters is not valid for the given method
-///
-///     (-3) access: Access was denied, permissions were not sufficient to call the function
-///
-///     (-4) noDevice: The named device could not be found. This tends to be because of disconnection
-///
-///     (-5) notFound: Some entity named as a parameter could not be found
-///
-///     (-6) busy: A required resource is busy
-///
-///     (-7) timeout: The timeout period elapsed without a response
-///
-///     (-8) overflow: An overflow error occured
-///
-///     (-9) pipe: A pipe error occured
-///
-///     (-10) interupted: A system call was interupted. This can be because of the interrupt
-///     signal
-///
-///     (-11) noMemory: There is not enough memory
-///
-///     (-12) notSupported: Operation not supported. For example, setting a configuration when the OS determines configuration
-///
-///     (-99) other: An unspecified error occured
-///
 enum USBError: Error {
+    /// The libUSB method returned with no issues
+    ///
+    /// Integer value: `0`
     case success
+    /// Input/output error
+    ///
+    /// Integer value: `-1`
     case io
+    /// One or more of the given parameters is not valid for the given method
+    ///
+    /// Integer value: `-2`
     case invalidParam
+    /// User lacks permissions to perform the operation
+    ///
+    /// Integer value: `-3`
     case access
+    /// The device is missing, usually because it has been disconnected
+    ///
+    /// Integer value: `-4`
     case noDevice
+    /// An object referenced by a parameter does not exist
+    ///
+    /// Integer value: `-5`
     case notFound
+    /// A required resource is busy
+    ///
+    /// Integer value: `-6`
     case busy
+    /// The timeout period elapsed without a response
+    ///
+    /// Integer value: `-7`
     case timeout
+    /// More data is available than space was provided
+    ///
+    /// Integer value: `-8`
     case overflow
+    /// The connection was interrupted, ususally due to an endpoint halt
+    ///
+    /// Integer value: `-9`
     case pipe
+    /// A system call was interrupted
+    ///
+    /// Integer value: `-10`
     case interrupted
+    /// Allocation on a libUSB object failed
+    ///
+    /// Integer value: `-11`
     case noMemory
+    /// The operation is not supported on this platform. This can happen if an OS does not let user-space programs set configurations
+    ///
+    /// Integer value: `-12`
     case notSupported
+    /// Another unspecified error occurred
+    ///
+    /// Integer value: `-99`
     case other
-    
 }
 
 extension USBError {
+    /// Converts a libUSB error value into a USBError
+    /// - parameters: the libUSB error value as an Int32
+    /// - returns: a USBError representing the same error
     static func from(code: Int32) -> Self {
         switch libusb_error(code) {
         case LIBUSB_SUCCESS: return .success

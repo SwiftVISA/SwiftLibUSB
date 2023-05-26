@@ -8,12 +8,16 @@
 import Foundation
 
 /// Each device has at least 1 configuration, often more. libUSB keeps track of these with libusb config descriptors.
-/// Each instance manages 1 of these descriptors, inclduing managing the getting and freeing of this discriptor
+/// Each instance manages 1 of these descriptors, inclduing managing the getting and freeing of this descriptor
 class Configuration: Hashable{
     var descriptor: UnsafeMutablePointer<libusb_config_descriptor>
     var interfaces : [Interface]
     var device: Device
     
+    /// Loads the configuration with the given index
+    ///
+    /// - throws: a USBError if getting the configuration fails
+    /// * `.notFound` if the index is invalid
     init(_ device: Device, index: UInt8) throws {
         var desc: UnsafeMutablePointer<libusb_config_descriptor>? = nil
         let error = libusb_get_config_descriptor(device.device, index, &desc)
@@ -26,6 +30,10 @@ class Configuration: Hashable{
         getInterfaces()
     }
     
+    /// Gets the descriptor of the active configuration.
+    ///
+    /// - throws: a USBError if getting the configuration fails
+    /// * `.notFound` if the device is not configured
     init(_ device: Device) throws {
         var desc: UnsafeMutablePointer<libusb_config_descriptor>? = nil
         let error = libusb_get_active_config_descriptor(device.device, &desc)
@@ -47,12 +55,14 @@ class Configuration: Hashable{
         }
     }
     
+    /// The index used to get a string descriptor of this configuration
     var index: Int {
         get {
             Int(descriptor.pointee.iConfiguration)
         }
     }
     
+    /// The number used to identify this configuration
     var value: Int {
         get {
             Int(descriptor.pointee.bConfigurationValue)
@@ -74,8 +84,17 @@ class Configuration: Hashable{
         lhs.descriptor == rhs.descriptor
     }
     
-    func setActive() throws{
-        let DeviceHandle = device.handle! // This will throw, if the deviceHandle is null(IE: The device was not opened
+    /// Makes this configuration active, if possible
+    ///
+    /// The device should have been opened with `device.open` first.
+    ///
+    /// Activating the configuration should be done before claiming an interface or sending data.
+    ///
+    /// - throws: A USBError if activating the configuration fails
+    /// * `.busy` if interfaces have already been claimed
+    /// * `.noDevice` if the device has been unplugged
+    func setActive() throws {
+        let DeviceHandle = device.handle! // This will throw if the device was not opened
         libusb_set_configuration(DeviceHandle.handle, // The handle we are configuring ourselves with
                                  Int32(descriptor.pointee.bConfigurationValue)) // our value
     }
