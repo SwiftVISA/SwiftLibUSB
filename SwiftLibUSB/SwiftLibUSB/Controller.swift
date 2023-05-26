@@ -10,7 +10,11 @@ import Foundation
 /// The primary class for holding the logic of the demonstration UI.
 class Controller: ObservableObject {
     var command = ""
-    @Published var chosenDevice: Device
+    @Published var chosenDevice: Device {
+        didSet {
+            chosenConfig = chosenDevice.configurations[0]
+        }
+    }
     @Published var chosenConfig: Configuration
     var context: Context
     var deviceList: DeviceList
