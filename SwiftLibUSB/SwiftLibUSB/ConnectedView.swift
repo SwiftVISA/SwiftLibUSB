@@ -31,6 +31,18 @@ struct ConnectedView: View {
                     Text(verbatim: item.wrappedValue.displayName).tag(item.wrappedValue)
                 }
             }
+            
+            Picker("Interface:", selection: $control.chosenInterface) {
+                ForEach($control.chosenConfig.interfaces, id: \.self) { item in
+                    Text(verbatim: String(item.wrappedValue.index)).tag(item.wrappedValue)
+                }
+            }
+            
+            Picker("Alt Setting:", selection: $control.chosenAltSetting) {
+                ForEach($control.chosenInterface.altSettings, id: \.self) { item in
+                    Text(verbatim: String(item.wrappedValue.displayName)).tag(item.wrappedValue)
+                }
+            }
 
             Button("Connect to Device", action: control.connect)
             
@@ -42,8 +54,6 @@ struct ConnectedView: View {
             TextField("Data received will display here", text: $control.dataReceived, axis: .vertical)
                 .disabled(true)
                 .lineLimit(6, reservesSpace: true)
-                
-            
         }
         .padding(.horizontal)
     }
