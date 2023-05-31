@@ -12,6 +12,6 @@ struct SwiftLibUSBApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-        }
+        }.defaultSize(width: 200, height: 150)
     }
 }
