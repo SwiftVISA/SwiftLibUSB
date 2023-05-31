@@ -8,7 +8,7 @@
 import Foundation
 
 /// A device list is a concept in libUSB that manages a list of devices. Each context has one device list which stores all of the connected devices
-/// DeviceList automaticaly creates and frees libUSB's device list as required.
+/// DeviceList automatically creates and frees libUSB's device list as required.
 class DeviceList {
     var devices: [Device]
     var pointer: UnsafeMutablePointer<OpaquePointer?>?

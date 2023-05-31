@@ -9,8 +9,8 @@ import Foundation
 
 ///Description
 ///All libUSB calls exist in some "context". While many of these methods allow for using
-///a null context, using a context is prefered. This class handles both the initilisation and closing of contexts automatically.
-/// - Throws: USBError on initilisation if libUSB cannot initlise the context
+///a null context, using a context is preferred. This class handles both the initialization and closing of contexts automatically.
+/// - Throws: USBError on initialization if libUSB cannot initialize the context
 
 class Context {
     var libContext: OpaquePointer // The actual context as libUSB understands it
