@@ -51,7 +51,7 @@ class Controller: ObservableObject {
     }
     
     /// Attempts to send an "OUTPUT ON" command to the selected device
-    func sendOutputOn() {
+    /*func sendOutputOn() {
         do {
             try chosenConfig.interfaces[0].claim()
             try chosenConfig.interfaces[0].altSettings[0].setActive()
@@ -65,5 +65,9 @@ class Controller: ObservableObject {
         } catch {
             print("Error sending bytes")
         }
+    }*/
+    
+    func sendCommand() {
+        
     }
 }

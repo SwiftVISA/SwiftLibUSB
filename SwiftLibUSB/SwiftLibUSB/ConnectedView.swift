@@ -31,14 +31,11 @@ struct ConnectedView: View {
                     Text(verbatim: item.wrappedValue.displayName).tag(item.wrappedValue)
                 }
             }
-            
-            Button("Print Device", action: control.printDevice)
 
             Button("Connect to Device", action: control.connect)
             
             TextField("Command", text: $control.command)
-            Button("Print Command", action: control.printCommand)
-            Button("Send OUTPUT ON", action: control.sendOutputOn)
+            Button("Send Command", action: control.sendCommand)
             
         }
         .padding(.horizontal)
