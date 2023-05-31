@@ -30,6 +30,7 @@ class Controller: ObservableObject {
     
     var context: Context
     var deviceList: DeviceList
+    var messageIndex: UInt8
     
     init() throws {
         try context = Context()
@@ -41,7 +42,7 @@ class Controller: ObservableObject {
         chosenConfig = deviceList.devices[0].configurations[0]
         chosenInterface = deviceList.devices[0].configurations[0].interfaces[0]
         chosenAltSetting = deviceList.devices[0].configurations[0].interfaces[0].altSettings[0]
-        
+        messageIndex = 1
     }
     
     /// Print the currently stored command to the terminal
@@ -49,8 +50,34 @@ class Controller: ObservableObject {
         print(command)
     }
     
-    func sendCommand(){
-        
+    func nextMessage() {
+        messageIndex = (messageIndex % 255) + 1
+    }
+    
+    func sendCommand() {
+        do {
+            var message = Data([1, messageIndex, 255-messageIndex, 0])
+            withUnsafeBytes(of: Int32(command.count + 1).littleEndian) {
+                message.append(Data(Array($0)))
+            }
+            message.append(Data([1, 0, 0, 0]))
+            command.withUTF8 {
+                message.append($0)
+            }
+            message.append(10)
+            message.append(Data(Array(repeating: 0, count: (4 - message.count % 4) % 4)))
+            print([UInt8](message))
+            for endpoint in chosenAltSetting.endpoints {
+                if endpoint.direction == .Out && endpoint.transferType == .bulk {
+                    let num = try endpoint.sendBulkTransfer(data: &message)
+                    print("Sent \(num) bytes")
+                }
+            }
+            nextMessage()
+            print("Sent message")
+        } catch {
+            print("Error sending message")
+        }
     }
     
     /// Print the currently chosen device to the terminal
