@@ -10,8 +10,8 @@ import Foundation
 /// The primary class for holding the logic of the demonstration UI.
 class Controller: ObservableObject {
     var command = ""
-    var dataReceived = ""
-    var isConnected = false
+    @Published var dataReceived = ""
+    @Published var isConnected = false
     @Published var chosenDevice: Device {
         didSet {
             chosenConfig = chosenDevice.configurations[0]
@@ -69,6 +69,7 @@ class Controller: ObservableObject {
             print("Connected!")
         } catch {
             print("Error connecting")
+            dataReceived.append("Error connecting\n")
         }
     }
     
