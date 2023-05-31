@@ -43,18 +43,21 @@ struct ConnectedView: View {
                     Text(verbatim: String(item.wrappedValue.displayName)).tag(item.wrappedValue)
                 }
             }
-            
-            Button("Print Device", action: control.printDevice)
-
             Button("Connect to Device", action: control.connect)
             
             TextField("Command", text: $control.command)
-            Button("Print Command", action: control.printCommand)
-            Button("Send Command", action: control.sendCommand)
-            Button("Send OUTPUT ON", action: control.sendOutputOn)
-            
+                .padding(.top)
+                .disabled(!control.isConnected)
+            Button("Send Command", action: control.sendCommand).disabled(!control.isConnected)
+            Text("Data Received")
+                .padding(.top)
+            TextField("Data received will display here", text: $control.dataReceived, axis: .vertical)
+                .disabled(true)
+                .lineLimit(6, reservesSpace: true)
+            Spacer()
         }
-        .padding(.horizontal)
+        .padding(.all)
+        .frame(minWidth:350)
     }
 }
 

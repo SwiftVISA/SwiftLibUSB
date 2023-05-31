@@ -10,6 +10,8 @@ import Foundation
 /// The primary class for holding the logic of the demonstration UI.
 class Controller: ObservableObject {
     var command = ""
+    @Published var dataReceived = ""
+    @Published var isConnected = false
     @Published var chosenDevice: Device {
         didSet {
             chosenConfig = chosenDevice.configurations[0]
@@ -148,14 +150,17 @@ class Controller: ObservableObject {
             try chosenConfig.setActive()
             try chosenInterface.claim()
             try chosenAltSetting.setActive()
+            isConnected = true
+
             print("Connected!")
         } catch {
             print("Error connecting")
+            dataReceived.append("Error connecting\n")
         }
     }
     
     /// Attempts to send an "OUTPUT ON" command to the selected device
-    func sendOutputOn() {
+    /*func sendOutputOn() {
         do {
             var message = Data([1, 1, 254, 0, 10, 0, 0, 0, 1, 0, 0, 0, 79, 85, 84, 80, 85, 84, 32, 79, 78, 10, 0, 0]) // Raw bytes of OUTPUT ON message
             for endpoint in chosenConfig.interfaces[0].altSettings[0].endpoints {
@@ -167,5 +172,5 @@ class Controller: ObservableObject {
         } catch {
             print("Error sending bytes")
         }
-    }
+    }*/
 }
