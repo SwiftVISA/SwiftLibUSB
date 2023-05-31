@@ -8,7 +8,7 @@
 import Foundation
 
 /// A setting that controls how endpoints behave. This must be activated using `setActive` before sending or receiving data.
-class AltSetting {
+class AltSetting : Hashable{
     var descriptor: libusb_interface_descriptor
     var endpoints: [Endpoint]
     var device: Device
@@ -20,6 +20,31 @@ class AltSetting {
         endpoints = []
         for i in 0..<descriptor.bNumEndpoints {
             endpoints.append(Endpoint(pointer: descriptor.endpoint[Int(i)], device: device))
+        }
+    }
+    
+    static func == (lhs: AltSetting, rhs: AltSetting) -> Bool {
+        lhs.device == rhs.device && lhs.index == rhs.index && lhs.interfaceIndex == rhs.interfaceIndex
+    }
+    
+    var displayName: String {
+        get {
+            //var size = 256;
+            //var buffer: [UInt8] = Array(repeating: 0, count: size)
+            //libusb_get_string_descriptor_ascii(device.handle?.handle, descriptor.iInterface, &buffer, Int32(size))
+            "not complete yet"
+        }
+    }
+    
+    var interfaceIndex: Int {
+        get {
+            Int(descriptor.bInterfaceNumber)
+        }
+    }
+    
+    var index: Int {
+        get {
+            Int(descriptor.bAlternateSetting)
         }
     }
     
@@ -61,4 +86,12 @@ class AltSetting {
             throw USBError.from(code: error)
         }
     }
+    
+    /// A hash representation of the altSetting
+    func hash(into hasher: inout Hasher) {
+        device.hash(into: &hasher)
+        interfaceIndex.hash(into: &hasher)
+        index.hash(into: &hasher)
+    }
+    
 }

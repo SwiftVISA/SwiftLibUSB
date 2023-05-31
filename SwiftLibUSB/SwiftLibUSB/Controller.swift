@@ -10,12 +10,26 @@ import Foundation
 /// The primary class for holding the logic of the demonstration UI.
 class Controller: ObservableObject {
     var command = ""
+    @Published var dataReceived = ""
+    @Published var isConnected = false
     @Published var chosenDevice: Device {
         didSet {
             chosenConfig = chosenDevice.configurations[0]
         }
     }
-    @Published var chosenConfig: Configuration
+    @Published var chosenConfig: Configuration {
+        didSet {
+            chosenInterface = chosenConfig.interfaces[0]
+        }
+    }
+    @Published var chosenInterface: Interface {
+        didSet {
+            chosenAltSetting = chosenInterface.altSettings[0]
+        }
+    }
+    
+    @Published var chosenAltSetting: AltSetting
+    
     var context: Context
     var deviceList: DeviceList
     
@@ -27,13 +41,20 @@ class Controller: ObservableObject {
         }
         chosenDevice = deviceList.devices[0]
         chosenConfig = deviceList.devices[0].configurations[0]
+        chosenInterface = deviceList.devices[0].configurations[0].interfaces[0]
+        chosenAltSetting = deviceList.devices[0].configurations[0].interfaces[0].altSettings[0]
+        
     }
     
     /// Print the currently stored command to the terminal
     func printCommand() {
         print(command)
     }
-
+    
+    func sendCommand(){
+        
+    }
+    
     /// Print the currently chosen device to the terminal
     func printDevice() {
         print(chosenDevice.displayName)
@@ -44,14 +65,16 @@ class Controller: ObservableObject {
         do {
             let handle = try chosenDevice.openHandle()
             try chosenConfig.setActive()
+            isConnected = true
             print("Connected!")
         } catch {
             print("Error connecting")
+            dataReceived.append("Error connecting\n")
         }
     }
     
     /// Attempts to send an "OUTPUT ON" command to the selected device
-    func sendOutputOn() {
+    /*func sendOutputOn() {
         do {
             try chosenConfig.interfaces[0].claim()
             try chosenConfig.interfaces[0].altSettings[0].setActive()
@@ -65,5 +88,5 @@ class Controller: ObservableObject {
         } catch {
             print("Error sending bytes")
         }
-    }
+    }*/
 }

@@ -32,16 +32,34 @@ struct ConnectedView: View {
                 }
             }
             
-            Button("Print Device", action: control.printDevice)
+            Picker("Interface:", selection: $control.chosenInterface) {
+                ForEach($control.chosenConfig.interfaces, id: \.self) { item in
+                    Text(verbatim: String(item.wrappedValue.index)).tag(item.wrappedValue)
+                }
+            }
+            
+            Picker("Alt Setting:", selection: $control.chosenAltSetting) {
+                ForEach($control.chosenInterface.altSettings, id: \.self) { item in
+                    Text(verbatim: String(item.wrappedValue.displayName)).tag(item.wrappedValue)
+                }
+            }
 
             Button("Connect to Device", action: control.connect)
             
             TextField("Command", text: $control.command)
-            Button("Print Command", action: control.printCommand)
-            Button("Send OUTPUT ON", action: control.sendOutputOn)
+                .padding(.top)
+                .disabled(!control.isConnected)
+            Button("Send Command", action: control.sendCommand).disabled(!control.isConnected)
+            Text("Data Received")
+                .padding(.top)
+            TextField("Data received will display here", text: $control.dataReceived, axis: .vertical)
+                .disabled(true)
+                .lineLimit(6, reservesSpace: true)
             
+            Spacer()
         }
-        .padding(.horizontal)
+        .padding(.all)
+        .frame(minWidth:350)
     }
 }
 

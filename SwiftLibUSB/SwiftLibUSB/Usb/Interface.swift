@@ -10,7 +10,11 @@ import Foundation
 /// A group of endpoints
 ///
 /// An `AltSetting` determines what functions these endpoints have.
-class Interface {
+class Interface : Hashable {
+    static func == (lhs: Interface, rhs: Interface) -> Bool {
+        return lhs.device == rhs.device && lhs.index == rhs.index
+    }
+    
     var descriptor: libusb_interface
     var claimed = false
     var altSettings: [AltSetting]
@@ -48,5 +52,11 @@ class Interface {
             throw USBError.from(code: error)
         }
         claimed = true
+    }
+    
+    /// A hash representation of the interface
+    func hash(into hasher: inout Hasher) {
+        device.hash(into: &hasher)
+        index.hash(into: &hasher)
     }
 }
