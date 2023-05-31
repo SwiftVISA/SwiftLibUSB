@@ -48,14 +48,18 @@ struct ConnectedView: View {
             
             TextField("Command", text: $control.command)
                 .padding(.top)
-            Button("Send Command", action: control.sendCommand)
+                .disabled(control.isConnected)
+            Button("Send Command", action: control.sendCommand).disabled(control.isConnected)
             Text("Data Received")
                 .padding(.top)
             TextField("Data received will display here", text: $control.dataReceived, axis: .vertical)
                 .disabled(true)
                 .lineLimit(6, reservesSpace: true)
+            
+            Spacer()
         }
-        .padding(.horizontal)
+        .padding(.all)
+        .frame(minWidth:350)
     }
 }
 

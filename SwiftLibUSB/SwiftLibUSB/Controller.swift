@@ -11,6 +11,7 @@ import Foundation
 class Controller: ObservableObject {
     var command = ""
     var dataReceived = ""
+    var isConnected = false
     @Published var chosenDevice: Device {
         didSet {
             chosenConfig = chosenDevice.configurations[0]
@@ -64,6 +65,7 @@ class Controller: ObservableObject {
         do {
             let handle = try chosenDevice.openHandle()
             try chosenConfig.setActive()
+            isConnected = true
             print("Connected!")
         } catch {
             print("Error connecting")
