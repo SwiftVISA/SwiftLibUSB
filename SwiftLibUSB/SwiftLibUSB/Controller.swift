@@ -53,7 +53,7 @@ class Controller: ObservableObject {
     func nextMessage() {
         messageIndex = (messageIndex % 255) + 1
     }
-    
+    /*
     func sendCommand() {
         do {
             var message = Data([1, messageIndex, 255-messageIndex, 0])
@@ -79,7 +79,63 @@ class Controller: ObservableObject {
             print("Error sending message")
         }
     }
-    
+    */
+    func sendCommand() {
+        do {
+            var message = Data([1, messageIndex, 255-messageIndex, 0])
+            withUnsafeBytes(of: Int32(command.count + 1).littleEndian) {
+                message.append(Data(Array($0)))
+            }
+            message.append(Data([1, 0, 0, 0]))
+            command.withUTF8 {
+                message.append($0)
+            }
+            message.append(10)
+            message.append(Data(Array(repeating: 0, count: (4 - message.count % 4) % 4)))
+            print([UInt8](message))
+            for endpoint in chosenAltSetting.endpoints {
+                if endpoint.direction == .Out && endpoint.transferType == .bulk {
+                    endpoint.clearHalt()
+                    let num = try endpoint.sendBulkTransfer(data: &message)
+                    print("Sent \(num) bytes")
+                }
+            }
+            nextMessage()
+            print("Sent command message")
+            
+            // Send read request to out endpoint
+            var readBufferSize = 1024
+            message = Data([2, messageIndex, 255-messageIndex, 0])
+            withUnsafeBytes(of: Int32(readBufferSize).littleEndian) {
+                message.append(Data(Array($0)))
+            }
+            message.append(Data([0,0,0,0]))
+            
+            for endpoint in chosenAltSetting.endpoints {
+                if endpoint.direction == .In && endpoint.transferType == .bulk {
+                    endpoint.clearHalt()
+                }
+            }
+            for endpoint in chosenAltSetting.endpoints {
+                if endpoint.direction == .Out && endpoint.transferType == .bulk {
+                    let num = try endpoint.sendBulkTransfer(data: &message)
+                    print("Sent \(num) bytes")
+                }
+            }
+            print ("Sent request message")
+            
+            for endpoint in chosenAltSetting.endpoints {
+                if endpoint.direction == .In && endpoint.transferType == .bulk {
+                    let data = try endpoint.receiveBulkTransfer()
+                    print([UInt8](data))
+                }
+            }
+            nextMessage()
+            
+        } catch {
+            print("Error sending message")
+        }
+    }
     /// Print the currently chosen device to the terminal
     func printDevice() {
         print(chosenDevice.displayName)
