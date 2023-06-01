@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0162E1E52A29258E0006EE63 /* USBSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0162E1E42A29258E0006EE63 /* USBSession.swift */; };
+		0162E1E82A2926940006EE63 /* CoreSwiftVISA in Frameworks */ = {isa = PBXBuildFile; productRef = 0162E1E72A2926940006EE63 /* CoreSwiftVISA */; };
+		0162E1EA2A2932D40006EE63 /* USBInstrument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0162E1E92A2932D40006EE63 /* USBInstrument.swift */; };
 		024F52722A1FE9B700E93233 /* AltSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 024F52712A1FE9B700E93233 /* AltSetting.swift */; };
 		912860CD2A1D46E9001AB351 /* SwiftLibUSBApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 912860CC2A1D46E9001AB351 /* SwiftLibUSBApp.swift */; };
 		912860CF2A1D46E9001AB351 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 912860CE2A1D46E9001AB351 /* ContentView.swift */; };
@@ -46,6 +49,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0162E1E42A29258E0006EE63 /* USBSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = USBSession.swift; sourceTree = "<group>"; };
+		0162E1E92A2932D40006EE63 /* USBInstrument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = USBInstrument.swift; sourceTree = "<group>"; };
 		024F52712A1FE9B700E93233 /* AltSetting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AltSetting.swift; sourceTree = "<group>"; };
 		912860C92A1D46E9001AB351 /* SwiftLibUSB.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftLibUSB.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		912860CC2A1D46E9001AB351 /* SwiftLibUSBApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftLibUSBApp.swift; sourceTree = "<group>"; };
@@ -78,6 +83,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0162E1E82A2926940006EE63 /* CoreSwiftVISA in Frameworks */,
 				DEC603EF2A1D76CB00ACE746 /* libusb-1.0.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -99,6 +105,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0162E1E32A2925420006EE63 /* SwiftVisaClasses */ = {
+			isa = PBXGroup;
+			children = (
+				0162E1E42A29258E0006EE63 /* USBSession.swift */,
+				0162E1E92A2932D40006EE63 /* USBInstrument.swift */,
+			);
+			path = SwiftVisaClasses;
+			sourceTree = "<group>";
+		};
 		912860C02A1D46E8001AB351 = {
 			isa = PBXGroup;
 			children = (
@@ -123,6 +138,7 @@
 		912860CB2A1D46E9001AB351 /* SwiftLibUSB */ = {
 			isa = PBXGroup;
 			children = (
+				0162E1E32A2925420006EE63 /* SwiftVisaClasses */,
 				912860CC2A1D46E9001AB351 /* SwiftLibUSBApp.swift */,
 				912860CE2A1D46E9001AB351 /* ContentView.swift */,
 				DEC604462A1FCE4200ACE746 /* Usb */,
@@ -202,6 +218,9 @@
 			dependencies = (
 			);
 			name = SwiftLibUSB;
+			packageProductDependencies = (
+				0162E1E72A2926940006EE63 /* CoreSwiftVISA */,
+			);
 			productName = SwiftLibUSB;
 			productReference = 912860C92A1D46E9001AB351 /* SwiftLibUSB.app */;
 			productType = "com.apple.product-type.application";
@@ -275,6 +294,9 @@
 				Base,
 			);
 			mainGroup = 912860C02A1D46E8001AB351;
+			packageReferences = (
+				0162E1E62A2926940006EE63 /* XCRemoteSwiftPackageReference "CoreSwiftVISA" */,
+			);
 			productRefGroup = 912860CA2A1D46E9001AB351 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -322,6 +344,8 @@
 				91DE965C2A1FECB8006D2047 /* Endpoint.swift in Sources */,
 				912860CF2A1D46E9001AB351 /* ContentView.swift in Sources */,
 				DEC6043D2A1E903800ACE746 /* DeviceList.swift in Sources */,
+				0162E1EA2A2932D40006EE63 /* USBInstrument.swift in Sources */,
+				0162E1E52A29258E0006EE63 /* USBSession.swift in Sources */,
 				DEC6043B2A1E881900ACE746 /* Context.swift in Sources */,
 				DEC604452A1FCC4D00ACE746 /* Configuration.swift in Sources */,
 				DEC6043F2A1E965B00ACE746 /* Device.swift in Sources */,
@@ -679,6 +703,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		0162E1E62A2926940006EE63 /* XCRemoteSwiftPackageReference "CoreSwiftVISA" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SwiftVISA/CoreSwiftVISA.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.1.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		0162E1E72A2926940006EE63 /* CoreSwiftVISA */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0162E1E62A2926940006EE63 /* XCRemoteSwiftPackageReference "CoreSwiftVISA" */;
+			productName = CoreSwiftVISA;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 912860C12A1D46E8001AB351 /* Project object */;
 }
