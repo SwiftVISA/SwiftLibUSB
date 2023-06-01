@@ -29,7 +29,7 @@ class Context {
         devices = []
         for i in 0..<size {
             if let dev = deviceList?[i] {
-                devices.append(try Device(pointer: dev))
+                devices.append(try Device(context: context, pointer: dev))
             }
         }
 

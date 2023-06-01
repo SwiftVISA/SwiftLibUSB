@@ -12,13 +12,13 @@ import Foundation
 class Configuration: Hashable{
     var descriptor: UnsafeMutablePointer<libusb_config_descriptor>
     var interfaces : [Interface]
-    unowned var device: Device
+    var device: DeviceRef
     
     /// Loads the configuration with the given index
     ///
     /// - throws: a USBError if getting the configuration fails
     /// * `.notFound` if the index is invalid
-    init(_ device: Device, index: UInt8) throws {
+    init(_ device: DeviceRef, index: UInt8) throws {
         var desc: UnsafeMutablePointer<libusb_config_descriptor>? = nil
         let error = libusb_get_config_descriptor(device.device, index, &desc)
         if error < 0 {
@@ -34,7 +34,7 @@ class Configuration: Hashable{
     ///
     /// - throws: a USBError if getting the configuration fails
     /// * `.notFound` if the device is not configured
-    init(_ device: Device) throws {
+    init(_ device: DeviceRef) throws {
         var desc: UnsafeMutablePointer<libusb_config_descriptor>? = nil
         let error = libusb_get_active_config_descriptor(device.device, &desc)
         if error < 0 {

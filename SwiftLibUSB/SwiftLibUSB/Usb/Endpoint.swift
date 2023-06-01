@@ -13,9 +13,9 @@ import Foundation
 /// that contain this endpoint.
 class Endpoint {
     var descriptor: libusb_endpoint_descriptor
-    unowned var device: Device
+    var device: DeviceRef
     
-    init(pointer : libusb_endpoint_descriptor, device: Device) {
+    init(pointer : libusb_endpoint_descriptor, device: DeviceRef) {
         descriptor = pointer
         self.device = device
     }

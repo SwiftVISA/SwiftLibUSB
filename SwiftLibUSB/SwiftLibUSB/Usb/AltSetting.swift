@@ -11,9 +11,9 @@ import Foundation
 class AltSetting : Hashable{
     var descriptor: libusb_interface_descriptor
     var endpoints: [Endpoint]
-    unowned var device: Device
+    var device: DeviceRef
     
-    init(pointer : libusb_interface_descriptor, device: Device) {
+    init(pointer : libusb_interface_descriptor, device: DeviceRef) {
         descriptor = pointer
         self.device = device
         
@@ -24,7 +24,7 @@ class AltSetting : Hashable{
     }
     
     static func == (lhs: AltSetting, rhs: AltSetting) -> Bool {
-        lhs.device == rhs.device && lhs.index == rhs.index && lhs.interfaceIndex == rhs.interfaceIndex
+        lhs.device.device == rhs.device.device && lhs.index == rhs.index && lhs.interfaceIndex == rhs.interfaceIndex
     }
     
     var displayName: String {
@@ -95,7 +95,7 @@ class AltSetting : Hashable{
     
     /// A hash representation of the altSetting
     func hash(into hasher: inout Hasher) {
-        device.hash(into: &hasher)
+        device.device.hash(into: &hasher)
         interfaceIndex.hash(into: &hasher)
         index.hash(into: &hasher)
     }

@@ -12,16 +12,16 @@ import Foundation
 /// An `AltSetting` determines what functions these endpoints have.
 class Interface : Hashable {
     static func == (lhs: Interface, rhs: Interface) -> Bool {
-        return lhs.device == rhs.device && lhs.index == rhs.index
+        return lhs.device.device == rhs.device.device && lhs.index == rhs.index
     }
     
     var descriptor: libusb_interface
     var claimed = false
     var altSettings: [AltSetting]
-    unowned var device: Device
+    var device: DeviceRef
     var index: Int
     
-    init(pointer : libusb_interface, device: Device, index: Int) {
+    init(pointer : libusb_interface, device: DeviceRef, index: Int) {
         descriptor = pointer
         self.device = device
         self.index = index
@@ -57,7 +57,7 @@ class Interface : Hashable {
     
     /// A hash representation of the interface
     func hash(into hasher: inout Hasher) {
-        device.hash(into: &hasher)
+        device.device.hash(into: &hasher)
         index.hash(into: &hasher)
     }
 }

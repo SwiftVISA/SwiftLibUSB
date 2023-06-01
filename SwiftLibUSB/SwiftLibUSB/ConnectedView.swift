@@ -19,7 +19,7 @@ struct ConnectedView: View {
     var body: some View {
         VStack {
             Picker("Device:", selection: $control.chosenDevice) {
-                ForEach($control.deviceList.devices, id: \.self) { item in
+                ForEach($control.context.devices, id: \.self) { item in
                     Text(verbatim: item.wrappedValue.displayName).tag(item.wrappedValue)
                 }
             }
