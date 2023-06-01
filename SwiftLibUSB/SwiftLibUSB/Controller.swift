@@ -130,6 +130,7 @@ class Controller: ObservableObject {
                 if endpoint.direction == .In && endpoint.transferType == .bulk {
                     let data = try endpoint.receiveBulkTransfer()
                     print([UInt8](data))
+                    dataReceived += String(decoding: data[12...], as: UTF8.self)
                 }
             }
             nextMessage()
