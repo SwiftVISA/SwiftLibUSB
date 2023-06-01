@@ -62,6 +62,23 @@ class Device: Hashable {
         }
     }
     
+    /// Serial number of the device, useful in identifying a device if there are multiple with the same product and vendor id
+    /// Returns a blank string if the serial number cannot be found
+    var serialCode: String {
+        get{
+            if(descriptor.iSerialNumber == 0){
+                return ""
+            }
+            var size = 256;
+            var buffer: [UInt8] = Array(repeating: 0, count: size)
+            var returnCode = libusb_get_string_descriptor_ascii(handle, descriptor.iSerialNumber, &buffer, Int32(size))
+            if(returnCode <= 0){
+                return ""
+            }
+            return String(bytes: buffer, encoding: .ascii) ?? ("")
+        }
+    }
+    
     /// Gets a human readable version of a device by indicating both the vendor and product id
     /// Together they form a primary key that can uniquely indentify the connected device
     /// - Returns: A string in the format "Vendor: [vendorID] Product: [productID]"

@@ -16,6 +16,7 @@ class USBInstrument {
     }
     
 }
+
 extension USBInstrument {
     /// An error associated with a  USB Instrument.
     /// 
