@@ -10,9 +10,8 @@ import Foundation
 /// Each device has at least 1 configuration, often more. libUSB keeps track of these with libusb config descriptors.
 /// Each instance manages 1 of these descriptors, inclduing managing the getting and freeing of this descriptor
 class Configuration: Hashable{
-    var descriptor: UnsafeMutablePointer<libusb_config_descriptor>
     var interfaces : [Interface]
-    var device: DeviceRef
+    var config: ConfigurationRef
     
     /// Loads the configuration with the given index
     ///
@@ -24,9 +23,8 @@ class Configuration: Hashable{
         if error < 0 {
             throw USBError.from(code: error)
         }
-        descriptor = desc!
+        config = ConfigurationRef(device: device, descriptor: desc!)
         interfaces = []
-        self.device = device
         getInterfaces()
     }
     
@@ -40,17 +38,16 @@ class Configuration: Hashable{
         if error < 0 {
             throw USBError.from(code: error)
         }
-        descriptor = desc!
+        config = ConfigurationRef(device: device, descriptor: desc!)
         interfaces = []
-        self.device = device
         getInterfaces()
     }
     
     func getInterfaces(){
-        let size = Int(descriptor.pointee.bNumInterfaces)
+        let size = Int(config.descriptor.pointee.bNumInterfaces)
         for i in 0..<size {
-            if let inf = descriptor.pointee.interface?[i] {
-                interfaces.append(Interface(pointer: inf, device: device, index: i))
+            if let inf = config.descriptor.pointee.interface?[i] {
+                interfaces.append(Interface(pointer: inf, device: config.device, index: i))
             }
         }
     }
@@ -58,14 +55,14 @@ class Configuration: Hashable{
     /// The index used to get a string descriptor of this configuration
     var index: Int {
         get {
-            Int(descriptor.pointee.iConfiguration)
+            Int(config.descriptor.pointee.iConfiguration)
         }
     }
     
     /// The number used to identify this configuration
     var value: Int {
         get {
-            Int(descriptor.pointee.bConfigurationValue)
+            Int(config.descriptor.pointee.bConfigurationValue)
         }
     }
     
@@ -75,14 +72,9 @@ class Configuration: Hashable{
         }
     }
     
-    deinit {
-        interfaces = []
-        libusb_free_config_descriptor(descriptor)
-    }
-    
     /// Compares configuration by their internal pointer. Two configurations classes that point to the same libUSB config descriptor are considered the same
     static func == (lhs: Configuration, rhs: Configuration) -> Bool {
-        lhs.descriptor == rhs.descriptor
+        lhs.config.descriptor == rhs.config.descriptor
     }
     
     /// Makes this configuration active, if possible
@@ -95,12 +87,26 @@ class Configuration: Hashable{
     /// * `.busy` if interfaces have already been claimed
     /// * `.noDevice` if the device has been unplugged
     func setActive() throws {
-        libusb_set_configuration(device.handle, // The handle we are configuring ourselves with
-                                 Int32(descriptor.pointee.bConfigurationValue)) // our value
+        libusb_set_configuration(config.device.handle, // The handle we are configuring ourselves with
+                                 Int32(config.descriptor.pointee.bConfigurationValue)) // our value
     }
     
     /// A hash representation of the configuration
     func hash(into hasher: inout Hasher) {
-        descriptor.hash(into: &hasher)
+        config.descriptor.hash(into: &hasher)
+    }
+}
+
+internal class ConfigurationRef {
+    var device: DeviceRef
+    var descriptor: UnsafeMutablePointer<libusb_config_descriptor>
+    
+    init(device: DeviceRef, descriptor: UnsafeMutablePointer<libusb_config_descriptor>) {
+        self.device = device
+        self.descriptor = descriptor
+    }
+    
+    deinit {
+        libusb_free_config_descriptor(descriptor)
     }
 }
