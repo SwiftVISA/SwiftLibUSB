@@ -73,6 +73,12 @@ internal class InterfaceRef {
         }
     }
     
+    var device: DeviceRef {
+        get {
+            config.device
+        }
+    }
+    
     init(config: ConfigurationRef, index: Int32) {
         self.config = config
         self.index = index

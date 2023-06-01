@@ -22,7 +22,7 @@ class AltSetting : Hashable{
     }
     
     static func == (lhs: AltSetting, rhs: AltSetting) -> Bool {
-        lhs.setting.interface.config.device.device == rhs.setting.interface.config.device.device && lhs.index == rhs.index && lhs.interfaceIndex == rhs.interfaceIndex
+        lhs.setting.device.device == rhs.setting.device.device && lhs.index == rhs.index && lhs.interfaceIndex == rhs.interfaceIndex
     }
     
     var displayName: String {
@@ -32,7 +32,7 @@ class AltSetting : Hashable{
             }
             var size = 256;
             var buffer: [UInt8] = Array(repeating: 0, count: size)
-            var returnCode = libusb_get_string_descriptor_ascii(setting.interface.config.device.handle, setting.altSetting.pointee.iInterface, &buffer, Int32(size))
+            var returnCode = libusb_get_string_descriptor_ascii(setting.device.handle, UInt8(setting.interfaceName), &buffer, Int32(size))
             if(returnCode <= 0){
                 return "\(index) error getting name: \(USBError.from(code: returnCode).localizedDescription)"
             }
@@ -42,34 +42,34 @@ class AltSetting : Hashable{
     
     var interfaceIndex: Int {
         get {
-            Int(setting.altSetting.pointee.bInterfaceNumber)
+            setting.interfaceNumber
         }
     }
     
     var index: Int {
         get {
-            Int(setting.altSetting.pointee.bAlternateSetting)
+            setting.index
         }
     }
     
     /// A code describing what kind of communication this setting handles.
     var interfaceClass: ClassCode {
         get {
-            ClassCode.from(code: UInt32(setting.altSetting.pointee.bInterfaceClass))
+            setting.interfaceClass
         }
     }
     
     /// If the `interfaceClass` has subtypes, this gives that type.
     var interfaceSubClass: Int {
         get {
-            Int(setting.altSetting.pointee.bInterfaceSubClass)
+            setting.interfaceSubClass
         }
     }
     
     /// If the `interfaceClass` and `interfaceSubClass` has protocols, this gives the protocol
     var interfaceProtocol: Int {
         get {
-            Int(setting.altSetting.pointee.bInterfaceProtocol)
+            setting.interfaceProtocol
         }
     }
     
@@ -81,7 +81,7 @@ class AltSetting : Hashable{
     /// * `.notFound` if the interface was not claimed
     /// * `.noDevice` if the device was disconnected
     func setActive() throws {
-        let error = libusb_set_interface_alt_setting(setting.interface.config.device.handle, Int32(setting.altSetting.pointee.bInterfaceNumber), Int32(setting.altSetting.pointee.bAlternateSetting))
+        let error = libusb_set_interface_alt_setting(setting.device.handle, Int32(setting.interfaceNumber), Int32(setting.index))
         if error < 0 {
             throw USBError.from(code: error)
         }
@@ -89,7 +89,7 @@ class AltSetting : Hashable{
     
     /// A hash representation of the altSetting
     func hash(into hasher: inout Hasher) {
-        setting.interface.config.device.device.hash(into: &hasher)
+        setting.device.device.hash(into: &hasher)
         interfaceIndex.hash(into: &hasher)
         index.hash(into: &hasher)
     }
@@ -105,6 +105,48 @@ internal class AltSettingRef {
     init(interface: InterfaceRef, index: Int) {
         self.interface = interface
         altSetting = interface.altsetting + index
+    }
+    
+    var device: DeviceRef {
+        get {
+            interface.device
+        }
+    }
+    
+    var index: Int {
+        get {
+            Int(altSetting.pointee.bAlternateSetting)
+        }
+    }
+    
+    var interfaceNumber: Int {
+        get {
+            Int(altSetting.pointee.bInterfaceNumber)
+        }
+    }
+    
+    var interfaceProtocol: Int {
+        get {
+            Int(altSetting.pointee.bInterfaceProtocol)
+        }
+    }
+    
+    var interfaceSubClass: Int {
+        get {
+            Int(altSetting.pointee.bInterfaceSubClass)
+        }
+    }
+    
+    var interfaceClass: ClassCode {
+        get {
+            ClassCode.from(code: UInt32(altSetting.pointee.bInterfaceClass))
+        }
+    }
+    
+    var interfaceName: Int {
+        get {
+            Int(altSetting.pointee.iInterface)
+        }
     }
     
     deinit {
