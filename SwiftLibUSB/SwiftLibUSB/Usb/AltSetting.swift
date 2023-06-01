@@ -29,15 +29,20 @@ class AltSetting : Hashable{
     
     var displayName: String {
         get {
+            // If the index is 0 this is an unnamed alt setting
             if(descriptor.iInterface == 0){
                 return "(\(index)) unnamed alt setting"
             }
-            let size = 256;
+            // Make a buffer for the name of the alt setting
+            var size = 256;
             var buffer: [UInt8] = Array(repeating: 0, count: size)
-            let returnCode = libusb_get_string_descriptor_ascii(device.handle, descriptor.iInterface, &buffer, Int32(size))
+            var returnCode = libusb_get_string_descriptor_ascii(device.handle, descriptor.iInterface, &buffer, Int32(size))
+            
+            // Check if there is an error when filling the buffer with the name
             if(returnCode <= 0){
                 return "\(index) error getting name: \(USBError.from(code: returnCode).localizedDescription)"
             }
+            
             return String(bytes: buffer, encoding: .ascii) ?? ("(\(index)) unnamed alt setting")
         }
     }

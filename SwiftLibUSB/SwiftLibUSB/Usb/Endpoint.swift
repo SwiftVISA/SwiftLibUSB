@@ -57,6 +57,7 @@ class Endpoint {
         }
     }
     
+    /// Clear halts or stalls for the endpoint
     func clearHalt(){
         libusb_clear_halt(device.handle, descriptor.bEndpointAddress)
     }

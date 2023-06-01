@@ -71,16 +71,22 @@ class Configuration: Hashable{
     
     var displayName: String {
         get {
+            // If the index is 0 this is an unnamed configuration
             if(descriptor.pointee.iConfiguration == 0){
                 return "(\(index)) unnamed configuration"
             }
-            let size = 256;
+
+            // Make a buffer for the name of the configuration
+            var size = 256;
             var buffer: [UInt8] = Array(repeating: 0, count: size)
-            let returnCode = libusb_get_string_descriptor_ascii(device.handle, descriptor.pointee.iConfiguration, &buffer, Int32(size))
+            var returnCode = libusb_get_string_descriptor_ascii(device.handle, descriptor.pointee.iConfiguration, &buffer, Int32(size))
+            
+            // Check if there is an error when filling the buffer with the name
             if(returnCode <= 0){
                 return "(\(index)) unknown configuration"
             }
-            return String(bytes: buffer, encoding: .ascii) ?? ("(\(index)) unknown configuration")
+            
+            return String(bytes: buffer, encoding: .ascii) ?? ("(\(index)) unnamed configuration")
         }
     }
     
