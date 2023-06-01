@@ -71,7 +71,16 @@ class Configuration: Hashable{
     
     var displayName: String {
         get {
-            return "value: \(value) Index: \(index)"
+            if(descriptor.pointee.iConfiguration == 0){
+                return "(\(index)) unnamed configuration"
+            }
+            var size = 256;
+            var buffer: [UInt8] = Array(repeating: 0, count: size)
+            var returnCode = libusb_get_string_descriptor_ascii(device.handle, descriptor.pointee.iConfiguration, &buffer, Int32(size))
+            if(returnCode <= 0){
+                return "\(index) error getting name: \(USBError.from(code: returnCode).localizedDescription)"
+            }
+            return String(bytes: buffer, encoding: .ascii) ?? ("(\(index)) unnamed configuration")
         }
     }
     
