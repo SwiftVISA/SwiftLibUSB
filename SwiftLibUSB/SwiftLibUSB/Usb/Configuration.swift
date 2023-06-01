@@ -95,6 +95,9 @@ class Configuration: Hashable{
     }
 }
 
+/// Internal class for managing lifetimes
+///
+/// This exists to ensure the libUSB device and context outlive any child objects.
 internal class ConfigurationRef {
     var device: DeviceRef
     var descriptor: UnsafeMutablePointer<libusb_config_descriptor>

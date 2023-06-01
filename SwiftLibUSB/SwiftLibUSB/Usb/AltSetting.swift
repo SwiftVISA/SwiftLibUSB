@@ -95,6 +95,9 @@ class AltSetting : Hashable{
     }
 }
 
+/// Internal class for managing lifetimes.
+///
+/// This exists to make sure the device and context live longer than any Endpoints that are in use.
 internal class AltSettingRef {
     let interface: InterfaceRef
     let altSetting: UnsafePointer<libusb_interface_descriptor>
@@ -105,6 +108,6 @@ internal class AltSettingRef {
     }
     
     deinit {
-        // AltSettings don't need to be released
+        // AltSettings don't have any data to be released
     }
 }

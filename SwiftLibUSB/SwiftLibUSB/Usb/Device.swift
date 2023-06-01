@@ -71,6 +71,9 @@ class Device: Hashable {
     }
 }
 
+/// Internal class for managing lifetimes
+///
+/// This ensures the libUSB context isn't freed until all devices have been closed.
 internal class DeviceRef {
     let context: ContextRef
     let device: OpaquePointer

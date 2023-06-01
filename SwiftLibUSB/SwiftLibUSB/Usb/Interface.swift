@@ -52,6 +52,9 @@ class Interface : Hashable {
     }
 }
 
+/// Internal class for managing lifetimes.
+///
+/// This exists to make sure the libUSB device and context outlive any interfaces even if the Device and Context are freed.
 internal class InterfaceRef {
     let config: ConfigurationRef
     let descriptor: UnsafePointer<libusb_interface>
