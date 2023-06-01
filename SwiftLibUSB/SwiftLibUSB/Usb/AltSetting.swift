@@ -9,32 +9,30 @@ import Foundation
 
 /// A setting that controls how endpoints behave. This must be activated using `setActive` before sending or receiving data.
 class AltSetting : Hashable{
-    var descriptor: libusb_interface_descriptor
     var endpoints: [Endpoint]
-    var device: DeviceRef
+    var setting: AltSettingRef
     
-    init(pointer : libusb_interface_descriptor, device: DeviceRef) {
-        descriptor = pointer
-        self.device = device
+    init(interface: InterfaceRef, index: Int) {
+        setting = AltSettingRef(interface: interface, index: index)
         
         endpoints = []
-        for i in 0..<descriptor.bNumEndpoints {
-            endpoints.append(Endpoint(pointer: descriptor.endpoint[Int(i)], device: device))
+        for i in 0..<setting.altSetting.pointee.bNumEndpoints {
+            endpoints.append(Endpoint(pointer: setting.altSetting.pointee.endpoint[Int(i)], device: setting.interface.config.device))
         }
     }
     
     static func == (lhs: AltSetting, rhs: AltSetting) -> Bool {
-        lhs.device.device == rhs.device.device && lhs.index == rhs.index && lhs.interfaceIndex == rhs.interfaceIndex
+        lhs.setting.interface.config.device.device == rhs.setting.interface.config.device.device && lhs.index == rhs.index && lhs.interfaceIndex == rhs.interfaceIndex
     }
     
     var displayName: String {
         get {
-            if(descriptor.iInterface == 0){
+            if(setting.altSetting.pointee.iInterface == 0){
                 return "(\(index)) unnamed alt setting"
             }
             var size = 256;
             var buffer: [UInt8] = Array(repeating: 0, count: size)
-            var returnCode = libusb_get_string_descriptor_ascii(device.handle, descriptor.iInterface, &buffer, Int32(size))
+            var returnCode = libusb_get_string_descriptor_ascii(setting.interface.config.device.handle, setting.altSetting.pointee.iInterface, &buffer, Int32(size))
             if(returnCode <= 0){
                 return "\(index) error getting name: \(USBError.from(code: returnCode).localizedDescription)"
             }
@@ -44,39 +42,35 @@ class AltSetting : Hashable{
     
     var interfaceIndex: Int {
         get {
-            Int(descriptor.bInterfaceNumber)
+            Int(setting.altSetting.pointee.bInterfaceNumber)
         }
     }
     
     var index: Int {
         get {
-            Int(descriptor.bAlternateSetting)
+            Int(setting.altSetting.pointee.bAlternateSetting)
         }
     }
     
     /// A code describing what kind of communication this setting handles.
     var interfaceClass: ClassCode {
         get {
-            ClassCode.from(code: UInt32(descriptor.bInterfaceClass))
+            ClassCode.from(code: UInt32(setting.altSetting.pointee.bInterfaceClass))
         }
     }
     
     /// If the `interfaceClass` has subtypes, this gives that type.
     var interfaceSubClass: Int {
         get {
-            Int(descriptor.bInterfaceSubClass)
+            Int(setting.altSetting.pointee.bInterfaceSubClass)
         }
     }
     
     /// If the `interfaceClass` and `interfaceSubClass` has protocols, this gives the protocol
     var interfaceProtocol: Int {
         get {
-            Int(descriptor.bInterfaceProtocol)
+            Int(setting.altSetting.pointee.bInterfaceProtocol)
         }
-    }
-    
-    deinit {
-        endpoints = []
     }
     
     /// Makes the setting active.
@@ -87,7 +81,7 @@ class AltSetting : Hashable{
     /// * `.notFound` if the interface was not claimed
     /// * `.noDevice` if the device was disconnected
     func setActive() throws {
-        let error = libusb_set_interface_alt_setting(device.handle, Int32(descriptor.bInterfaceNumber), Int32(descriptor.bAlternateSetting))
+        let error = libusb_set_interface_alt_setting(setting.interface.config.device.handle, Int32(setting.altSetting.pointee.bInterfaceNumber), Int32(setting.altSetting.pointee.bAlternateSetting))
         if error < 0 {
             throw USBError.from(code: error)
         }
@@ -95,9 +89,22 @@ class AltSetting : Hashable{
     
     /// A hash representation of the altSetting
     func hash(into hasher: inout Hasher) {
-        device.device.hash(into: &hasher)
+        setting.interface.config.device.device.hash(into: &hasher)
         interfaceIndex.hash(into: &hasher)
         index.hash(into: &hasher)
     }
+}
+
+internal class AltSettingRef {
+    let interface: InterfaceRef
+    let altSetting: UnsafePointer<libusb_interface_descriptor>
     
+    init(interface: InterfaceRef, index: Int) {
+        self.interface = interface
+        altSetting = interface.altsetting + index
+    }
+    
+    deinit {
+        // AltSettings don't need to be released
+    }
 }

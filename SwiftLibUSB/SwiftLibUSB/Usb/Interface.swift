@@ -22,8 +22,8 @@ class Interface : Hashable {
         interface = InterfaceRef(config: config, index: Int32(index))
         
         altSettings = []
-        for i in 0..<interface.num_altsetting {
-            altSettings.append(AltSetting(pointer: interface.altsetting[Int(i)], device: interface.config.device))
+        for i in 0..<Int(interface.numAltsetting) {
+            altSettings.append(AltSetting(interface: interface, index: i))
         }
     }
     
@@ -58,7 +58,7 @@ internal class InterfaceRef {
     let index: Int32
     var claimed: Bool
     
-    var num_altsetting: Int32 {
+    var numAltsetting: Int32 {
         get {
             descriptor.pointee.num_altsetting
         }
