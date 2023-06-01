@@ -12,7 +12,7 @@ class USBInstrument {
     var _session: USBSession
     
     init(vendorID: Int, productID: Int, SerialNumber: String?) throws {
-        _session = try USBSession(vendorID: <#T##Int#>, productID: <#T##Int#>, SerialNumber: <#T##String?#>)
+        _session = try USBSession(vendorID: vendorID, productID: productID, SerialNumber: SerialNumber)
     }
     
 }
