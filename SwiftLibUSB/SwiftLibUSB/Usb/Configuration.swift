@@ -12,7 +12,7 @@ import Foundation
 class Configuration: Hashable{
     var descriptor: UnsafeMutablePointer<libusb_config_descriptor>
     var interfaces : [Interface]
-    var device: Device
+    unowned var device: Device
     
     /// Loads the configuration with the given index
     ///
@@ -76,6 +76,7 @@ class Configuration: Hashable{
     }
     
     deinit {
+        interfaces = []
         libusb_free_config_descriptor(descriptor)
     }
     

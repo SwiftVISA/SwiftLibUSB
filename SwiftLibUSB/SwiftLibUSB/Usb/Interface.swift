@@ -18,7 +18,7 @@ class Interface : Hashable {
     var descriptor: libusb_interface
     var claimed = false
     var altSettings: [AltSetting]
-    var device: Device
+    unowned var device: Device
     var index: Int
     
     init(pointer : libusb_interface, device: Device, index: Int) {
@@ -33,6 +33,7 @@ class Interface : Hashable {
     }
     
     deinit {
+        altSettings = []
         if claimed {
             libusb_release_interface(device.handle, Int32(index))
         }

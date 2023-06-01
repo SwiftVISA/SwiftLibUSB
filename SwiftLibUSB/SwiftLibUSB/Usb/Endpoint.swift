@@ -13,7 +13,7 @@ import Foundation
 /// that contain this endpoint.
 class Endpoint {
     var descriptor: libusb_endpoint_descriptor
-    var device: Device
+    unowned var device: Device
     
     init(pointer : libusb_endpoint_descriptor, device: Device) {
         descriptor = pointer

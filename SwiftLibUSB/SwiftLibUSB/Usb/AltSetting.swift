@@ -11,7 +11,7 @@ import Foundation
 class AltSetting : Hashable{
     var descriptor: libusb_interface_descriptor
     var endpoints: [Endpoint]
-    var device: Device
+    unowned var device: Device
     
     init(pointer : libusb_interface_descriptor, device: Device) {
         descriptor = pointer
@@ -76,7 +76,7 @@ class AltSetting : Hashable{
     }
     
     deinit {
-        
+        endpoints = []
     }
     
     /// Makes the setting active.

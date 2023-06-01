@@ -77,6 +77,7 @@ class Device: Hashable {
     }
 
     deinit {
+        configurations = []
         libusb_close(handle)
     }
 }
