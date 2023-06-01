@@ -6,9 +6,14 @@
 //
 
 import Foundation
+import CoreSwiftVISA
 
 class USBInstrument {
+    var _session: USBSession
     
+    init(vendorID: Int, productID: Int, SerialNumber: String?) throws {
+        _session = try USBSession(vendorID: <#T##Int#>, productID: <#T##Int#>, SerialNumber: <#T##String?#>)
+    }
     
 }
 
@@ -37,6 +42,14 @@ extension USBInstrument.Error {
             return "Identification of USB device was not unique"
         case .noDevices:
             return "No devices were found"
+        }
+    }
+}
+
+extension USBInstrument : Instrument {
+    var session: CoreSwiftVISA.Session {
+        get{
+            return _session
         }
     }
 }
