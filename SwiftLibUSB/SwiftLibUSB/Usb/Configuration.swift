@@ -44,7 +44,7 @@ class Configuration: Hashable{
     }
     
     func getInterfaces(){
-        let size = Int(config.descriptor.pointee.bNumInterfaces)
+        let size = Int(config.numInterfaces)
         for i in 0..<size {
             interfaces.append(Interface(config: config, index: i))
         }
@@ -53,28 +53,28 @@ class Configuration: Hashable{
     /// The index used to get a string descriptor of this configuration
     var index: Int {
         get {
-            Int(config.descriptor.pointee.iConfiguration)
+            config.index
         }
     }
     
     /// The number used to identify this configuration
     var value: Int {
         get {
-            Int(config.descriptor.pointee.bConfigurationValue)
+            config.value
         }
     }
     
     var displayName: String {
         get {
             // If the index is 0 this is an unnamed configuration
-            if(config.descriptor.pointee.iConfiguration == 0){
+            if(config.index == 0){
                 return "(\(index)) unnamed configuration"
             }
 
             // Make a buffer for the name of the configuration
             var size = 256;
             var buffer: [UInt8] = Array(repeating: 0, count: size)
-            var returnCode = libusb_get_string_descriptor_ascii(config.raw_handle, config.descriptor.pointee.iConfiguration, &buffer, Int32(size))
+            var returnCode = libusb_get_string_descriptor_ascii(config.raw_handle, UInt8(config.index), &buffer, Int32(size))
             
             // Check if there is an error when filling the buffer with the name
             if(returnCode <= 0){
@@ -101,7 +101,7 @@ class Configuration: Hashable{
     /// * `.noDevice` if the device has been unplugged
     func setActive() throws {
         libusb_set_configuration(config.raw_handle, // The handle we are configuring ourselves with
-                                 Int32(config.descriptor.pointee.bConfigurationValue)) // our value
+                                 Int32(value)) // our value
     }
     
     /// A hash representation of the configuration
@@ -131,6 +131,24 @@ internal class ConfigurationRef {
     var raw_device: OpaquePointer {
         get {
             device.raw_device
+        }
+    }
+    
+    var numInterfaces: Int {
+        get {
+            Int(descriptor.pointee.bNumInterfaces)
+        }
+    }
+    
+    var value: Int {
+        get {
+            Int(descriptor.pointee.bConfigurationValue)
+        }
+    }
+    
+    var index: Int {
+        get {
+            Int(descriptor.pointee.iConfiguration)
         }
     }
     
