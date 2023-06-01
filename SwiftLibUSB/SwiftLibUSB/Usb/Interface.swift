@@ -12,30 +12,24 @@ import Foundation
 /// An `AltSetting` determines what functions these endpoints have.
 class Interface : Hashable {
     static func == (lhs: Interface, rhs: Interface) -> Bool {
-        return lhs.device.device == rhs.device.device && lhs.index == rhs.index
+        return lhs.interface.config.device.device == rhs.interface.config.device.device && lhs.interface.index == rhs.interface.index
     }
     
-    var descriptor: libusb_interface
-    var claimed = false
     var altSettings: [AltSetting]
-    var device: DeviceRef
-    var index: Int
+    var interface: InterfaceRef
     
-    init(pointer : libusb_interface, device: DeviceRef, index: Int) {
-        descriptor = pointer
-        self.device = device
-        self.index = index
+    init(config: ConfigurationRef, index: Int) {
+        interface = InterfaceRef(config: config, index: Int32(index))
         
         altSettings = []
-        for i in 0..<descriptor.num_altsetting {
-            altSettings.append(AltSetting(pointer: descriptor.altsetting[Int(i)], device: device))
+        for i in 0..<interface.num_altsetting {
+            altSettings.append(AltSetting(pointer: interface.altsetting[Int(i)], device: interface.config.device))
         }
     }
     
-    deinit {
-        altSettings = []
-        if claimed {
-            libusb_release_interface(device.handle, Int32(index))
+    var index: Int {
+        get {
+            Int(interface.index)
         }
     }
     
@@ -48,16 +42,52 @@ class Interface : Hashable {
     /// * `.busy` if another program has claimed the interface
     /// * `.noDevice` if the device has been disconnected
     func claim() throws {
-        let error = libusb_claim_interface(device.handle, Int32(index))
+        try interface.claim()
+    }
+    
+    /// A hash representation of the interface
+    func hash(into hasher: inout Hasher) {
+        interface.config.device.device.hash(into: &hasher)
+        interface.index.hash(into: &hasher)
+    }
+}
+
+internal class InterfaceRef {
+    let config: ConfigurationRef
+    let descriptor: UnsafePointer<libusb_interface>
+    let index: Int32
+    var claimed: Bool
+    
+    var num_altsetting: Int32 {
+        get {
+            descriptor.pointee.num_altsetting
+        }
+    }
+    
+    var altsetting: UnsafePointer<libusb_interface_descriptor> {
+        get {
+            descriptor.pointee.altsetting
+        }
+    }
+    
+    init(config: ConfigurationRef, index: Int32) {
+        self.config = config
+        self.index = index
+        descriptor = config.descriptor.pointee.interface + Int(index)
+        claimed = false
+    }
+    
+    func claim() throws {
+        let error = libusb_claim_interface(config.device.handle, Int32(index))
         if error < 0 {
             throw USBError.from(code: error)
         }
         claimed = true
     }
     
-    /// A hash representation of the interface
-    func hash(into hasher: inout Hasher) {
-        device.device.hash(into: &hasher)
-        index.hash(into: &hasher)
+    deinit {
+        if claimed {
+            libusb_release_interface(config.device.handle, index)
+        }
     }
 }
