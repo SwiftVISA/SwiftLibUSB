@@ -19,7 +19,7 @@ class Configuration: Hashable{
     /// * `.notFound` if the index is invalid
     init(_ device: DeviceRef, index: UInt8) throws {
         var desc: UnsafeMutablePointer<libusb_config_descriptor>? = nil
-        let error = libusb_get_config_descriptor(device.device, index, &desc)
+        let error = libusb_get_config_descriptor(device.raw_device, index, &desc)
         if error < 0 {
             throw USBError.from(code: error)
         }
@@ -34,7 +34,7 @@ class Configuration: Hashable{
     /// * `.notFound` if the device is not configured
     init(_ device: DeviceRef) throws {
         var desc: UnsafeMutablePointer<libusb_config_descriptor>? = nil
-        let error = libusb_get_active_config_descriptor(device.device, &desc)
+        let error = libusb_get_active_config_descriptor(device.raw_device, &desc)
         if error < 0 {
             throw USBError.from(code: error)
         }
@@ -67,14 +67,14 @@ class Configuration: Hashable{
     var displayName: String {
         get {
             // If the index is 0 this is an unnamed configuration
-            if(descriptor.pointee.iConfiguration == 0){
+            if(config.descriptor.pointee.iConfiguration == 0){
                 return "(\(index)) unnamed configuration"
             }
 
             // Make a buffer for the name of the configuration
             var size = 256;
             var buffer: [UInt8] = Array(repeating: 0, count: size)
-            var returnCode = libusb_get_string_descriptor_ascii(device.handle, descriptor.pointee.iConfiguration, &buffer, Int32(size))
+            var returnCode = libusb_get_string_descriptor_ascii(config.raw_handle, config.descriptor.pointee.iConfiguration, &buffer, Int32(size))
             
             // Check if there is an error when filling the buffer with the name
             if(returnCode <= 0){
@@ -100,7 +100,7 @@ class Configuration: Hashable{
     /// * `.busy` if interfaces have already been claimed
     /// * `.noDevice` if the device has been unplugged
     func setActive() throws {
-        libusb_set_configuration(config.device.handle, // The handle we are configuring ourselves with
+        libusb_set_configuration(config.raw_handle, // The handle we are configuring ourselves with
                                  Int32(config.descriptor.pointee.bConfigurationValue)) // our value
     }
     
@@ -120,6 +120,18 @@ internal class ConfigurationRef {
     init(device: DeviceRef, descriptor: UnsafeMutablePointer<libusb_config_descriptor>) {
         self.device = device
         self.descriptor = descriptor
+    }
+    
+    var raw_handle: OpaquePointer {
+        get {
+            device.raw_handle
+        }
+    }
+    
+    var raw_device: OpaquePointer {
+        get {
+            device.raw_device
+        }
     }
     
     deinit {

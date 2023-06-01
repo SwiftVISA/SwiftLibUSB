@@ -12,7 +12,7 @@ import Foundation
 /// An `AltSetting` determines what functions these endpoints have.
 class Interface : Hashable {
     static func == (lhs: Interface, rhs: Interface) -> Bool {
-        return lhs.interface.config.device.device == rhs.interface.config.device.device && lhs.interface.index == rhs.interface.index
+        return lhs.interface.raw_device == rhs.interface.raw_device && lhs.interface.index == rhs.interface.index
     }
     
     var altSettings: [AltSetting]
@@ -47,7 +47,7 @@ class Interface : Hashable {
     
     /// A hash representation of the interface
     func hash(into hasher: inout Hasher) {
-        interface.config.device.device.hash(into: &hasher)
+        interface.raw_device.hash(into: &hasher)
         interface.index.hash(into: &hasher)
     }
 }
@@ -73,9 +73,15 @@ internal class InterfaceRef {
         }
     }
     
-    var device: DeviceRef {
+    var raw_device: OpaquePointer {
         get {
-            config.device
+            config.raw_device
+        }
+    }
+    
+    var raw_handle: OpaquePointer {
+        get {
+            config.raw_handle
         }
     }
     
@@ -87,7 +93,7 @@ internal class InterfaceRef {
     }
     
     func claim() throws {
-        let error = libusb_claim_interface(config.device.handle, Int32(index))
+        let error = libusb_claim_interface(config.raw_handle, Int32(index))
         if error < 0 {
             throw USBError.from(code: error)
         }
@@ -96,7 +102,7 @@ internal class InterfaceRef {
     
     deinit {
         if claimed {
-            libusb_release_interface(config.device.handle, index)
+            libusb_release_interface(config.raw_handle, index)
         }
     }
 }

@@ -22,7 +22,7 @@ class AltSetting : Hashable{
     }
     
     static func == (lhs: AltSetting, rhs: AltSetting) -> Bool {
-        lhs.setting.device.device == rhs.setting.device.device && lhs.index == rhs.index && lhs.interfaceIndex == rhs.interfaceIndex
+        lhs.setting.raw_device == rhs.setting.raw_device && lhs.index == rhs.index && lhs.interfaceIndex == rhs.interfaceIndex
     }
     
     var displayName: String {
@@ -34,7 +34,7 @@ class AltSetting : Hashable{
             // Make a buffer for the name of the alt setting
             var size = 256;
             var buffer: [UInt8] = Array(repeating: 0, count: size)
-            var returnCode = libusb_get_string_descriptor_ascii(setting.device.handle, UInt8(setting.interfaceName), &buffer, Int32(size))
+            var returnCode = libusb_get_string_descriptor_ascii(setting.raw_handle, UInt8(setting.interfaceName), &buffer, Int32(size))
             
             // Check if there is an error when filling the buffer with the name
             if(returnCode <= 0){
@@ -86,7 +86,7 @@ class AltSetting : Hashable{
     /// * `.notFound` if the interface was not claimed
     /// * `.noDevice` if the device was disconnected
     func setActive() throws {
-        let error = libusb_set_interface_alt_setting(setting.device.handle, Int32(setting.interfaceNumber), Int32(setting.index))
+        let error = libusb_set_interface_alt_setting(setting.raw_handle, Int32(setting.interfaceNumber), Int32(setting.index))
         if error < 0 {
             throw USBError.from(code: error)
         }
@@ -94,7 +94,7 @@ class AltSetting : Hashable{
     
     /// A hash representation of the altSetting
     func hash(into hasher: inout Hasher) {
-        setting.device.device.hash(into: &hasher)
+        setting.raw_device.hash(into: &hasher)
         interfaceIndex.hash(into: &hasher)
         index.hash(into: &hasher)
     }
@@ -112,9 +112,15 @@ internal class AltSettingRef {
         altSetting = interface.altsetting + index
     }
     
-    var device: DeviceRef {
+    var raw_device: OpaquePointer {
         get {
-            interface.device
+            interface.raw_device
+        }
+    }
+    
+    var raw_handle: OpaquePointer {
+        get {
+            interface.raw_handle
         }
     }
     
