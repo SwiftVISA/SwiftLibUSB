@@ -77,9 +77,9 @@ class Configuration: Hashable{
             }
 
             // Make a buffer for the name of the configuration
-            var size = 256;
+            let size = 256;
             var buffer: [UInt8] = Array(repeating: 0, count: size)
-            var returnCode = libusb_get_string_descriptor_ascii(device.handle, descriptor.pointee.iConfiguration, &buffer, Int32(size))
+            let returnCode = libusb_get_string_descriptor_ascii(device.handle, descriptor.pointee.iConfiguration, &buffer, Int32(size))
             
             // Check if there is an error when filling the buffer with the name
             if(returnCode <= 0){

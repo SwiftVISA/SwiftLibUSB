@@ -34,9 +34,9 @@ class AltSetting : Hashable{
                 return "(\(index)) unnamed alt setting"
             }
             // Make a buffer for the name of the alt setting
-            var size = 256;
+            let size = 256;
             var buffer: [UInt8] = Array(repeating: 0, count: size)
-            var returnCode = libusb_get_string_descriptor_ascii(device.handle, descriptor.iInterface, &buffer, Int32(size))
+            let returnCode = libusb_get_string_descriptor_ascii(device.handle, descriptor.iInterface, &buffer, Int32(size))
             
             // Check if there is an error when filling the buffer with the name
             if(returnCode <= 0){
