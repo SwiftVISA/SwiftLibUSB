@@ -84,17 +84,26 @@ class Controller: ObservableObject {
     */
     func sendCommand() {
         do {
+            // Part 1 of header: Write Out (constant 1), message index, inverse of message index, padding
             var message = Data([1, messageIndex, 255-messageIndex, 0])
-            withUnsafeBytes(of: Int32(command.count + 1).littleEndian) {
-                message.append(Data(Array($0)))
+            // Part 2 of header: Little Endian length of the message (with added newline)
+            withUnsafeBytes(of: Int32(command.count + 1).littleEndian) { lengthBytes in
+                message.append(Data(Array(lengthBytes)))
             }
+            // Part 3 of header: End of Message (constant 1), three bytes of padding
             message.append(Data([1, 0, 0, 0]))
-            command.withUTF8 {
-                message.append($0)
+            // Add the message as bytes
+            command.withUTF8 { commandBytes in
+                message.append(commandBytes)
             }
+            // Add a newline
             message.append(10)
+            // Pad to 4 byte boundary
             message.append(Data(Array(repeating: 0, count: (4 - message.count % 4) % 4)))
+            
             print([UInt8](message))
+            
+            // Send the command message to a bulk out endpoint
             for endpoint in chosenAltSetting.endpoints {
                 if endpoint.direction == .Out && endpoint.transferType == .bulk {
                     endpoint.clearHalt()
@@ -107,10 +116,13 @@ class Controller: ObservableObject {
             
             // Send read request to out endpoint
             var readBufferSize = 1024
+            // Part 1 of header: Read In (constant 2), message index, inverse of message index, padding
             message = Data([2, messageIndex, 255-messageIndex, 0])
-            withUnsafeBytes(of: Int32(readBufferSize).littleEndian) {
-                message.append(Data(Array($0)))
+            // Part 2 of header: Little Endian length of the buffer
+            withUnsafeBytes(of: Int32(readBufferSize).littleEndian) { lengthBytes in
+                message.append(Data(Array(lengthBytes)))
             }
+            // Part 3 of header: Optional terminator byte (not used here), three bytes of padding
             message.append(Data([0,0,0,0]))
             
             for endpoint in chosenAltSetting.endpoints {
