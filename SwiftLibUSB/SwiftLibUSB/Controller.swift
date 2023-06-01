@@ -115,7 +115,7 @@ class Controller: ObservableObject {
             print("Sent command message")
             
             // Send read request to out endpoint
-            var readBufferSize = 1024
+            let readBufferSize = 1024
             // Part 1 of header: Read In (constant 2), message index, inverse of message index, padding
             message = Data([2, messageIndex, 255-messageIndex, 0])
             // Part 2 of header: Little Endian length of the buffer
@@ -142,13 +142,14 @@ class Controller: ObservableObject {
                 if endpoint.direction == .In && endpoint.transferType == .bulk {
                     let data = try endpoint.receiveBulkTransfer()
                     print([UInt8](data))
+                    print(data.count)
                     dataReceived += String(decoding: data[12...], as: UTF8.self)
                 }
             }
             nextMessage()
             
         } catch {
-            print("Error sending message")
+            print("Error sending/receiving message")
         }
     }
     /// Print the currently chosen device to the terminal

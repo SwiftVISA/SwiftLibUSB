@@ -103,6 +103,9 @@ class Endpoint {
         if error < 0 {
             throw USBError.from(code: error)
         }
+        if(sent <= 12){
+            throw USBError.other
+        }
         return Data(innerData[..<Int(sent)])
     }
 }
