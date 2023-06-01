@@ -62,7 +62,21 @@ extension USBSession {
         if deviceList.devices.isEmpty {
             throw Error.noDevices
         }
-        /// TODO: find the specified device then return it
+        var foundCount = 0;
+        var foundDevice: Device
+        for device in deviceList.devices {
+            if(device.productId == productID &&
+               device.vendorId == vendorID
+            ){
+                if(SerialNumber == nil){
+                    foundCount += 1
+                    foundDevice = device
+                }else if (SerialNumber! == device.serialNumber){
+                    foundCount += 1
+                    foundDevice = device
+                }
+            }
+        }
     }
 }
 
