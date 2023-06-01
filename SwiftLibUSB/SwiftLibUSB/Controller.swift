@@ -146,7 +146,6 @@ class Controller: ObservableObject {
     /// connect to the chosen device and save the returned handle
     func connect() {
         do {
-            let handle = try chosenDevice.openHandle()
             try chosenConfig.setActive()
             try chosenInterface.claim()
             try chosenAltSetting.setActive()

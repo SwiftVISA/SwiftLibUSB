@@ -24,7 +24,6 @@
 		DEC6043B2A1E881900ACE746 /* Context.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC6043A2A1E881900ACE746 /* Context.swift */; };
 		DEC6043D2A1E903800ACE746 /* DeviceList.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC6043C2A1E903800ACE746 /* DeviceList.swift */; };
 		DEC6043F2A1E965B00ACE746 /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC6043E2A1E965B00ACE746 /* Device.swift */; };
-		DEC604412A1F188C00ACE746 /* DeviceHandle.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC604402A1F188C00ACE746 /* DeviceHandle.swift */; };
 		DEC604432A1FC5D200ACE746 /* ConnectedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC604422A1FC5D200ACE746 /* ConnectedView.swift */; };
 		DEC604452A1FCC4D00ACE746 /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC604442A1FCC4D00ACE746 /* Configuration.swift */; };
 /* End PBXBuildFile section */
@@ -70,7 +69,6 @@
 		DEC6043A2A1E881900ACE746 /* Context.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Context.swift; sourceTree = "<group>"; };
 		DEC6043C2A1E903800ACE746 /* DeviceList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceList.swift; sourceTree = "<group>"; };
 		DEC6043E2A1E965B00ACE746 /* Device.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Device.swift; sourceTree = "<group>"; };
-		DEC604402A1F188C00ACE746 /* DeviceHandle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceHandle.swift; sourceTree = "<group>"; };
 		DEC604422A1FC5D200ACE746 /* ConnectedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectedView.swift; sourceTree = "<group>"; };
 		DEC604442A1FCC4D00ACE746 /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -176,7 +174,6 @@
 			isa = PBXGroup;
 			children = (
 				DEC604382A1E877100ACE746 /* Error.swift */,
-				DEC604402A1F188C00ACE746 /* DeviceHandle.swift */,
 				DEC6043C2A1E903800ACE746 /* DeviceList.swift */,
 				DEC6043E2A1E965B00ACE746 /* Device.swift */,
 				DEC6043A2A1E881900ACE746 /* Context.swift */,
@@ -321,7 +318,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				DEC604392A1E877100ACE746 /* Error.swift in Sources */,
-				DEC604412A1F188C00ACE746 /* DeviceHandle.swift in Sources */,
 				91DE961D2A1D5818006D2047 /* Controller.swift in Sources */,
 				91DE965C2A1FECB8006D2047 /* Endpoint.swift in Sources */,
 				912860CF2A1D46E9001AB351 /* ContentView.swift in Sources */,

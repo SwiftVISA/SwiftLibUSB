@@ -17,22 +17,27 @@ class Device: Hashable {
     /// Each device has "configurations" which manage their operation.
     var configurations: [Configuration]
     
-    var handle: DeviceHandle?
+    var handle: OpaquePointer
     
     init(pointer: OpaquePointer) throws {
         device = pointer
         descriptor = libusb_device_descriptor()
-        let error = libusb_get_device_descriptor(device, &descriptor)
+        var error = libusb_get_device_descriptor(device, &descriptor)
         if error < 0 {
             throw USBError.from(code: error)
         }
+        var base_handle: OpaquePointer? = nil
+        error = libusb_open(device, &base_handle)
+        if error < 0 {
+            throw USBError.from(code: error)
+        }
+        handle = base_handle!
         configurations = []
         for i in 0..<descriptor.bNumConfigurations {
             do {
                 try configurations.append(Configuration(self, index: i))
             } catch {} // Ignore configurations with errors
         }
-        handle = nil
     }
     /// Compares devices by their internal pointer. Two device classes that point to the same libUSB device are considered the same
     static func == (lhs: Device, rhs: Device) -> Bool {
@@ -66,17 +71,12 @@ class Device: Hashable {
         }
     }
 
-    /// Before a device can be used, a handle for that device must be opened. Each call to open handle opens one such handle
-    /// Only one handle should be opened per device
-    /// - Returns: The device handle class that will manage communication with this device.
-    func openHandle() throws -> DeviceHandle {
-        let createdHandle = try DeviceHandle(device: self)
-        handle = createdHandle
-        return createdHandle
-    }
-    
     /// A hash representation of the device
     func hash(into hasher: inout Hasher) {
         device.hash(into: &hasher)
+    }
+
+    deinit {
+        libusb_close(handle)
     }
 }

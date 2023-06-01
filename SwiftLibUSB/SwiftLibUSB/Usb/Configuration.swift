@@ -94,8 +94,7 @@ class Configuration: Hashable{
     /// * `.busy` if interfaces have already been claimed
     /// * `.noDevice` if the device has been unplugged
     func setActive() throws {
-        let DeviceHandle = device.handle! // This will throw if the device was not opened
-        libusb_set_configuration(DeviceHandle.handle, // The handle we are configuring ourselves with
+        libusb_set_configuration(device.handle, // The handle we are configuring ourselves with
                                  Int32(descriptor.pointee.bConfigurationValue)) // our value
     }
     

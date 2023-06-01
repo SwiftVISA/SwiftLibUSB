@@ -34,7 +34,7 @@ class AltSetting : Hashable{
             }
             var size = 256;
             var buffer: [UInt8] = Array(repeating: 0, count: size)
-            var returnCode = libusb_get_string_descriptor_ascii(device.handle?.handle, descriptor.iInterface, &buffer, Int32(size))
+            var returnCode = libusb_get_string_descriptor_ascii(device.handle, descriptor.iInterface, &buffer, Int32(size))
             if(returnCode <= 0){
                 return "\(index) error getting name: \(USBError.from(code: returnCode).localizedDescription)"
             }
@@ -87,7 +87,7 @@ class AltSetting : Hashable{
     /// * `.notFound` if the interface was not claimed
     /// * `.noDevice` if the device was disconnected
     func setActive() throws {
-        let error = libusb_set_interface_alt_setting(device.handle?.handle, Int32(descriptor.bInterfaceNumber), Int32(descriptor.bAlternateSetting))
+        let error = libusb_set_interface_alt_setting(device.handle, Int32(descriptor.bInterfaceNumber), Int32(descriptor.bAlternateSetting))
         if error < 0 {
             throw USBError.from(code: error)
         }
