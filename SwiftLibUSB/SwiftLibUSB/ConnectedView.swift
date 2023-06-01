@@ -54,9 +54,9 @@ struct ConnectedView: View {
             Button("Send Command", action: control.sendCommand).disabled(!control.isConnected)
             Text("Data Received")
                 .padding(.top)
-            TextField("Data received will display here", text: $control.dataReceived, axis: .vertical)
-                .disabled(true)
-                .lineLimit(6, reservesSpace: true)
+            List(control.dataReceived, id: \.self) {
+                s in Text(s)
+            }.navigationTitle("Data Received")
             Spacer()
         }
         .padding(.all)
