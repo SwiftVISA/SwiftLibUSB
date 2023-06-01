@@ -32,9 +32,9 @@ class AltSetting : Hashable{
             if(descriptor.iInterface == 0){
                 return "(\(index)) unnamed alt setting"
             }
-            var size = 256;
+            let size = 256;
             var buffer: [UInt8] = Array(repeating: 0, count: size)
-            var returnCode = libusb_get_string_descriptor_ascii(device.handle, descriptor.iInterface, &buffer, Int32(size))
+            let returnCode = libusb_get_string_descriptor_ascii(device.handle, descriptor.iInterface, &buffer, Int32(size))
             if(returnCode <= 0){
                 return "\(index) error getting name: \(USBError.from(code: returnCode).localizedDescription)"
             }

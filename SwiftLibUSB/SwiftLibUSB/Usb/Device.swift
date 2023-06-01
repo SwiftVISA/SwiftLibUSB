@@ -69,9 +69,9 @@ class Device: Hashable {
             if(descriptor.iSerialNumber == 0){
                 return ""
             }
-            var size = 256;
+            let size = 256;
             var buffer: [UInt8] = Array(repeating: 0, count: size)
-            var returnCode = libusb_get_string_descriptor_ascii(handle, descriptor.iSerialNumber, &buffer, Int32(size))
+            let returnCode = libusb_get_string_descriptor_ascii(handle, descriptor.iSerialNumber, &buffer, Int32(size))
             if(returnCode <= 0){
                 return ""
             }

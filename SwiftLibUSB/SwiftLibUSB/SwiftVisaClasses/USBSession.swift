@@ -47,7 +47,7 @@ class USBSession {
 
 extension USBSession {
     private static func raw_connect() throws -> Context {
-        var createdContext = try Context()
+        let createdContext = try Context()
         return createdContext
     }
     private static func raw_find_device(
@@ -56,7 +56,7 @@ extension USBSession {
         SerialNumber: String?,
         context: Context
     ) throws -> Device {
-        var deviceList = try context.getDeviceList()
+        let deviceList = try context.getDeviceList()
         if deviceList.devices.isEmpty {
             throw Error.noDevices
         }
