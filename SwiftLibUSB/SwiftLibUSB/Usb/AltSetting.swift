@@ -16,8 +16,8 @@ class AltSetting : Hashable{
         setting = AltSettingRef(interface: interface, index: index)
         
         endpoints = []
-        for i in 0..<setting.altSetting.pointee.bNumEndpoints {
-            endpoints.append(Endpoint(pointer: setting.altSetting.pointee.endpoint[Int(i)], device: setting.interface.config.device))
+        for i in 0..<Int(setting.altSetting.pointee.bNumEndpoints) {
+            endpoints.append(Endpoint(altSetting: setting, index: i))
         }
     }
     

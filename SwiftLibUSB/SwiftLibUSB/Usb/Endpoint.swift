@@ -12,12 +12,12 @@ import Foundation
 /// Before transferring data, you should activate the configuration, claim the interface, and activate the alternate setting
 /// that contain this endpoint.
 class Endpoint {
-    var descriptor: libusb_endpoint_descriptor
-    var device: DeviceRef
+    var descriptor: UnsafePointer<libusb_endpoint_descriptor>
+    var altSetting: AltSettingRef
     
-    init(pointer : libusb_endpoint_descriptor, device: DeviceRef) {
-        descriptor = pointer
-        self.device = device
+    init(altSetting: AltSettingRef, index: Int) {
+        self.altSetting = altSetting
+        descriptor = altSetting.altSetting.pointee.endpoint + index
     }
     
     deinit {
@@ -26,19 +26,19 @@ class Endpoint {
     
     var address: Int {
         get {
-            Int(descriptor.bEndpointAddress)
+            Int(descriptor.pointee.bEndpointAddress)
         }
     }
     
     var attributes: Int {
         get {
-            Int(descriptor.bmAttributes)
+            Int(descriptor.pointee.bmAttributes)
         }
     }
     
     var direction: Direction {
         get {
-            switch descriptor.bEndpointAddress >> 7 {
+            switch descriptor.pointee.bEndpointAddress >> 7 {
             case 1: return .In
             case 0: return .Out
             default: return .Out
@@ -48,7 +48,7 @@ class Endpoint {
     
     var transferType: TransferType {
         get {
-            switch libusb_endpoint_transfer_type(UInt32(descriptor.bmAttributes & 3)) {
+            switch libusb_endpoint_transfer_type(UInt32(descriptor.pointee.bmAttributes & 3)) {
             case LIBUSB_ENDPOINT_TRANSFER_TYPE_BULK: return .bulk
             case LIBUSB_ENDPOINT_TRANSFER_TYPE_ISOCHRONOUS: return .isochronous
             case LIBUSB_ENDPOINT_TRANSFER_TYPE_INTERRUPT: return .interrupt
@@ -58,7 +58,7 @@ class Endpoint {
     }
     
     func clearHalt(){
-        libusb_clear_halt(device.handle, descriptor.bEndpointAddress)
+        libusb_clear_halt(altSetting.interface.config.device.handle, descriptor.pointee.bEndpointAddress)
     }
     
     /// Sends a message to a bulk out endpoint
@@ -75,7 +75,7 @@ class Endpoint {
         var sent: Int32 = 0;
         var data = [UInt8](data)
         let length: Int32 = Int32(data.count)
-        let error = libusb_bulk_transfer(device.handle, descriptor.bEndpointAddress, &data, length, &sent, 1000)
+        let error = libusb_bulk_transfer(altSetting.interface.config.device.handle, descriptor.pointee.bEndpointAddress, &data, length, &sent, 1000)
         if error < 0 {
             throw USBError.from(code: error)
         }
@@ -98,7 +98,7 @@ class Endpoint {
         var sent: Int32 = 0;
         var innerData = [UInt8](repeating: 0, count: 1024)
         let length: Int32 = 1024
-        let error = libusb_bulk_transfer(device.handle, descriptor.bEndpointAddress, &innerData, length, &sent, 1000)
+        let error = libusb_bulk_transfer(altSetting.interface.config.device.handle, descriptor.pointee.bEndpointAddress, &innerData, length, &sent, 1000)
         print("Amount sent: \(sent), with error \(error) \(USBError.from(code: error))")
         if error < 0 {
             throw USBError.from(code: error)
