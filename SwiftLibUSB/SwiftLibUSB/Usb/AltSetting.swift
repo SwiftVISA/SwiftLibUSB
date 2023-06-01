@@ -9,34 +9,32 @@ import Foundation
 
 /// A setting that controls how endpoints behave. This must be activated using `setActive` before sending or receiving data.
 class AltSetting : Hashable{
-    var descriptor: libusb_interface_descriptor
     var endpoints: [Endpoint]
-    var device: Device
+    var setting: AltSettingRef
     
-    init(pointer : libusb_interface_descriptor, device: Device) {
-        descriptor = pointer
-        self.device = device
+    init(interface: InterfaceRef, index: Int) {
+        setting = AltSettingRef(interface: interface, index: index)
         
         endpoints = []
-        for i in 0..<descriptor.bNumEndpoints {
-            endpoints.append(Endpoint(pointer: descriptor.endpoint[Int(i)], device: device))
+        for i in 0..<setting.numEndpoints {
+            endpoints.append(Endpoint(altSetting: setting, index: i))
         }
     }
     
     static func == (lhs: AltSetting, rhs: AltSetting) -> Bool {
-        lhs.device == rhs.device && lhs.index == rhs.index && lhs.interfaceIndex == rhs.interfaceIndex
+        lhs.setting.raw_device == rhs.setting.raw_device && lhs.index == rhs.index && lhs.interfaceIndex == rhs.interfaceIndex
     }
     
     var displayName: String {
         get {
             // If the index is 0 this is an unnamed alt setting
-            if(descriptor.iInterface == 0){
+            if(setting.interfaceName == 0){
                 return "(\(index)) unnamed alt setting"
             }
             // Make a buffer for the name of the alt setting
             let size = 256;
             var buffer: [UInt8] = Array(repeating: 0, count: size)
-            let returnCode = libusb_get_string_descriptor_ascii(device.handle, descriptor.iInterface, &buffer, Int32(size))
+            var returnCode = libusb_get_string_descriptor_ascii(setting.raw_handle, UInt8(setting.interfaceName), &buffer, Int32(size))
             
             // Check if there is an error when filling the buffer with the name
             if(returnCode <= 0){
@@ -49,39 +47,35 @@ class AltSetting : Hashable{
     
     var interfaceIndex: Int {
         get {
-            Int(descriptor.bInterfaceNumber)
+            setting.interfaceNumber
         }
     }
     
     var index: Int {
         get {
-            Int(descriptor.bAlternateSetting)
+            setting.index
         }
     }
     
     /// A code describing what kind of communication this setting handles.
     var interfaceClass: ClassCode {
         get {
-            ClassCode.from(code: UInt32(descriptor.bInterfaceClass))
+            setting.interfaceClass
         }
     }
     
     /// If the `interfaceClass` has subtypes, this gives that type.
     var interfaceSubClass: Int {
         get {
-            Int(descriptor.bInterfaceSubClass)
+            setting.interfaceSubClass
         }
     }
     
     /// If the `interfaceClass` and `interfaceSubClass` has protocols, this gives the protocol
     var interfaceProtocol: Int {
         get {
-            Int(descriptor.bInterfaceProtocol)
+            setting.interfaceProtocol
         }
-    }
-    
-    deinit {
-        
     }
     
     /// Makes the setting active.
@@ -92,7 +86,7 @@ class AltSetting : Hashable{
     /// * `.notFound` if the interface was not claimed
     /// * `.noDevice` if the device was disconnected
     func setActive() throws {
-        let error = libusb_set_interface_alt_setting(device.handle, Int32(descriptor.bInterfaceNumber), Int32(descriptor.bAlternateSetting))
+        let error = libusb_set_interface_alt_setting(setting.raw_handle, Int32(setting.interfaceNumber), Int32(setting.index))
         if error < 0 {
             throw USBError.from(code: error)
         }
@@ -100,9 +94,83 @@ class AltSetting : Hashable{
     
     /// A hash representation of the altSetting
     func hash(into hasher: inout Hasher) {
-        device.hash(into: &hasher)
+        setting.raw_device.hash(into: &hasher)
         interfaceIndex.hash(into: &hasher)
         index.hash(into: &hasher)
     }
+}
+
+/// Internal class for managing lifetimes.
+///
+/// This exists to make sure the device and context live longer than any Endpoints that are in use.
+internal class AltSettingRef {
+    let interface: InterfaceRef
+    let altSetting: UnsafePointer<libusb_interface_descriptor>
     
+    init(interface: InterfaceRef, index: Int) {
+        self.interface = interface
+        altSetting = interface.altsetting + index
+    }
+    
+    var raw_device: OpaquePointer {
+        get {
+            interface.raw_device
+        }
+    }
+    
+    var raw_handle: OpaquePointer {
+        get {
+            interface.raw_handle
+        }
+    }
+    
+    var index: Int {
+        get {
+            Int(altSetting.pointee.bAlternateSetting)
+        }
+    }
+    
+    var interfaceNumber: Int {
+        get {
+            Int(altSetting.pointee.bInterfaceNumber)
+        }
+    }
+    
+    var interfaceProtocol: Int {
+        get {
+            Int(altSetting.pointee.bInterfaceProtocol)
+        }
+    }
+    
+    var interfaceSubClass: Int {
+        get {
+            Int(altSetting.pointee.bInterfaceSubClass)
+        }
+    }
+    
+    var interfaceClass: ClassCode {
+        get {
+            ClassCode.from(code: UInt32(altSetting.pointee.bInterfaceClass))
+        }
+    }
+    
+    var interfaceName: Int {
+        get {
+            Int(altSetting.pointee.iInterface)
+        }
+    }
+    
+    var numEndpoints: Int {
+        get {
+            Int(altSetting.pointee.bNumEndpoints)
+        }
+    }
+    
+    func endpoint(index: Int) -> UnsafePointer<libusb_endpoint_descriptor> {
+        altSetting.pointee.endpoint + index
+    }
+    
+    deinit {
+        // AltSettings don't have any data to be released
+    }
 }

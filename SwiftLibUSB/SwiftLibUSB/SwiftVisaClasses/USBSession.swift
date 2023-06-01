@@ -56,13 +56,12 @@ extension USBSession {
         SerialNumber: String?,
         context: Context
     ) throws -> Device {
-        let deviceList = try context.getDeviceList()
-        if deviceList.devices.isEmpty {
+        if context.devices.isEmpty {
             throw Error.noDevices
         }
         var didFind = false;
         var foundDevice: Device?
-        for device in deviceList.devices {
+        for device in context.devices {
             if(device.productId == productID &&
                device.vendorId == vendorID
             ){

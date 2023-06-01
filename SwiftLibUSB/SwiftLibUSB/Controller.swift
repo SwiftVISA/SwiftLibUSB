@@ -31,19 +31,17 @@ class Controller: ObservableObject {
     @Published var chosenAltSetting: AltSetting
     
     var context: Context
-    var deviceList: DeviceList
     var messageIndex: UInt8
     
     init() throws {
         try context = Context()
-        try deviceList = context.getDeviceList()
-        if deviceList.devices.isEmpty {
+        if context.devices.isEmpty {
             throw USBError.other
         }
-        chosenDevice = deviceList.devices[0]
-        chosenConfig = deviceList.devices[0].configurations[0]
-        chosenInterface = deviceList.devices[0].configurations[0].interfaces[0]
-        chosenAltSetting = deviceList.devices[0].configurations[0].interfaces[0].altSettings[0]
+        chosenDevice = context.devices[0]
+        chosenConfig = context.devices[0].configurations[0]
+        chosenInterface = context.devices[0].configurations[0].interfaces[0]
+        chosenAltSetting = context.devices[0].configurations[0].interfaces[0].altSettings[0]
         messageIndex = 1
     }
     

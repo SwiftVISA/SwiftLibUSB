@@ -11,37 +11,31 @@ import Foundation
 /// Communicating with the device requires opening the device
 class Device: Hashable {
     /// The device as libUSB understands it. It is managed as a pointer
-    var device: OpaquePointer
+    var device: DeviceRef
     /// A C struct containing information about the device
     var descriptor: libusb_device_descriptor
     /// Each device has "configurations" which manage their operation.
     var configurations: [Configuration]
     
-    var handle: OpaquePointer
-    
-    init(pointer: OpaquePointer) throws {
-        device = pointer
+    init(context: ContextRef, pointer: OpaquePointer) throws {
+        try device = DeviceRef(context: context, device: pointer)
+        
         descriptor = libusb_device_descriptor()
-        var error = libusb_get_device_descriptor(device, &descriptor)
+        var error = libusb_get_device_descriptor(device.raw_device, &descriptor)
         if error < 0 {
             throw USBError.from(code: error)
         }
-        var base_handle: OpaquePointer? = nil
-        error = libusb_open(device, &base_handle)
-        if error < 0 {
-            throw USBError.from(code: error)
-        }
-        handle = base_handle!
+
         configurations = []
         for i in 0..<descriptor.bNumConfigurations {
             do {
-                try configurations.append(Configuration(self, index: i))
+                try configurations.append(Configuration(device, index: i))
             } catch {} // Ignore configurations with errors
         }
     }
     /// Compares devices by their internal pointer. Two device classes that point to the same libUSB device are considered the same
     static func == (lhs: Device, rhs: Device) -> Bool {
-        lhs.device == rhs.device
+        lhs.device.raw_device == rhs.device.raw_device
     }
     
     /// Get the product ID of the device
@@ -71,7 +65,7 @@ class Device: Hashable {
             }
             let size = 256;
             var buffer: [UInt8] = Array(repeating: 0, count: size)
-            let returnCode = libusb_get_string_descriptor_ascii(handle, descriptor.iSerialNumber, &buffer, Int32(size))
+            let returnCode = libusb_get_string_descriptor_ascii(device.raw_handle, descriptor.iSerialNumber, &buffer, Int32(size))
             if(returnCode <= 0){
                 return ""
             }
@@ -91,7 +85,7 @@ class Device: Hashable {
         // Make a buffer for the name of the device
         let size = 256;
         var buffer: [UInt8] = Array(repeating: 0, count: size)
-        let returnCode = libusb_get_string_descriptor_ascii(handle, descriptor.iProduct, &buffer, Int32(size))
+        let returnCode = libusb_get_string_descriptor_ascii(device.raw_handle, descriptor.iProduct, &buffer, Int32(size))
         
         // Check if there is an error when filling the buffer with the name
         if(returnCode <= 0){
@@ -103,10 +97,30 @@ class Device: Hashable {
 
     /// A hash representation of the device
     func hash(into hasher: inout Hasher) {
-        device.hash(into: &hasher)
+        device.raw_device.hash(into: &hasher)
     }
+}
 
+/// Internal class for managing lifetimes
+///
+/// This ensures the libUSB context isn't freed until all devices have been closed.
+internal class DeviceRef {
+    let context: ContextRef
+    let raw_device: OpaquePointer
+    let raw_handle: OpaquePointer
+    
+    init(context: ContextRef, device: OpaquePointer) throws {
+        self.context = context
+        raw_device = device
+        var base_handle: OpaquePointer? = nil
+        let error = libusb_open(device, &base_handle)
+        if error < 0 {
+            throw USBError.from(code: error)
+        }
+        raw_handle = base_handle!
+    }
+    
     deinit {
-        libusb_close(handle)
+        libusb_close(raw_handle)
     }
 }
