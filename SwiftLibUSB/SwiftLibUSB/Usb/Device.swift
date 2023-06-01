@@ -66,15 +66,21 @@ class Device: Hashable {
     /// Together they form a primary key that can uniquely indentify the connected device
     /// - Returns: A string in the format "Vendor: [vendorID] Product: [productID]"
     var displayName: String {
+        // If the index is 0 give the name as indicated
         if(descriptor.iProduct == 0){
             return "Vendor: \(vendorId) Product: \(productId)"
         }
+        
+        // Make a buffer for the name of the device
         let size = 256;
         var buffer: [UInt8] = Array(repeating: 0, count: size)
         let returnCode = libusb_get_string_descriptor_ascii(handle, descriptor.iProduct, &buffer, Int32(size))
+        
+        // Check if there is an error when filling the buffer with the name
         if(returnCode <= 0){
             return "error getting name: \(USBError.from(code: returnCode).localizedDescription)"
         }
+        
         return String(bytes: buffer, encoding: .ascii) ?? "Vendor: \(vendorId) Product: \(productId)"
     }
 

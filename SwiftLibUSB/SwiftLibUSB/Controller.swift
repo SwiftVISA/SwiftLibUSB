@@ -82,6 +82,8 @@ class Controller: ObservableObject {
         }
     }
     */
+    
+    /// Send the currently stored command to the chosen device
     func sendCommand() {
         do {
             var inEndpoint: Endpoint?
