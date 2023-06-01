@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "coreswiftvisa",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SwiftVISA/CoreSwiftVISA.git",
+      "state" : {
+        "revision" : "071780d8ff6e3eb02e248692d6d2278440e90e73",
+        "version" : "0.1.1"
+      }
+    }
+  ],
+  "version" : 2
+}

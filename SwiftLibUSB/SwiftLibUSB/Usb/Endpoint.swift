@@ -57,6 +57,7 @@ class Endpoint {
         }
     }
     
+    /// Clear halts or stalls for the endpoint
     func clearHalt(){
         libusb_clear_halt(altSetting.device.handle, descriptor.pointee.bEndpointAddress)
     }
@@ -102,6 +103,9 @@ class Endpoint {
         print("Amount sent: \(sent), with error \(error) \(USBError.from(code: error))")
         if error < 0 {
             throw USBError.from(code: error)
+        }
+        if(sent <= 12){
+            throw USBError.other
         }
         return Data(innerData[..<Int(sent)])
     }

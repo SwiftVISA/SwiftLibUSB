@@ -48,6 +48,9 @@ struct ConnectedView: View {
             TextField("Command", text: $control.command)
                 .padding(.top)
                 .disabled(!control.isConnected)
+                .onSubmit {
+                    control.sendCommand()
+                }
             Button("Send Command", action: control.sendCommand).disabled(!control.isConnected)
             Text("Data Received")
                 .padding(.top)

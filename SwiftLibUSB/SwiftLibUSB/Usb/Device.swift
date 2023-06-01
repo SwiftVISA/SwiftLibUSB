@@ -56,13 +56,43 @@ class Device: Hashable {
         }
     }
     
+    /// Serial number of the device, useful in identifying a device if there are multiple with the same product and vendor id
+    /// Returns a blank string if the serial number cannot be found
+    var serialCode: String {
+        get{
+            if(descriptor.iSerialNumber == 0){
+                return ""
+            }
+            let size = 256;
+            var buffer: [UInt8] = Array(repeating: 0, count: size)
+            let returnCode = libusb_get_string_descriptor_ascii(handle, descriptor.iSerialNumber, &buffer, Int32(size))
+            if(returnCode <= 0){
+                return ""
+            }
+            return String(bytes: buffer, encoding: .ascii) ?? ("")
+        }
+    }
+    
     /// Gets a human readable version of a device by indicating both the vendor and product id
     /// Together they form a primary key that can uniquely indentify the connected device
     /// - Returns: A string in the format "Vendor: [vendorID] Product: [productID]"
     var displayName: String {
-        get {
+        // If the index is 0 give the name as indicated
+        if(descriptor.iProduct == 0){
             return "Vendor: \(vendorId) Product: \(productId)"
         }
+        
+        // Make a buffer for the name of the device
+        let size = 256;
+        var buffer: [UInt8] = Array(repeating: 0, count: size)
+        let returnCode = libusb_get_string_descriptor_ascii(handle, descriptor.iProduct, &buffer, Int32(size))
+        
+        // Check if there is an error when filling the buffer with the name
+        if(returnCode <= 0){
+            return "error getting name: \(USBError.from(code: returnCode).localizedDescription)"
+        }
+        
+        return String(bytes: buffer, encoding: .ascii) ?? "Vendor: \(vendorId) Product: \(productId)"
     }
 
     /// A hash representation of the device
