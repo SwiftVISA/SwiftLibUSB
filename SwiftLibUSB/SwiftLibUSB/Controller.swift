@@ -10,7 +10,7 @@ import Foundation
 /// The primary class for holding the logic of the demonstration UI.
 class Controller: ObservableObject {
     var command = ""
-    @Published var dataReceived = ""
+    @Published var dataReceived: [String] = []
     @Published var isConnected = false
     @Published var chosenDevice: Device {
         didSet {
@@ -169,7 +169,7 @@ class Controller: ObservableObject {
             // Get the response message from a bulk in endpoint and print it
             let data = try inEndpoint.unsafelyUnwrapped.receiveBulkTransfer()
             print([UInt8](data))
-            dataReceived += String(decoding: data[12...], as: UTF8.self)
+            dataReceived.append(String(decoding: data[12...], as: UTF8.self))
 //            for endpoint in chosenAltSetting.endpoints {
 //                if endpoint.direction == .In && endpoint.transferType == .bulk {
 //                    let data = try endpoint.receiveBulkTransfer()
