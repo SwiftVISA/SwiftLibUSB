@@ -66,9 +66,6 @@ class Device: Hashable {
     /// Together they form a primary key that can uniquely indentify the connected device
     /// - Returns: A string in the format "Vendor: [vendorID] Product: [productID]"
     var displayName: String {
-        /*get {
-            return "Vendor: \(vendorId) Product: \(productId)"
-        }*/
         if(descriptor.iProduct == 0){
             return "Vendor: \(vendorId) Product: \(productId)"
         }
