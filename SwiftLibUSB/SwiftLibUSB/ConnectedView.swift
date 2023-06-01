@@ -43,7 +43,6 @@ struct ConnectedView: View {
                     Text(verbatim: String(item.wrappedValue.displayName)).tag(item.wrappedValue)
                 }
             }
-
             Button("Connect to Device", action: control.connect)
             
             TextField("Command", text: $control.command)
@@ -55,7 +54,6 @@ struct ConnectedView: View {
             TextField("Data received will display here", text: $control.dataReceived, axis: .vertical)
                 .disabled(true)
                 .lineLimit(6, reservesSpace: true)
-            
             Spacer()
         }
         .padding(.all)

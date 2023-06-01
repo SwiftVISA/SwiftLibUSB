@@ -34,7 +34,7 @@ class Interface : Hashable {
     
     deinit {
         if claimed {
-            libusb_release_interface(device.handle?.handle, Int32(index))
+            libusb_release_interface(device.handle, Int32(index))
         }
     }
     
@@ -47,7 +47,7 @@ class Interface : Hashable {
     /// * `.busy` if another program has claimed the interface
     /// * `.noDevice` if the device has been disconnected
     func claim() throws {
-        let error = libusb_claim_interface(device.handle?.handle, Int32(index))
+        let error = libusb_claim_interface(device.handle, Int32(index))
         if error < 0 {
             throw USBError.from(code: error)
         }
