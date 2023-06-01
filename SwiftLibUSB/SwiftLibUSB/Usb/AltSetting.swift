@@ -16,7 +16,7 @@ class AltSetting : Hashable{
         setting = AltSettingRef(interface: interface, index: index)
         
         endpoints = []
-        for i in 0..<Int(setting.altSetting.pointee.bNumEndpoints) {
+        for i in 0..<Int(setting.numEndpoints) {
             endpoints.append(Endpoint(altSetting: setting, index: i))
         }
     }
@@ -147,6 +147,16 @@ internal class AltSettingRef {
         get {
             Int(altSetting.pointee.iInterface)
         }
+    }
+    
+    var numEndpoints: Int {
+        get {
+            Int(altSetting.pointee.bNumEndpoints)
+        }
+    }
+    
+    func endpoint(index: Int) -> UnsafePointer<libusb_endpoint_descriptor> {
+        altSetting.pointee.endpoint + index
     }
     
     deinit {

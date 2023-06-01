@@ -17,7 +17,7 @@ class Endpoint {
     
     init(altSetting: AltSettingRef, index: Int) {
         self.altSetting = altSetting
-        descriptor = altSetting.altSetting.pointee.endpoint + index
+        descriptor = altSetting.endpoint(index: index)
     }
     
     deinit {
@@ -58,7 +58,7 @@ class Endpoint {
     }
     
     func clearHalt(){
-        libusb_clear_halt(altSetting.interface.config.device.handle, descriptor.pointee.bEndpointAddress)
+        libusb_clear_halt(altSetting.device.handle, descriptor.pointee.bEndpointAddress)
     }
     
     /// Sends a message to a bulk out endpoint
@@ -75,7 +75,7 @@ class Endpoint {
         var sent: Int32 = 0;
         var data = [UInt8](data)
         let length: Int32 = Int32(data.count)
-        let error = libusb_bulk_transfer(altSetting.interface.config.device.handle, descriptor.pointee.bEndpointAddress, &data, length, &sent, 1000)
+        let error = libusb_bulk_transfer(altSetting.device.handle, descriptor.pointee.bEndpointAddress, &data, length, &sent, 1000)
         if error < 0 {
             throw USBError.from(code: error)
         }
@@ -98,7 +98,7 @@ class Endpoint {
         var sent: Int32 = 0;
         var innerData = [UInt8](repeating: 0, count: 1024)
         let length: Int32 = 1024
-        let error = libusb_bulk_transfer(altSetting.interface.config.device.handle, descriptor.pointee.bEndpointAddress, &innerData, length, &sent, 1000)
+        let error = libusb_bulk_transfer(altSetting.device.handle, descriptor.pointee.bEndpointAddress, &innerData, length, &sent, 1000)
         print("Amount sent: \(sent), with error \(error) \(USBError.from(code: error))")
         if error < 0 {
             throw USBError.from(code: error)
