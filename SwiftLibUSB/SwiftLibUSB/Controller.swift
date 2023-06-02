@@ -58,6 +58,7 @@ class Controller: ObservableObject {
             messageIndex = 1
         }catch {
             print("Error refreshing")
+            dataReceived.insert("Error refreshing", at: 0)
         }
     }
     
@@ -220,7 +221,7 @@ class Controller: ObservableObject {
             print("Connected!")
         } catch {
             print("Error connecting")
-            dataReceived.append("Error connecting\n")
+            dataReceived.insert("Error connecting", at: 0)
         }
     }
     
