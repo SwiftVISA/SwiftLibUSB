@@ -18,6 +18,8 @@ struct ConnectedView: View {
     
     var body: some View {
         VStack {
+            Button("Refresh", action: control.reinit)
+            
             Picker("Device:", selection: $control.chosenDevice) {
                 ForEach($control.context.devices, id: \.self) { item in
                     Text(verbatim: item.wrappedValue.displayName).tag(item.wrappedValue)
@@ -57,7 +59,6 @@ struct ConnectedView: View {
             List(control.dataReceived, id: \.self) {
                 s in Text(s)
             }.navigationTitle("Data Received")
-            Spacer()
         }
         .padding(.all)
         .frame(minWidth:350)
