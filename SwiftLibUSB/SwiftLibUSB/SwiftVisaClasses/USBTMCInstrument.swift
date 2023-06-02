@@ -15,16 +15,62 @@ class USBTMCInstrument : USBInstrument {
     var outEndpoint: Endpoint?
     
     override init(vendorID: Int, productID: Int, SerialNumber: String?) throws {
-        try super.init(vendorID: vendorID, productID: productID, SerialNumber: SerialNumber)
-        
         messageIndex = 1
+        inEndpoint = nil
+        outEndpoint = nil
+        try super.init(vendorID: vendorID, productID: productID, SerialNumber: SerialNumber)
+        try findEndpoints()
+    }
+}
+extension USBTMCInstrument {
+    private func findEndpoints() throws {
+        let device = self._session.usbDevice
+        
+        for config in device.configurations {
+            for interface in config.interfaces {
+                for AltSetting in interface.altSettings {
+                    if(AltSetting.interfaceProtocol == 0){
+                        try setupConfig(config: config)
+                        try setupInterface(interface: interface)
+                        try setupEndpoints(altSetting: AltSetting)
+                        return
+                    }
+                }
+            }
+        }
+        // If the loop finishes without finding endpoints that meet our requirements, we must throw
+        throw Error.couldNotFindEndpoint
     }
     
-    func nextMessage() {
+    private func setupConfig(config: Configuration) throws {
+        try config.setActive()
+    }
+    
+    private func setupInterface(interface: Interface) throws{
+        try interface.claim()
+    }
+    
+    private func setupEndpoints(altSetting: AltSetting) throws{
+        try altSetting.setActive()
+        
+        inEndpoint = try getEndpoint(endpoints: altSetting.endpoints,direction: Direction.In)
+        outEndpoint = try getEndpoint(endpoints: altSetting.endpoints,direction: Direction.Out)
+    }
+    
+    private func getEndpoint(endpoints: [Endpoint],direction: Direction) throws -> Endpoint  {
+        for endpoint in endpoints {
+            if endpoint.direction == direction && endpoint.transferType == .bulk {
+                return endpoint
+            }
+        }
+        throw Error.couldNotFindEndpoint
+    }
+    
+    /// Increment the message index such that it remains in the range [1-255] inclusive
+    private func nextMessage() {
         messageIndex = (messageIndex % 255) + 1
     }
 }
-
 extension USBTMCInstrument : MessageBasedInstrument {
     func read(until terminator: String, strippingTerminator: Bool, encoding: String.Encoding, chunkSize: Int) throws -> String {
         return ""
@@ -63,8 +109,8 @@ extension USBTMCInstrument : MessageBasedInstrument {
         print([UInt8](dataToSend))
         
         // Send the command message to a bulk out endpoint
-        outEndpoint.unsafelyUnwrapped.clearHalt()
-        var num = try outEndpoint.unsafelyUnwrapped.sendBulkTransfer(data: &dataToSend)
+        (outEndpoint!).clearHalt()
+        var num = try (outEndpoint!).sendBulkTransfer(data: &dataToSend)
         print("Sent \(num) bytes")
         nextMessage()
         
