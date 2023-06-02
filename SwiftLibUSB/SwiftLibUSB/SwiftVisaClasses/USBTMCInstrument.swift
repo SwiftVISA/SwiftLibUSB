@@ -65,11 +65,36 @@ extension USBTMCInstrument {
 }
 extension USBTMCInstrument : MessageBasedInstrument {
     func read(until terminator: String, strippingTerminator: Bool, encoding: String.Encoding, chunkSize: Int) throws -> String {
-        return ""
+        throw USBError.notSupported
     }
     
     func readBytes(length: Int, chunkSize: Int) throws -> Data {
-        return Data()
+        // Send read request to out endpoint
+        let readBufferSize = 1024
+        // Part 1 of header: Read In (constant 2), message index, inverse of message index, padding
+        var message = Data([2, messageIndex, 255-messageIndex, 0])
+        // Part 2 of header: Little Endian length of the buffer
+        withUnsafeBytes(of: Int32(readBufferSize).littleEndian) { lengthBytes in
+            message.append(Data(Array(lengthBytes)))
+        }
+        // Part 3 of header: Optional terminator byte (not used here), three bytes of padding
+        message.append(Data([0,0,0,0]))
+        
+        // Clear halt for the in endpoint
+        inEndpoint.unsafelyUnwrapped.clearHalt()
+        
+        // Send the request message to a bulk out endpoint
+        let num = try outEndpoint.unsafelyUnwrapped.sendBulkTransfer(data: &message)
+        print("Sent \(num) bytes")
+        print ("Sent request message")
+        
+        // Get the response message from a bulk in endpoint and print it
+        let data = try inEndpoint.unsafelyUnwrapped.receiveBulkTransfer()
+        print([UInt8](data))
+        
+        nextMessage()
+        
+        return data[12...]
     }
     
     func readBytes(maxLength: Int?, until terminator: Data, strippingTerminator: Bool, chunkSize: Int) throws -> Data {
