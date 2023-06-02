@@ -91,20 +91,24 @@ extension USBTMCInstrument : MessageBasedInstrument {
         if(messageData == nil) {
             throw Error.cannotEncode
         }
-        
+        return try writeBytes(messageData!, appending: nil)
+    }
+    
+    func writeBytes(_ data: Data, appending terminator: Data?) throws -> Int {
+        let messageData = data + (terminator ?? Data())
         // Part 1 of header: Write Out (constant 1), message index, inverse of message index, padding
         var dataToSend = Data([1, messageIndex, 255-messageIndex, 0])
         // Part 2 of header: Little Endian length of the message (with added newline)
-        withUnsafeBytes(of: Int32(message.count).littleEndian) { lengthBytes in
+        withUnsafeBytes(of: Int32(messageData.count).littleEndian) { lengthBytes in
             dataToSend.append(Data(Array(lengthBytes)))
         }
         // Part 3 of header: End of Message (constant 1), three bytes of padding
         dataToSend.append(Data([1, 0, 0, 0]))
         // Add the message as bytes
-        dataToSend.append(messageData!)
+        dataToSend.append(messageData)
         
         // Pad to 4 byte boundary
-        dataToSend.append(Data(Array(repeating: 0, count: (4 - message.count % 4) % 4)))
+        dataToSend.append(Data(Array(repeating: 0, count: (4 - messageData.count % 4) % 4)))
         
         print([UInt8](dataToSend))
         
@@ -114,10 +118,6 @@ extension USBTMCInstrument : MessageBasedInstrument {
         print("Sent \(num) bytes")
         nextMessage()
         
-        return 0
-    }
-    
-    func writeBytes(_ data: Data, appending terminator: Data?) throws -> Int {
         return 0
     }
 }
