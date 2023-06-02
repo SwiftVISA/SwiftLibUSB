@@ -30,8 +30,11 @@ extension USBInstrument {
         /// Found no devices when searching
         case noDevices
         
-        // Found multiple devices with the same product id, vendor id and serial number.
+        ///Found multiple devices with the same product id, vendor id and serial number.
         case serialCodeNotUnique
+        
+        ///error encoding string
+        case cannotEncode
         
     }
 }
@@ -47,6 +50,8 @@ extension USBInstrument.Error {
             return "No devices were found"
         case .serialCodeNotUnique:
             return "Identification of USB devices with serial number was not unique"
+        case .cannotEncode:
+            return "Could not encode given string with given encoding"
         }
     }
 }
