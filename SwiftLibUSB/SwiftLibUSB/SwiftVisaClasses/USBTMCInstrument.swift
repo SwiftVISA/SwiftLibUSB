@@ -153,7 +153,7 @@ extension USBTMCInstrument : MessageBasedInstrument {
             dataToSend.append(dataSlice)
             
             // Pad to 4 byte boundary
-            dataToSend.append(Data(Array(repeating: 0, count: (4 - messageData.count % 4) % 4)))
+            dataToSend.append(Data(Array(repeating: 0, count: (4 - dataSlice.count % 4) % 4)))
             
             print([UInt8](dataToSend)) // TODO: Remove debug print
             
