@@ -88,28 +88,49 @@ extension USBTMCInstrument : MessageBasedInstrument {
     
     func writeBytes(_ data: Data, appending terminator: Data?) throws -> Int {
         let messageData = data + (terminator ?? Data())
-        // Part 1 of header: Write Out (constant 1), message index, inverse of message index, padding
-        var dataToSend = Data([1, messageIndex, 255-messageIndex, 0])
-        // Part 2 of header: Little Endian length of the message (with added newline)
-        withUnsafeBytes(of: Int32(messageData.count).littleEndian) { lengthBytes in
-            dataToSend.append(Data(Array(lengthBytes)))
+        let writeSize = 12 // TODO: Increase to a larger number
+        
+        var sliceNum = 0
+        var lastMessage = false
+        while(!lastMessage) {
+            sliceNum += 1
+            let lowerBound = (sliceNum - 1) * writeSize
+            var upperBound = sliceNum * writeSize
+            
+            if(upperBound >= messageData.count){
+                lastMessage = true
+                upperBound = messageData.count
+            }
+            var dataSlice = messageData.subdata(in: lowerBound..<upperBound)
+            
+            // Part 1 of header: Write Out (constant 1), message index, inverse of message index, padding
+            var dataToSend = Data([1, messageIndex, 255-messageIndex, 0])
+            // Part 2 of header: Little Endian length of the message (with added newline)
+            withUnsafeBytes(of: Int32(dataSlice.count).littleEndian) { lengthBytes in
+                dataToSend.append(Data(Array(lengthBytes)))
+            }
+            // Part 3 of hedaer: end of field
+            if(lastMessage){
+                dataToSend.append(1)
+            }else{
+                dataToSend.append(0)
+            }
+            // Part 4 of header: Three bytes of padding
+            dataToSend.append(Data([0, 0, 0]))
+            // Add the message as bytes
+            dataToSend.append(dataSlice)
+            
+            // Pad to 4 byte boundary
+            dataToSend.append(Data(Array(repeating: 0, count: (4 - messageData.count % 4) % 4)))
+            
+            print([UInt8](dataToSend)) // TODO: Remove debug print
+            
+            // Send the command message to a bulk out endpoint
+            (outEndpoint!).clearHalt()
+            let num = try (outEndpoint!).sendBulkTransfer(data: &dataToSend)
+            print("Sent \(num) bytes") // TODO: Remove debug print
+            nextMessage()
         }
-        // Part 3 of header: End of Message (constant 1), three bytes of padding
-        dataToSend.append(Data([1, 0, 0, 0]))
-        // Add the message as bytes
-        dataToSend.append(messageData)
-        
-        // Pad to 4 byte boundary
-        dataToSend.append(Data(Array(repeating: 0, count: (4 - messageData.count % 4) % 4)))
-        
-        print([UInt8](dataToSend))
-        
-        // Send the command message to a bulk out endpoint
-        (outEndpoint!).clearHalt()
-        let num = try (outEndpoint!).sendBulkTransfer(data: &dataToSend)
-        print("Sent \(num) bytes")
-        nextMessage()
-        
         return 0
     }
 }
