@@ -65,7 +65,7 @@ extension USBTMCInstrument {
 }
 extension USBTMCInstrument : MessageBasedInstrument {
     func read(until terminator: String, strippingTerminator: Bool, encoding: String.Encoding, chunkSize: Int) throws -> String {
-        return ""
+        throw USBError.notSupported
     }
     
     func readBytes(length: Int, chunkSize: Int) throws -> Data {
