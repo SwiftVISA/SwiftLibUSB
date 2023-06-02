@@ -28,11 +28,9 @@ extension USBTMCInstrument {
         
         for config in device.configurations {
             for interface in config.interfaces {
-                for AltSetting in interface.altSettings {
-                    if(AltSetting.interfaceProtocol == 0){
-                        try setupConfig(config: config)
-                        try setupInterface(interface: interface)
-                        try setupEndpoints(altSetting: AltSetting)
+                for altSetting in interface.altSettings {
+                    if(altSetting.interfaceProtocol == 0){
+                        try setupEndpoints(config: config, interface: interface, altSetting: altSetting)
                         return
                     }
                 }
@@ -42,15 +40,9 @@ extension USBTMCInstrument {
         throw Error.couldNotFindEndpoint
     }
     
-    private func setupConfig(config: Configuration) throws {
+    private func setupEndpoints(config: Configuration, interface: Interface, altSetting: AltSetting) throws{
         try config.setActive()
-    }
-    
-    private func setupInterface(interface: Interface) throws{
         try interface.claim()
-    }
-    
-    private func setupEndpoints(altSetting: AltSetting) throws{
         try altSetting.setActive()
         
         inEndpoint = try getEndpoint(endpoints: altSetting.endpoints,direction: Direction.In)
