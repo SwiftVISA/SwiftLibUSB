@@ -21,7 +21,7 @@ class Device: Hashable {
         try device = DeviceRef(context: context, device: pointer)
         
         descriptor = libusb_device_descriptor()
-        var error = libusb_get_device_descriptor(device.raw_device, &descriptor)
+        let error = libusb_get_device_descriptor(device.raw_device, &descriptor)
         if error < 0 {
             throw USBError.from(code: error)
         }
