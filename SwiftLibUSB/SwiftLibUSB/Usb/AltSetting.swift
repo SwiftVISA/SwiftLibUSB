@@ -160,6 +160,12 @@ internal class AltSettingRef {
         }
     }
     
+    var bInterfaceProtocol: Int {
+        get {
+            Int(altSetting.pointee.bInterfaceProtocol)
+        }
+    }
+    
     var numEndpoints: Int {
         get {
             Int(altSetting.pointee.bNumEndpoints)
