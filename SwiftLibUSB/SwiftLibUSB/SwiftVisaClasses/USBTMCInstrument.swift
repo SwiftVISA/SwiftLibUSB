@@ -29,7 +29,8 @@ extension USBTMCInstrument {
         for config in device.configurations {
             for interface in config.interfaces {
                 for altSetting in interface.altSettings {
-                    if(altSetting.interfaceProtocol == 0){
+                    var validEndpoint = endpointCheck(altSetting: altSetting)
+                    if(validEndpoint){
                         try setupEndpoints(config: config, interface: interface, altSetting: altSetting)
                         return
                     }
@@ -38,6 +39,12 @@ extension USBTMCInstrument {
         }
         // If the loop finishes without finding endpoints that meet our requirements, we must throw
         throw Error.couldNotFindEndpoint
+    }
+    
+    private func endpointCheck(altSetting: AltSetting) -> Bool {
+        return altSetting.interfaceClass == .application &&
+                altSetting.interfaceSubClass == 0x03 &&
+        (altSetting.interfaceProtocol == 0 || altSetting.interfaceProtocol == 1)
     }
     
     private func setupEndpoints(config: Configuration, interface: Interface, altSetting: AltSetting) throws{
