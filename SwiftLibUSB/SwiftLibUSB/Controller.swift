@@ -45,6 +45,22 @@ class Controller: ObservableObject {
         messageIndex = 1
     }
     
+    func reinit() {
+        do {
+            try context = Context()
+            if context.devices.isEmpty {
+                throw USBError.other
+            }
+            chosenDevice = context.devices[0]
+            chosenConfig = context.devices[0].configurations[0]
+            chosenInterface = context.devices[0].configurations[0].interfaces[0]
+            chosenAltSetting = context.devices[0].configurations[0].interfaces[0].altSettings[0]
+            messageIndex = 1
+        }catch {
+            print("Error refreshing")
+        }
+    }
+    
     /// Print the currently stored command to the terminal
     func printCommand() {
         print(command)
