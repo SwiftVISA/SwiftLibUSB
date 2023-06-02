@@ -77,8 +77,8 @@ extension USBTMCInstrument : MessageBasedInstrument {
     }
     
     func write(_ string: String, appending terminator: String?, encoding: String.Encoding) throws -> Int {
-        var message = string + (terminator ?? "")
-        var messageData = message.data(using: encoding)
+        let message = string + (terminator ?? "")
+        let messageData = message.data(using: encoding)
         
         if(messageData == nil) {
             throw Error.cannotEncode
@@ -106,7 +106,7 @@ extension USBTMCInstrument : MessageBasedInstrument {
         
         // Send the command message to a bulk out endpoint
         (outEndpoint!).clearHalt()
-        var num = try (outEndpoint!).sendBulkTransfer(data: &dataToSend)
+        let num = try (outEndpoint!).sendBulkTransfer(data: &dataToSend)
         print("Sent \(num) bytes")
         nextMessage()
         
