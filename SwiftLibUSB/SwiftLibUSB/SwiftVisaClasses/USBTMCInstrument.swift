@@ -98,7 +98,7 @@ extension USBTMCInstrument : MessageBasedInstrument {
     }
     
     func readBytes(maxLength: Int?, until terminator: Data, strippingTerminator: Bool, chunkSize: Int) throws -> Data {
-        return Data()
+        throw USBError.notSupported
     }
     
     func write(_ string: String, appending terminator: String?, encoding: String.Encoding) throws -> Int {
