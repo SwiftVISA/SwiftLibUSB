@@ -173,7 +173,7 @@ class Controller: ObservableObject {
                 // Get the response message from a bulk in endpoint and print it
                 let data = try inEndpoint.unsafelyUnwrapped.receiveBulkTransfer()
                 print([UInt8](data))
-                dataReceived.append(String(decoding: data[12...], as: UTF8.self))
+                dataReceived.insert(String(decoding: data[12...], as: UTF8.self), at: 0)
                 //            for endpoint in chosenAltSetting.endpoints {
                 //                if endpoint.direction == .In && endpoint.transferType == .bulk {
                 //                    let data = try endpoint.receiveBulkTransfer()
