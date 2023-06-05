@@ -8,12 +8,25 @@
 import Foundation
 import CoreSwiftVISA
 
+/// An Instrument connected over USB
+///
+/// This depends on the USB device using the USBTMC interface, which should be the case for all VISA-compatible instruments. If you need to connect to a USB device that does not support this protocol, you will need a new class to communicate with it.
 class USBTMCInstrument : USBInstrument {
     public var attributes = MessageBasedInstrumentAttributes()
     var messageIndex: UInt8
     var inEndpoint: Endpoint?
     var outEndpoint: Endpoint?
     
+    /// Attempts to connect to a USB device with the given identification.
+    ///
+    /// - Parameters:
+    ///    - vendorID: the number assigned to the manufacturer of the device
+    ///    - productID: the number assigned to this type of device
+    ///    - SerialNumber: an optional string assigned uniquely to this device. This is needed if multiple of the same type of device are connected.
+    ///
+    ///    These can be found from the VISA identification string in the following format: `USB::<vendorID>::<productID>::<SerialNumber>::...`
+    ///
+    /// - Throws: an error if the device was not found, or if it doesn't support the USBTMC interface.
     override init(vendorID: Int, productID: Int, SerialNumber: String?) throws {
         messageIndex = 1
         inEndpoint = nil
@@ -23,6 +36,7 @@ class USBTMCInstrument : USBInstrument {
     }
 }
 extension USBTMCInstrument {
+    /// Looks through the available configurations and interfaces for an AltSetting that supports USBTMC
     private func findEndpoints() throws {
         let device = self._session.usbDevice
         
@@ -41,12 +55,14 @@ extension USBTMCInstrument {
         throw Error.couldNotFindEndpoint
     }
     
+    /// Checks if an AltSetting supports USBTMC
     private func endpointCheck(altSetting: AltSetting) -> Bool {
         return altSetting.interfaceClass == .application &&
                 altSetting.interfaceSubClass == 0x03 &&
         (altSetting.interfaceProtocol == 0 || altSetting.interfaceProtocol == 1)
     }
     
+    /// Claims the interfaces and selects the endpoints for communicating
     private func setupEndpoints(config: Configuration, interface: Interface, altSetting: AltSetting) throws{
         try config.setActive()
         try interface.claim()
@@ -56,6 +72,7 @@ extension USBTMCInstrument {
         outEndpoint = try getEndpoint(endpoints: altSetting.endpoints,direction: Direction.Out)
     }
     
+    /// Finds an endpoint with the intended direction
     private func getEndpoint(endpoints: [Endpoint],direction: Direction) throws -> Endpoint  {
         for endpoint in endpoints {
             if endpoint.direction == direction && endpoint.transferType == .bulk {
@@ -84,7 +101,7 @@ extension USBTMCInstrument : MessageBasedInstrument {
         withUnsafeBytes(of: Int32(readBufferSize).littleEndian) { lengthBytes in
             message.append(Data(Array(lengthBytes)))
         }
-        // Part 3 of header: Optional terminator byte (not used here), three bytes of padding
+        // Part 3 of header: Bit to indicate presence of terminator byte, Optional terminator byte (not used here), two bytes of padding
         message.append(Data([0,0,0,0]))
         
         // Clear halt for the in endpoint
@@ -141,7 +158,7 @@ extension USBTMCInstrument : MessageBasedInstrument {
             withUnsafeBytes(of: Int32(dataSlice.count).littleEndian) { lengthBytes in
                 dataToSend.append(Data(Array(lengthBytes)))
             }
-            // Part 3 of hedaer: end of field
+            // Part 3 of header: end of field
             if(lastMessage){
                 dataToSend.append(1)
             }else{

@@ -8,6 +8,9 @@
 import Foundation
 import CoreSwiftVISA
 
+/// A base class for instruments connected over USB.
+///
+/// This does nothing on its own; use USBTMCInstrument or another subclass to communicate with a device.
 class USBInstrument {
     var _session: USBSession
     
