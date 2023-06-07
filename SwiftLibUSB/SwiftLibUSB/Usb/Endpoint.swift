@@ -118,6 +118,16 @@ class Endpoint {
 enum Direction {
     case In
     case Out
+    var val: UInt8 {
+        get {
+            switch self {
+            case .In:
+                return 1
+            case .Out:
+                return 0
+            }
+        }
+    }
 }
 
 /// Describes the type of data transfer an endpoint can send

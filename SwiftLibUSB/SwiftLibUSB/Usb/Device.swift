@@ -103,23 +103,34 @@ class Device: Hashable {
         wIndex: UInt16,
         data: Data,
         wLength: UInt16,
-        timeout: UInt8
-    ){
-        
+        timeout: UInt32
+    ) throws -> Data {
+        var charArrayData = [UInt8](data)
+        let returnVal = libusb_control_transfer(device.raw_handle,bmRequestTypeL,bRequest,wValue,wIndex,&charArrayData,wLength,timeout)
+        if(returnVal < 0){
+            throw USBError.from(code: returnVal)
+        }
+        return Data(charArrayData)
     }
     
     func sendControlTransfer(
         direction: Direction,
         type: LibUSBControlType,
-        recipeint: LibUSBRecipient
+        recipeint: LibUSBRecipient,
         bRequest: UInt8,
         wValue: UInt16,
         wIndex: UInt16,
         data: Data,
         wLength: UInt16,
-        timeout: UInt8
-    ){
+        timeout: UInt32
+    ) throws -> Data {
+        // Fill in bits of request Type
+        var requestType : UInt8 = (Direction.In.val << 5)
+        requestType += (LibUSBControlType.Class.val << 7)
+        requestType += (LibUSBRecipient.Interface.val << 0)
         
+        // Make the control transfer
+        return try sendControlTransfer(bmRequestTypeL: requestType, bRequest: bRequest, wValue: wValue, wIndex: wIndex, data: data, wLength: wLength, timeout: timeout)
     }
     
     /// A hash representation of the device
@@ -157,7 +168,7 @@ enum LibUSBControlType{
     case Class
     case Vendor
     case Reserved
-    var val: Int {
+    var val: UInt8 {
         get {
             switch self {
             case .Standard:
@@ -174,20 +185,20 @@ enum LibUSBControlType{
 }
 
 enum LibUSBRecipient{
-    case Standard
-    case Class
-    case Vendor
-    case Reserved
-    var val: Int {
+    case Device
+    case Interface
+    case Endpoint
+    case Other
+    var val: UInt8 {
         get {
             switch self {
-            case .Standard:
+            case .Device:
                 return 0
-            case .Class:
+            case .Interface:
                 return 1
-            case .Vendor:
+            case .Endpoint:
                 return 2
-            case .Reserved:
+            case .Other:
                 return 3
             }
         }
