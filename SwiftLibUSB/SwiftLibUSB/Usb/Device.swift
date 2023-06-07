@@ -94,7 +94,34 @@ class Device: Hashable {
         
         return String(bytes: buffer, encoding: .ascii) ?? "Vendor: \(vendorId) Product: \(productId)"
     }
-
+    
+    
+    func sendControlTransfer(
+        bmRequestTypeL: UInt8,
+        bRequest: UInt8,
+        wValue: UInt16,
+        wIndex: UInt16,
+        data: Data,
+        wLength: UInt16,
+        timeout: UInt8
+    ){
+        
+    }
+    
+    func sendControlTransfer(
+        direction: Direction,
+        type: LibUSBControlType,
+        recipeint: LibUSBRecipient
+        bRequest: UInt8,
+        wValue: UInt16,
+        wIndex: UInt16,
+        data: Data,
+        wLength: UInt16,
+        timeout: UInt8
+    ){
+        
+    }
+    
     /// A hash representation of the device
     func hash(into hasher: inout Hasher) {
         device.raw_device.hash(into: &hasher)
@@ -124,3 +151,46 @@ internal class DeviceRef {
         libusb_close(raw_handle)
     }
 }
+
+enum LibUSBControlType{
+    case Standard
+    case Class
+    case Vendor
+    case Reserved
+    var val: Int {
+        get {
+            switch self {
+            case .Standard:
+                return 0
+            case .Class:
+                return 1
+            case .Vendor:
+                return 2
+            case .Reserved:
+                return 3
+            }
+        }
+    }
+}
+
+enum LibUSBRecipient{
+    case Standard
+    case Class
+    case Vendor
+    case Reserved
+    var val: Int {
+        get {
+            switch self {
+            case .Standard:
+                return 0
+            case .Class:
+                return 1
+            case .Vendor:
+                return 2
+            case .Reserved:
+                return 3
+            }
+        }
+    }
+}
+

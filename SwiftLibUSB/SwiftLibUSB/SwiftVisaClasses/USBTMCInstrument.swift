@@ -16,6 +16,8 @@ class USBTMCInstrument : USBInstrument {
     var messageIndex: UInt8
     var inEndpoint: Endpoint?
     var outEndpoint: Endpoint?
+    var activeInterface: AltSetting?
+    var canUseTerminator: Bool
     
     /// Attempts to connect to a USB device with the given identification.
     ///
@@ -31,8 +33,11 @@ class USBTMCInstrument : USBInstrument {
         messageIndex = 1
         inEndpoint = nil
         outEndpoint = nil
+        activeInterface = nil
+        canUseTerminator = false
         try super.init(vendorID: vendorID, productID: productID, SerialNumber: SerialNumber)
         try findEndpoints()
+        getCapabilities()
     }
 }
 extension USBTMCInstrument {
@@ -67,7 +72,7 @@ extension USBTMCInstrument {
         try config.setActive()
         try interface.claim()
         try altSetting.setActive()
-        
+        activeInterface = altSetting
         inEndpoint = try getEndpoint(endpoints: altSetting.endpoints,direction: Direction.In)
         outEndpoint = try getEndpoint(endpoints: altSetting.endpoints,direction: Direction.Out)
     }
@@ -86,23 +91,48 @@ extension USBTMCInstrument {
     private func nextMessage() {
         messageIndex = (messageIndex % 255) + 1
     }
+    
+    private func makeHeader(read: Bool = false, bufferSize: Int = 1028) -> Data {
+        // Part 1 of header: message type, message index, inverse of message index, padding
+        var firstByte : UInt8 = read ? 2 : 1 // Reads are type 2, writes are type 1
+        var message = Data([firstByte, messageIndex, 255-messageIndex, 0])
+        // Part 2 of header: Little Endian length of the buffer
+        withUnsafeBytes(of: Int32(bufferSize).littleEndian) { lengthBytes in
+            message.append(Data(Array(lengthBytes)))
+        }
+        return message
+    }
+    
+    private func getCapabilities(){
+    
+    }
+    
 }
 extension USBTMCInstrument : MessageBasedInstrument {
     func read(until terminator: String, strippingTerminator: Bool, encoding: String.Encoding, chunkSize: Int) throws -> String {
-        var dataRead = try readBytes(maxLength: nil, until: terminator.data(using: encoding), strippingTerminator: strippingTerminator, chunkSize: chunkSize)
-        return String(decoding: dataRead, as: UTF8.self)
+        
+        // Prepare the parameters
+        var terminatorBytes : Data? = terminator.data(using:encoding)
+        if(terminatorBytes == nil){
+            throw Error.cannotEncode
+        }
+        
+        // Make the call to readBytes
+        var dataRead = try readBytes(maxLength: nil, until: terminatorBytes!, strippingTerminator: strippingTerminator, chunkSize: chunkSize)
+        
+        // Encode the output as a string
+        var outputString : String? = String(data: dataRead, encoding: encoding)
+        if(outputString == nil){
+            throw Error.cannotEncode
+        }
+        return outputString!
     }
     
     func readBytes(length: Int, chunkSize: Int) throws -> Data {
         // Send read request to out endpoint
-        let readBufferSize = 1024
-        // Part 1 of header: Read In (constant 2), message index, inverse of message index, padding
-        var message = Data([2, messageIndex, 255-messageIndex, 0])
-        // Part 2 of header: Little Endian length of the buffer
-        withUnsafeBytes(of: Int32(readBufferSize).littleEndian) { lengthBytes in
-            message.append(Data(Array(lengthBytes)))
-        }
-        // Part 3 of header: Bit to indicate presence of terminator byte, Optional terminator byte (not used here), two bytes of padding
+        var message : Data = makeHeader(read: true, bufferSize: chunkSize)
+        
+        // Add zeros to get basic behavior
         message.append(Data([0,0,0,0]))
         
         // Clear halt for the in endpoint
@@ -124,6 +154,8 @@ extension USBTMCInstrument : MessageBasedInstrument {
     
     func readBytes(maxLength: Int?, until terminator: Data, strippingTerminator: Bool, chunkSize: Int) throws -> Data {
         throw USBError.notSupported
+        var message : Data = makeHeader(read: true, bufferSize: chunkSize)
+        
     }
     
     func write(_ string: String, appending terminator: String?, encoding: String.Encoding) throws -> Int {
