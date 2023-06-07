@@ -133,16 +133,17 @@ extension USBTMCInstrument {
     private func getCapabilities(){
         do {
             // These arguments are defined by the USBTMC specification, table 36
-            let capabilities = try _session.usbDevice.sendControlTransfer(
-                direction: .Out,
+            let capabilities: Data = try _session.usbDevice.sendControlTransfer(
+                direction: .In,
                 type: .Class,
                 recipeint: .Interface,
                 bRequest: ControlMessages.getCapabilities.toByte(),
                 wValue: 0,
-                wIndex: activeInterface?.index,
+                wIndex: UInt16(activeInterface?.index ?? 0),
                 data: Data(count: 24),
                 wLength: 24,
-                timeout: 10000)
+                timeout: 10000
+            )
             let termCapability = [UInt8](capabilities.subdata(in: 5..<6))[0]
             canUseTerminator = termCapability == 1
         } catch {
