@@ -41,6 +41,30 @@ class USBTMCInstrument : USBInstrument {
     }
 }
 extension USBTMCInstrument {
+    /// Message types defined by USBTMC specification, table 15
+    private enum ControlMessages {
+        case initiateAbortBulkOut
+        case checkAbortBulkOutStatus
+        case initiateAbortBulkIn
+        case checkAbortBulkInStatus
+        case initiateClear
+        case checkClearStatus
+        case getCapabilities
+        case indicatorPulse
+        
+        func toByte() -> UInt8 {
+            switch self {
+            case .initiateAbortBulkOut: return 1
+            case .checkAbortBulkOutStatus: return 2
+            case .initiateAbortBulkIn: return 3
+            case .checkAbortBulkInStatus: return 4
+            case .initiateClear: return 5
+            case .checkClearStatus: return 6
+            case .getCapabilities: return 7
+            case .indicatorPulse: return 64 // This is correct; there is a very large gap here
+            }
+        }
+    }
     /// Looks through the available configurations and interfaces for an AltSetting that supports USBTMC
     private func findEndpoints() throws {
         let device = self._session.usbDevice
@@ -103,8 +127,28 @@ extension USBTMCInstrument {
         return message
     }
     
+    /// Get the capabilities of the device.
+    ///
+    /// Available capabilities include whether the device supports sending data, receiving data, pulsing, or using a terminator character on reads
     private func getCapabilities(){
-    
+        do {
+            // These arguments are defined by the USBTMC specification, table 36
+            let capabilities = try _session.usbDevice.sendControlTransfer(
+                direction: .Out,
+                type: .Class,
+                recipeint: .Interface,
+                bRequest: ControlMessages.getCapabilities.toByte(),
+                wValue: 0,
+                wIndex: activeInterface?.index,
+                data: Data(count: 24),
+                wLength: 24,
+                timeout: 10000)
+            let termCapability = [UInt8](capabilities.subdata(in: 5..<6))[0]
+            canUseTerminator = termCapability == 1
+        } catch {
+            // Ignore errors for now
+            canUseTerminator = false
+        }
     }
     
 }
