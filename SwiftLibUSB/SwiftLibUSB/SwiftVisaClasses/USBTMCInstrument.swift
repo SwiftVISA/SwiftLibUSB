@@ -88,10 +88,22 @@ extension USBTMCInstrument {
     }
 }
 extension USBTMCInstrument : MessageBasedInstrument {
+    /// Read from a device until the terminator is reached.
+    /// - Parameters:
+    ///    - terminator: The string to end reading at.
+    ///    - srtippingTerminator:If `true`, the terminator is stripped from the string before being returned, otherwise the string is returned with the terminator at the end.
+    ///   - encoding: The encoding used to encode the string.
+    ///   - chunkSize: The number of bytes to read into a buffer at a time.
+    /// - Returns: The data read from the device as a string.
     func read(until terminator: String, strippingTerminator: Bool, encoding: String.Encoding, chunkSize: Int) throws -> String {
         throw USBError.notSupported
     }
     
+    /// Read the given number of bytes from a device..
+    /// - Parameters:
+    ///    - length: The number of bytes to read.
+    ///   - chunkSize: The number of bytes to read into a buffer at a time.
+    /// - Returns: The data read from the device as bytes.
     func readBytes(length: Int, chunkSize: Int) throws -> Data {
         // Send read request to out endpoint
         let readBufferSize = 1024
@@ -121,10 +133,25 @@ extension USBTMCInstrument : MessageBasedInstrument {
         return data[12...]
     }
     
+    /// Reads bytes from a device until the terminator is reached.
+    /// - Parameters:
+    ///   - maxLength: The maximum number of bytes to read.
+    ///   - terminator: The byte sequence to end reading at.
+    ///   - strippingTerminator: If `true`, the terminator is stripped from the data before being returned, otherwise the data is returned with the terminator at the end.
+    ///   - chunkSize: The number of bytes to read into a buffer at a time.
+    /// - Throws: Error if the device could not be read from.
+    /// - Returns: The data read from the device as bytes.
     func readBytes(maxLength: Int?, until terminator: Data, strippingTerminator: Bool, chunkSize: Int) throws -> Data {
         throw USBError.notSupported
     }
     
+    /// Write data to the device as a string.
+    /// - Parameters:
+    ///   - string: The string to write to the device.
+    ///   - terminator: The terminator to add to the end of `string`.
+    ///   - encoding: The method to encode the string with.
+    /// - Throws: Error if the device could not be written to.
+    /// - Returns: The number of bytes that were written to the device.
     func write(_ string: String, appending terminator: String?, encoding: String.Encoding) throws -> Int {
         let message = string + (terminator ?? "")
         let messageData = message.data(using: encoding)
@@ -135,10 +162,16 @@ extension USBTMCInstrument : MessageBasedInstrument {
         return try writeBytes(messageData!, appending: nil)
     }
     
+    /// Write data to a device as bytes.
+    /// - Parameters:
+    ///   - bytes: The data to write to the device.
+    ///   - terminator: The sequence of bytes to append to the end of `bytes`.
+    /// - Returns: The number of bytes that were written to the device.
     func writeBytes(_ data: Data, appending terminator: Data?) throws -> Int {
         let messageData = data + (terminator ?? Data())
         let writeSize = 12 // TODO: Increase to a larger number
         
+        // Split the message if necessary
         var sliceNum = 0
         var lastMessage = false
         while(!lastMessage) {
