@@ -10,6 +10,7 @@
 		0162E1E52A29258E0006EE63 /* USBSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0162E1E42A29258E0006EE63 /* USBSession.swift */; };
 		0162E1E82A2926940006EE63 /* CoreSwiftVISA in Frameworks */ = {isa = PBXBuildFile; productRef = 0162E1E72A2926940006EE63 /* CoreSwiftVISA */; };
 		0162E1EA2A2932D40006EE63 /* USBInstrument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0162E1E92A2932D40006EE63 /* USBInstrument.swift */; };
+		0175428F2A3140A50000FCD5 /* Enumerable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0175428E2A3140A50000FCD5 /* Enumerable.swift */; };
 		024F52722A1FE9B700E93233 /* AltSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 024F52712A1FE9B700E93233 /* AltSetting.swift */; };
 		02A5A1DE2A2A78190000D947 /* USBTMCInstrument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02A5A1DD2A2A78190000D947 /* USBTMCInstrument.swift */; };
 		912860CD2A1D46E9001AB351 /* SwiftLibUSBApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 912860CC2A1D46E9001AB351 /* SwiftLibUSBApp.swift */; };
@@ -51,6 +52,7 @@
 /* Begin PBXFileReference section */
 		0162E1E42A29258E0006EE63 /* USBSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = USBSession.swift; sourceTree = "<group>"; };
 		0162E1E92A2932D40006EE63 /* USBInstrument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = USBInstrument.swift; sourceTree = "<group>"; };
+		0175428E2A3140A50000FCD5 /* Enumerable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enumerable.swift; sourceTree = "<group>"; };
 		024F52712A1FE9B700E93233 /* AltSetting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AltSetting.swift; sourceTree = "<group>"; };
 		02A5A1DD2A2A78190000D947 /* USBTMCInstrument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = USBTMCInstrument.swift; sourceTree = "<group>"; };
 		912860C92A1D46E9001AB351 /* SwiftLibUSB.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftLibUSB.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -198,6 +200,7 @@
 				91DE965F2A1FF85A006D2047 /* ClassCode.swift */,
 				91DE965D2A1FF2C8006D2047 /* Interface.swift */,
 				91DE965B2A1FECB8006D2047 /* Endpoint.swift */,
+				0175428E2A3140A50000FCD5 /* Enumerable.swift */,
 			);
 			path = Usb;
 			sourceTree = "<group>";
@@ -350,6 +353,7 @@
 				DEC604452A1FCC4D00ACE746 /* Configuration.swift in Sources */,
 				DEC6043F2A1E965B00ACE746 /* Device.swift in Sources */,
 				91DE96602A1FF85A006D2047 /* ClassCode.swift in Sources */,
+				0175428F2A3140A50000FCD5 /* Enumerable.swift in Sources */,
 				91DE965E2A1FF2C8006D2047 /* Interface.swift in Sources */,
 				024F52722A1FE9B700E93233 /* AltSetting.swift in Sources */,
 				912860CD2A1D46E9001AB351 /* SwiftLibUSBApp.swift in Sources */,

@@ -110,35 +110,3 @@ class Endpoint {
         return Data(innerData[..<Int(sent)])
     }
 }
-
-/// Describes the direction of data transfer on an endpoint.
-///
-/// `In` endpoints can only transfer data from the device to the program, while
-/// `Out` endpoints only transfer data from the program to the device.
-enum Direction {
-    case In
-    case Out
-    var val: UInt8 {
-        get {
-            switch self {
-            case .In:
-                return 1
-            case .Out:
-                return 0
-            }
-        }
-    }
-}
-
-/// Describes the type of data transfer an endpoint can send
-///
-/// `bulk` endpoints transfer individual blocks of data.
-/// `isochronous` endpoints transfer streams, such as audio or video, that need to be received quickly, but that can be dropped occasionally without problems.
-/// `interrupt` endpoints transfer incidental messages from the device
-/// `control` endpoints send status messages, such as the ones used to select an alternate setting. These are not exposed in an `AltSetting`
-enum TransferType {
-    case bulk
-    case isochronous
-    case interrupt
-    case control
-}

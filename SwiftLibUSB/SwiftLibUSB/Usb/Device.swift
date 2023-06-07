@@ -163,45 +163,4 @@ internal class DeviceRef {
     }
 }
 
-enum LibUSBControlType{
-    case Standard
-    case Class
-    case Vendor
-    case Reserved
-    var val: UInt8 {
-        get {
-            switch self {
-            case .Standard:
-                return 0
-            case .Class:
-                return 1
-            case .Vendor:
-                return 2
-            case .Reserved:
-                return 3
-            }
-        }
-    }
-}
-
-enum LibUSBRecipient{
-    case Device
-    case Interface
-    case Endpoint
-    case Other
-    var val: UInt8 {
-        get {
-            switch self {
-            case .Device:
-                return 0
-            case .Interface:
-                return 1
-            case .Endpoint:
-                return 2
-            case .Other:
-                return 3
-            }
-        }
-    }
-}
 
