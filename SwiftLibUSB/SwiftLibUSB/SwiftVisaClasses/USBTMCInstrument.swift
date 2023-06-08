@@ -41,6 +41,10 @@ class USBTMCInstrument : USBInstrument {
     }
 }
 extension USBTMCInstrument {
+    private static let HEADER_SIZE = 12
+    private static let TRANSFER_ATTRIBUTES_BYTE = 8
+    private static let END_OF_MESSAGE_BIT: UInt8 = 1
+    
     /// Message types defined by USBTMC specification, table 15
     private enum ControlMessages {
         case initiateAbortBulkOut
@@ -168,7 +172,6 @@ extension USBTMCInstrument {
                 message = makeHeader(read: true, bufferSize: chunkSize)
             }
             
-            // Add zeros to get basic behavior
             message += headerSuffix
             
             // Clear halt for the in endpoint
@@ -185,9 +188,10 @@ extension USBTMCInstrument {
             
             nextMessage()
             
-            endOfMessage = data[8] & 1 == 1
+            endOfMessage = data[Self.TRANSFER_ATTRIBUTES_BYTE] & Self.END_OF_MESSAGE_BIT != 0
             
-            readData += data[12...]
+            // Don't add the header to the data buffer
+            readData += data[Self.HEADER_SIZE...]
         }
         
         return readData
