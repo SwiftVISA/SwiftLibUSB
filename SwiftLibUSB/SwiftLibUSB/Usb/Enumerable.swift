@@ -36,7 +36,7 @@ enum Direction {
 enum TransferType {
     case bulk
     case isochronous
-    case ginterrupt
+    case interrupt
     case control
 }
 

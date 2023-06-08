@@ -174,27 +174,38 @@ extension USBTMCInstrument : MessageBasedInstrument {
     }
     
     func readBytes(length: Int, chunkSize: Int) throws -> Data {
-        // Send read request to out endpoint
-        var message : Data = makeHeader(read: true, bufferSize: chunkSize)
+        var readData = Data()
+        var endOfMessage = false
         
-        // Add zeros to get basic behavior
-        message.append(Data([0,0,0,0]))
+        // TODO: get max transfer size
         
-        // Clear halt for the in endpoint
-        inEndpoint.unsafelyUnwrapped.clearHalt()
+        while !endOfMessage {
+            // Send read request to out endpoint
+            var message : Data = makeHeader(read: true, bufferSize: min(chunkSize, length - readData.count))
+            
+            // Add zeros to get basic behavior
+            message.append(Data([0,0,0,0]))
+            
+            // Clear halt for the in endpoint
+            inEndpoint.unsafelyUnwrapped.clearHalt()
+            
+            // Send the request message to a bulk out endpoint
+            let num = try outEndpoint.unsafelyUnwrapped.sendBulkTransfer(data: &message)
+            print("Sent \(num) bytes")
+            print ("Sent request message")
+            
+            // Get the response message from a bulk in endpoint and print it
+            let data = try inEndpoint.unsafelyUnwrapped.receiveBulkTransfer()
+            print([UInt8](data))
+            
+            nextMessage()
+            
+            endOfMessage = data[8] & 1 == 1
+            
+            readData += data[12...]
+        }
         
-        // Send the request message to a bulk out endpoint
-        let num = try outEndpoint.unsafelyUnwrapped.sendBulkTransfer(data: &message)
-        print("Sent \(num) bytes")
-        print ("Sent request message")
-        
-        // Get the response message from a bulk in endpoint and print it
-        let data = try inEndpoint.unsafelyUnwrapped.receiveBulkTransfer()
-        print([UInt8](data))
-        
-        nextMessage()
-        
-        return data[12...]
+        return readData
     }
     
     func readBytes(maxLength: Int?, until terminator: Data, strippingTerminator: Bool, chunkSize: Int) throws -> Data {
