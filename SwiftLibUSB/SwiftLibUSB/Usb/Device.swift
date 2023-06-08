@@ -17,6 +17,11 @@ public class Device: Hashable {
     /// Each device has "configurations" which manage their operation.
     var configurations: [Configuration]
     
+    /// contruct a device from a context and a pointer to the device
+    /// - Parameters:
+    ///   - context: the associated context class
+    ///   - pointer: the pointer to the device
+    /// - Throws:  ``USBError`` if libsub returns an error
     init(context: ContextRef, pointer: OpaquePointer) throws {
         try device = DeviceRef(context: context, device: pointer)
         
@@ -75,7 +80,7 @@ public class Device: Hashable {
     
     /// Gets a human readable version of a device by indicating both the vendor and product id
     /// Together they form a primary key that can uniquely indentify the connected device
-    /// - Returns: A string in the format "Vendor: [vendorID] Product: [productID]"
+    /// - Returns: A ``String`` in the format "Vendor: [vendorID] Product: [productID]"
     var displayName: String {
         // If the index is 0 give the name as indicated
         if(descriptor.iProduct == 0){
@@ -96,6 +101,17 @@ public class Device: Hashable {
     }
     
     
+    ///Send a control transfer to a device
+    /// - Parameters:
+    ///   - requestType:
+    ///   - request:
+    ///   - value:
+    ///   - index:
+    ///   - data: the data of the control transfer
+    ///   - length: the length of the data to transfer
+    ///   - timeout: timeout (in milliseconds) that this function should wait before giving up due to no response being received. For an unlimited timeout, use value 0.
+    /// - Returns: the data sent back from the device
+    /// - Throws: a ``USBError`` if libusb encounters and internal error
     func sendControlTransfer(
         requestType: UInt8,
         request: UInt8,
@@ -115,6 +131,19 @@ public class Device: Hashable {
         return Data(charArrayData)
     }
     
+    ///
+    /// - Parameters:
+    ///   - direction:
+    ///   - type:
+    ///   - recipient:
+    ///   - request:
+    ///   - value:
+    ///   - index:
+    ///   - data:
+    ///   - length:
+    ///   - timeout: timeout (in milliseconds) that this function should wait before giving up due to no response being received. For an unlimited timeout, use value 0.
+    ///- Returns: the data sent back from the device
+    ///- Throws: a ``USBError`` if libusb encounters and internal error
     func sendControlTransfer(
         direction: Direction,
         type: LibUSBControlType,

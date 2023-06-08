@@ -11,7 +11,6 @@ import Foundation
 ///All libUSB calls exist in some "context". While many of these methods allow for using
 ///a null context, using a context is preferred. This class handles both the initialization and closing of contexts automatically.
 /// - Throws: USBError on initialization if libUSB cannot initialize the context
-
 public class Context {
     var context: ContextRef
     var devices: [Device]
