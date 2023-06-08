@@ -20,7 +20,7 @@ class USBSession {
     var vendorID: Int
     
     /// Stores the serial number, if defined. This must be specified if more than one device has the same vendor and product id
-    var SerialNumber: String?
+    var serialNumber: String?
     
     var usbContext: Context
     
@@ -36,12 +36,12 @@ class USBSession {
     ///   - productID: Help define which product this device is and is more specific than vendorID. Part of primary identifying key
     ///   - SerialNumber: This string value represents the "Serial number" of the device. If there are multiple of the same product attached this is used to identify the product.
     /// - Throws: USBInstrument.Error if there is an error initilising the session. USBError if libUSB encounted an error
-    init(vendorID: Int, productID: Int, SerialNumber: String?) throws {
+    init(vendorID: Int, productID: Int, serialNumber: String?) throws {
         self.vendorID = vendorID
         self.productID = productID
-        self.SerialNumber = SerialNumber
+        self.serialNumber = serialNumber
         try usbContext = Self.raw_connect()
-        try usbDevice = Self.raw_find_device(vendorID: vendorID, productID: productID, SerialNumber: SerialNumber, context: usbContext)
+        try usbDevice = Self.raw_find_device(vendorID: vendorID, productID: productID, SerialNumber: serialNumber, context: usbContext)
     }
 }
 

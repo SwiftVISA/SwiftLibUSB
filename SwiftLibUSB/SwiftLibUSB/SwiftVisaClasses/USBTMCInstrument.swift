@@ -27,11 +27,11 @@ class USBTMCInstrument : USBInstrument {
     ///    These can be found from the VISA identification string in the following format: `USB::<vendorID>::<productID>::<SerialNumber>::...`
     ///
     /// - Throws: an error if the device was not found, or if it doesn't support the USBTMC interface.
-    override init(vendorID: Int, productID: Int, SerialNumber: String?) throws {
+    override init(vendorID: Int, productID: Int, serialNumber: String?) throws {
         messageIndex = 1
         inEndpoint = nil
         outEndpoint = nil
-        try super.init(vendorID: vendorID, productID: productID, SerialNumber: SerialNumber)
+        try super.init(vendorID: vendorID, productID: productID, serialNumber: serialNumber)
         try findEndpoints()
     }
 }
