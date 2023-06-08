@@ -162,7 +162,7 @@ extension USBTMCInstrument {
             var message : Data
             
             // Send read request to out endpoint
-            if(length != nil){
+            if length != nil {
                 message = makeHeader(read: true, bufferSize: min(chunkSize, length! - readData.count))
             }else{
                 message = makeHeader(read: true, bufferSize: chunkSize)
@@ -197,7 +197,7 @@ extension USBTMCInstrument : MessageBasedInstrument {
     func read(until terminator: String, strippingTerminator: Bool, encoding: String.Encoding, chunkSize: Int) throws -> String {
         // Prepare the parameters
         var terminatorBytes : Data? = terminator.data(using:encoding)
-        if(terminatorBytes == nil){
+        if terminatorBytes == nil{
             throw Error.cannotEncode
         }
         
@@ -206,7 +206,7 @@ extension USBTMCInstrument : MessageBasedInstrument {
         
         // Encode the output as a string
         var outputString : String? = String(data: dataRead, encoding: encoding)
-        if(outputString == nil){
+        if outputString == nil{
             throw Error.cannotEncode
         }
         return outputString!
@@ -230,7 +230,7 @@ extension USBTMCInstrument : MessageBasedInstrument {
         
         var received: Data = try receiveUntilEndOfMessage(headerSuffix: message, length: maxLength, chunkSize: chunkSize)
         
-        if(strippingTerminator){
+        if strippingTerminator{
            return received.dropLast(1)
         }else{
             return received
