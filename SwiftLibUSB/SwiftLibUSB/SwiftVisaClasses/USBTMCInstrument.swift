@@ -211,9 +211,24 @@ extension USBTMCInstrument : MessageBasedInstrument {
     }
     
     func readBytes(maxLength: Int?, until terminator: Data, strippingTerminator: Bool, chunkSize: Int) throws -> Data {
-        throw USBError.notSupported
-        var message : Data = makeHeader(read: true, bufferSize: chunkSize)
+        //check if terminator is ok
+        if(!canUseTerminator) {throw Error.notSupported}
+        if(terminator.count != 1) { throw Error.invalidTerminator}
         
+        //create read message to inform device that we would like to read
+        var message : Data = makeHeader(read: true, bufferSize: chunkSize)
+        message.append(2) //enable terminating character
+        message.append(terminator)
+        
+        message.append(Data([0,0]))// bytes are reserved
+        
+        var received: Data = try readUntilEndOfMessage(message, maxLength, chunkSize)
+        
+        if(strippingTerminator){
+           return received.dropLast(1)
+        }else{
+            return received
+        }
     }
     
     func write(_ string: String, appending terminator: String?, encoding: String.Encoding) throws -> Int {
