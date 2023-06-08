@@ -8,7 +8,7 @@
 import Foundation
 
 
-/// Describes the direction of data transfer on an endpoint.
+/// Describes the direction of data transfer on an `Endpoint`.
 ///
 /// `In` endpoints can only transfer data from the device to the program, while
 /// `Out` endpoints only transfer data from the program to the device.
@@ -27,12 +27,12 @@ public enum Direction {
     }
 }
 
-/// Describes the type of data transfer an endpoint can send
+/// Describes the type of data transfer an `Endpoint` can send.
 ///
 /// `bulk` endpoints transfer individual blocks of data.
 /// `isochronous` endpoints transfer streams, such as audio or video, that need to be received quickly, but that can be dropped occasionally without problems.
-/// `interrupt` endpoints transfer incidental messages from the device
-/// `control` endpoints send status messages, such as the ones used to select an alternate setting. These are not exposed in an `AltSetting`
+/// `interrupt` endpoints transfer incidental messages from the device.
+/// `control` endpoints send status messages, such as the ones used to select an alternate setting. These are not exposed in an `AltSetting`.
 public enum TransferType {
     case bulk
     case isochronous
@@ -40,6 +40,12 @@ public enum TransferType {
     case control
 }
 
+/// Forms one part of a bmRequestType as part of a USB message.
+///
+/// `Standard` is for getting the basic information.
+/// `Class` is for the type of device.
+/// `Vendor` is for commands made by the vendor of the device.
+/// `Reserved` should never be used.
 public enum LibUSBControlType{
     case Standard
     case Class
@@ -61,6 +67,9 @@ public enum LibUSBControlType{
     }
 }
 
+/// Describes what is receiving the request.
+///
+/// A `Device`, `Interface`, `Endpoint`, or something else (`Other`) could be receiving the request.
 enum LibUSBRecipient{
     case Device
     case Interface

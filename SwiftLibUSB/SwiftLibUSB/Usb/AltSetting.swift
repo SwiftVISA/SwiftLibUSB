@@ -25,6 +25,7 @@ public class AltSetting : Hashable{
         lhs.setting.raw_device == rhs.setting.raw_device && lhs.index == rhs.index && lhs.interfaceIndex == rhs.interfaceIndex
     }
     
+    /// The name of the `AltSetting` to be displayed.
     var displayName: String {
         get {
             // If the index is 0 this is an unnamed alt setting
@@ -45,12 +46,14 @@ public class AltSetting : Hashable{
         }
     }
     
+    /// The number of this interface
     var interfaceIndex: Int {
         get {
             setting.interfaceNumber
         }
     }
     
+    /// The value used to select this alternate setting for this interface
     var index: Int {
         get {
             setting.index

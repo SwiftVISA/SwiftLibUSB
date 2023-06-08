@@ -64,6 +64,7 @@ public class Configuration: Hashable{
         }
     }
     
+    /// The name of the `Configuration` to be displayed.
     var displayName: String {
         get {
             // If the index is 0 this is an unnamed configuration

@@ -37,7 +37,7 @@ public class Interface : Hashable {
     /// The parent configuration should be made active before calling this, and this must be called before activating
     /// an alternate setting.
     ///
-    /// - throws: a USBError is claiming fails
+    /// - throws: a USBError if claiming fails
     /// * `.busy` if another program has claimed the interface
     /// * `.noDevice` if the device has been disconnected
     func claim() throws {
