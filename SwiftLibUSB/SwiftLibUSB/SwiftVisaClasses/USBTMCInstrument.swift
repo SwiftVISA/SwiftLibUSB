@@ -44,7 +44,7 @@ extension USBTMCInstrument {
             for interface in config.interfaces {
                 for altSetting in interface.altSettings {
                     var validEndpoint = endpointCheck(altSetting: altSetting)
-                    if(validEndpoint){
+                    if validEndpoint {
                         try setupEndpoints(config: config, interface: interface, altSetting: altSetting)
                         return
                     }
@@ -122,7 +122,7 @@ extension USBTMCInstrument : MessageBasedInstrument {
         // Send the request message to a bulk out endpoint
         let num = try outEndpoint.unsafelyUnwrapped.sendBulkTransfer(data: &message)
         print("Sent \(num) bytes")
-        print ("Sent request message")
+        print("Sent request message")
         
         // Get the response message from a bulk in endpoint and print it
         let data = try inEndpoint.unsafelyUnwrapped.receiveBulkTransfer()
@@ -156,7 +156,7 @@ extension USBTMCInstrument : MessageBasedInstrument {
         let message = string + (terminator ?? "")
         let messageData = message.data(using: encoding)
         
-        if(messageData == nil) {
+        if messageData == nil {
             throw Error.cannotEncode
         }
         return try writeBytes(messageData!, appending: nil)
@@ -174,12 +174,12 @@ extension USBTMCInstrument : MessageBasedInstrument {
         // Split the message if necessary
         var sliceNum = 0
         var lastMessage = false
-        while(!lastMessage) {
+        while !lastMessage {
             sliceNum += 1
             let lowerBound = (sliceNum - 1) * writeSize
             var upperBound = sliceNum * writeSize
             
-            if(upperBound >= messageData.count){
+            if upperBound >= messageData.count {
                 lastMessage = true
                 upperBound = messageData.count
             }
@@ -192,9 +192,9 @@ extension USBTMCInstrument : MessageBasedInstrument {
                 dataToSend.append(Data(Array(lengthBytes)))
             }
             // Part 3 of header: end of field
-            if(lastMessage){
+            if lastMessage {
                 dataToSend.append(1)
-            }else{
+            } else {
                 dataToSend.append(0)
             }
             // Part 4 of header: Three bytes of padding
