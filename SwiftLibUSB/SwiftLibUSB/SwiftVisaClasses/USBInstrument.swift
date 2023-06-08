@@ -70,7 +70,7 @@ extension USBInstrument.Error {
         case .cannotEncode:
             return "Could not encode given string with given encoding"
         case .couldNotFindEndpoint:
-            return "Could not find at least 1 required endpoint that satisfies requirements"
+            return "Could not find at least one required endpoint that satisfies requirements"
         case .invalidTerminator:
             return "Invalid terminator given"
         case .notSupported:

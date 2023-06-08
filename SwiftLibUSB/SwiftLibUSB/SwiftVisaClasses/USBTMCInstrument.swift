@@ -198,7 +198,7 @@ extension USBTMCInstrument : MessageBasedInstrument {
         // Prepare the parameters
         var terminatorBytes : Data? = terminator.data(using:encoding)
         if terminatorBytes == nil{
-            throw Error.cannotEncode
+            throw Error.invalidTerminator
         }
         
         // Make the call to readBytes
