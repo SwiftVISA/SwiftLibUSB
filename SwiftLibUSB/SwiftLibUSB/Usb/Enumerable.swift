@@ -12,7 +12,7 @@ import Foundation
 ///
 /// `In` endpoints can only transfer data from the device to the program, while
 /// `Out` endpoints only transfer data from the program to the device.
-enum Direction {
+public enum Direction {
     case In
     case Out
     var val: UInt8 {
@@ -33,15 +33,14 @@ enum Direction {
 /// `isochronous` endpoints transfer streams, such as audio or video, that need to be received quickly, but that can be dropped occasionally without problems.
 /// `interrupt` endpoints transfer incidental messages from the device
 /// `control` endpoints send status messages, such as the ones used to select an alternate setting. These are not exposed in an `AltSetting`
-enum TransferType {
+public enum TransferType {
     case bulk
     case isochronous
     case interrupt
     case control
 }
 
-
-enum LibUSBControlType{
+public enum LibUSBControlType{
     case Standard
     case Class
     case Vendor

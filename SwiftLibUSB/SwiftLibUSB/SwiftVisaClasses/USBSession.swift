@@ -90,11 +90,11 @@ extension USBSession {
 extension USBSession: Session {
     /// Closes the session. The instrument owning this session will no longer be able to read or write data.
     func close() throws {
-        throw USBError.notSupported
+        throw Error.notSupported
     }
     
     /// Tries to reestablish the session's connection.
     func reconnect(timeout: TimeInterval) throws {
-        throw USBError.notSupported
+        throw Error.notSupported
     }
 }
