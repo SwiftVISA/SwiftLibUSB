@@ -127,9 +127,9 @@ class Device: Hashable {
         timeout: UInt32
     ) throws -> Data {
         // Fill in bits of request Type
-        var requestType : UInt8 = Direction.In.val << 5
-        requestType += LibUSBControlType.Class.val << 7
-        requestType += LibUSBRecipient.Interface.val << 0
+        var requestType : UInt8 = direction.val << 5
+        requestType += type.val << 7
+        requestType += recipient.val << 0
         
         // Make the control transfer
         return try sendControlTransfer(requestType: requestType, request: request,
