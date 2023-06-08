@@ -11,7 +11,7 @@ import Foundation
 ///
 /// Before transferring data, you should activate the configuration, claim the interface, and activate the alternate setting
 /// that contain this endpoint.
-class Endpoint {
+public class Endpoint {
     var descriptor: UnsafePointer<libusb_endpoint_descriptor>
     var altSetting: AltSettingRef
     

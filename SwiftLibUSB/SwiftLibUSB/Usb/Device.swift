@@ -9,7 +9,7 @@ import Foundation
 
 /// Class representing an available USB device.
 /// Communicating with the device requires opening the device
-class Device: Hashable {
+public class Device: Hashable {
     /// The device as libUSB understands it. It is managed as a pointer
     var device: DeviceRef
     /// A C struct containing information about the device
@@ -34,7 +34,7 @@ class Device: Hashable {
         }
     }
     /// Compares devices by their internal pointer. Two device classes that point to the same libUSB device are considered the same
-    static func == (lhs: Device, rhs: Device) -> Bool {
+    public static func == (lhs: Device, rhs: Device) -> Bool {
         lhs.device.raw_device == rhs.device.raw_device
     }
     
@@ -138,7 +138,7 @@ class Device: Hashable {
     }
     
     /// A hash representation of the device
-    func hash(into hasher: inout Hasher) {
+    public func hash(into hasher: inout Hasher) {
         device.raw_device.hash(into: &hasher)
     }
 }

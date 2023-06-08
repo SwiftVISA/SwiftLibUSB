@@ -13,7 +13,7 @@ import Foundation
 ///
 /// Lab equipment commonly implements the *Test and Measurement Class* interface, which is identified by the `.application` class
 /// and subclass `3`.
-enum ClassCode {
+public enum ClassCode {
     case perInterface
     case audio
     case communications
@@ -36,7 +36,7 @@ enum ClassCode {
     case other
 }
 
-extension ClassCode {
+public extension ClassCode {
     static func from(code: UInt32) -> Self {
         switch libusb_class_code(code) {
         case LIBUSB_CLASS_PER_INTERFACE: return .perInterface

@@ -9,7 +9,7 @@ import Foundation
 
 /// Each device has at least 1 configuration, often more. libUSB keeps track of these with libusb config descriptors.
 /// Each instance manages 1 of these descriptors, inclduing managing the getting and freeing of this descriptor
-class Configuration: Hashable{
+public class Configuration: Hashable{
     var interfaces : [Interface]
     var config: ConfigurationRef
     
@@ -86,7 +86,7 @@ class Configuration: Hashable{
     }
     
     /// Compares configuration by their internal pointer. Two configurations classes that point to the same libUSB config descriptor are considered the same
-    static func == (lhs: Configuration, rhs: Configuration) -> Bool {
+    public static func == (lhs: Configuration, rhs: Configuration) -> Bool {
         lhs.config.descriptor == rhs.config.descriptor
     }
     
@@ -105,7 +105,7 @@ class Configuration: Hashable{
     }
     
     /// A hash representation of the configuration
-    func hash(into hasher: inout Hasher) {
+    public func hash(into hasher: inout Hasher) {
         config.descriptor.hash(into: &hasher)
     }
 }

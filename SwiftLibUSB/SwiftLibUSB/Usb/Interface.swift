@@ -10,8 +10,8 @@ import Foundation
 /// A group of endpoints
 ///
 /// An `AltSetting` determines what functions these endpoints have.
-class Interface : Hashable {
-    static func == (lhs: Interface, rhs: Interface) -> Bool {
+public class Interface : Hashable {
+    public static func == (lhs: Interface, rhs: Interface) -> Bool {
         return lhs.interface.raw_device == rhs.interface.raw_device && lhs.interface.index == rhs.interface.index
     }
     
@@ -45,7 +45,7 @@ class Interface : Hashable {
     }
     
     /// A hash representation of the interface
-    func hash(into hasher: inout Hasher) {
+    public func hash(into hasher: inout Hasher) {
         interface.raw_device.hash(into: &hasher)
         interface.index.hash(into: &hasher)
     }
