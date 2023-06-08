@@ -29,13 +29,13 @@ class USBTMCInstrument : USBInstrument {
     ///    These can be found from the VISA identification string in the following format: `USB::<vendorID>::<productID>::<SerialNumber>::...`
     ///
     /// - Throws: an error if the device was not found, or if it doesn't support the USBTMC interface.
-    override init(vendorID: Int, productID: Int, SerialNumber: String?) throws {
+    override init(vendorID: Int, productID: Int, serialNumber SerialNumber: String?) throws {
         messageIndex = 1
         inEndpoint = nil
         outEndpoint = nil
         activeInterface = nil
         canUseTerminator = false
-        try super.init(vendorID: vendorID, productID: productID, SerialNumber: SerialNumber)
+        try super.init(vendorID: vendorID, productID: productID, serialNumber: SerialNumber)
         try findEndpoints()
         getCapabilities()
     }
@@ -164,7 +164,7 @@ extension USBTMCInstrument {
             // Send read request to out endpoint
             if length != nil {
                 message = makeHeader(read: true, bufferSize: min(chunkSize, length! - readData.count))
-            }else{
+            } else {
                 message = makeHeader(read: true, bufferSize: chunkSize)
             }
             
@@ -172,12 +172,12 @@ extension USBTMCInstrument {
             message += headerSuffix
             
             // Clear halt for the in endpoint
-            inEndpoint.unsafelyUnwrapped.clearHalt()
+            inEndpoint!.clearHalt()
             
             // Send the request message to a bulk out endpoint
-            let num = try outEndpoint.unsafelyUnwrapped.sendBulkTransfer(data: &message)
+            let num = try outEndpoint!.sendBulkTransfer(data: &message)
             print("Sent \(num) bytes")
-            print ("Sent request message")
+            print("Sent request message")
             
             // Get the response message from a bulk in endpoint and print it
             let data = try inEndpoint.unsafelyUnwrapped.receiveBulkTransfer()
@@ -218,8 +218,8 @@ extension USBTMCInstrument : MessageBasedInstrument {
     
     func readBytes(maxLength: Int?, until terminator: Data, strippingTerminator: Bool, chunkSize: Int) throws -> Data {
         //check if terminator is ok
-        if(!canUseTerminator) {throw Error.notSupported}
-        if(terminator.count != 1) { throw Error.invalidTerminator}
+        if !canUseTerminator {throw Error.notSupported}
+        if terminator.count != 1 { throw Error.invalidTerminator}
         
         //create read message to inform device that we would like to read
         var message : Data = makeHeader(read: true, bufferSize: chunkSize)
@@ -232,7 +232,7 @@ extension USBTMCInstrument : MessageBasedInstrument {
         
         if strippingTerminator{
            return received.dropLast(1)
-        }else{
+        } else {
             return received
         }
     }
@@ -241,7 +241,7 @@ extension USBTMCInstrument : MessageBasedInstrument {
         let message = string + (terminator ?? "")
         let messageData = message.data(using: encoding)
         
-        if(messageData == nil) {
+        if messageData == nil {
             throw Error.cannotEncode
         }
         return try writeBytes(messageData!, appending: nil)

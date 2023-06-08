@@ -97,8 +97,9 @@ class Endpoint {
     func receiveBulkTransfer(length: Int32 = 1024) throws -> Data {
         //clearHalt()
         var sent: Int32 = 0;
-        var innerData = [UInt8](repeating: 0, count: 1024)
-        let error = libusb_bulk_transfer(altSetting.raw_handle, descriptor.pointee.bEndpointAddress, &innerData, length, &sent, 1000)
+        var innerData = [UInt8](repeating: 0, count: Int(length))
+        let error = libusb_bulk_transfer(altSetting.raw_handle, descriptor.pointee.bEndpointAddress,
+                                         &innerData, length, &sent, 1000)
         print("Amount sent: \(sent), with error \(error) \(USBError.from(code: error))")
         if error < 0 {
             throw USBError.from(code: error)

@@ -106,8 +106,10 @@ class Device: Hashable {
         timeout: UInt32
     ) throws -> Data {
         var charArrayData = [UInt8](data)
-        let returnVal = libusb_control_transfer(device.raw_handle,bmRequestTypeL,bRequest,wValue,wIndex,&charArrayData,wLength,timeout)
-        if(returnVal < 0){
+        let returnVal = libusb_control_transfer(device.raw_handle,
+                                                bmRequestTypeL,bRequest,wValue,wIndex,
+                                                &charArrayData,wLength,timeout)
+        if returnVal < 0 {
             throw USBError.from(code: returnVal)
         }
         return Data(charArrayData)
@@ -125,12 +127,14 @@ class Device: Hashable {
         timeout: UInt32
     ) throws -> Data {
         // Fill in bits of request Type
-        var requestType : UInt8 = (Direction.In.val << 5)
-        requestType += (LibUSBControlType.Class.val << 7)
-        requestType += (LibUSBRecipient.Interface.val << 0)
+        var requestType : UInt8 = Direction.In.val << 5
+        requestType += LibUSBControlType.Class.val << 7
+        requestType += LibUSBRecipient.Interface.val << 0
         
         // Make the control transfer
-        return try sendControlTransfer(bmRequestTypeL: requestType, bRequest: bRequest, wValue: wValue, wIndex: wIndex, data: data, wLength: wLength, timeout: timeout)
+        return try sendControlTransfer(bmRequestTypeL: requestType, bRequest: bRequest,
+                                       wValue: wValue, wIndex: wIndex, data: data, wLength: wLength,
+                                       timeout: timeout)
     }
     
     /// A hash representation of the device
