@@ -221,13 +221,6 @@ extension USBTMCInstrument : MessageBasedInstrument {
         if !canUseTerminator { throw Error.notSupported }
         if terminator.count != 1 { throw Error.invalidTerminator }
         
-        //create read message to inform device that we would like to read
-        var message : Data = makeHeader(read: true, bufferSize: chunkSize)
-        message.append(2) //enable terminating character
-        message.append(terminator)
-        
-        message.append(Data([0,0]))// bytes are reserved
-        
         var received: Data = try receiveUntilEndOfMessage(headerSuffix: Data([2, terminator[0], 0, 0]),
                                                           length: maxLength, chunkSize: chunkSize)
         
