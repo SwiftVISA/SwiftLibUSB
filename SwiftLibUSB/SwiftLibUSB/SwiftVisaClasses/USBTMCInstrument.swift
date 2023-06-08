@@ -16,6 +16,8 @@ class USBTMCInstrument : USBInstrument {
     var messageIndex: UInt8
     var inEndpoint: Endpoint?
     var outEndpoint: Endpoint?
+    var activeInterface: AltSetting?
+    var canUseTerminator: Bool
     
     /// Attempts to connect to a USB device with the given identification.
     ///
@@ -31,11 +33,42 @@ class USBTMCInstrument : USBInstrument {
         messageIndex = 1
         inEndpoint = nil
         outEndpoint = nil
+        activeInterface = nil
+        canUseTerminator = false
         try super.init(vendorID: vendorID, productID: productID, serialNumber: serialNumber)
         try findEndpoints()
+        getCapabilities()
     }
 }
 extension USBTMCInstrument {
+    private static let HEADER_SIZE = 12
+    private static let TRANSFER_ATTRIBUTES_BYTE = 8
+    private static let END_OF_MESSAGE_BIT: UInt8 = 1
+    
+    /// Message types defined by USBTMC specification, table 15
+    private enum ControlMessages {
+        case initiateAbortBulkOut
+        case checkAbortBulkOutStatus
+        case initiateAbortBulkIn
+        case checkAbortBulkInStatus
+        case initiateClear
+        case checkClearStatus
+        case getCapabilities
+        case indicatorPulse
+        
+        func toByte() -> UInt8 {
+            switch self {
+            case .initiateAbortBulkOut: return 1
+            case .checkAbortBulkOutStatus: return 2
+            case .initiateAbortBulkIn: return 3
+            case .checkAbortBulkInStatus: return 4
+            case .initiateClear: return 5
+            case .checkClearStatus: return 6
+            case .getCapabilities: return 7
+            case .indicatorPulse: return 64 // This is correct; there is a very large gap here
+            }
+        }
+    }
     /// Looks through the available configurations and interfaces for an AltSetting that supports USBTMC
     private func findEndpoints() throws {
         let device = self._session.usbDevice
@@ -67,7 +100,7 @@ extension USBTMCInstrument {
         try config.setActive()
         try interface.claim()
         try altSetting.setActive()
-        
+        activeInterface = altSetting
         inEndpoint = try getEndpoint(endpoints: altSetting.endpoints,direction: Direction.In)
         outEndpoint = try getEndpoint(endpoints: altSetting.endpoints,direction: Direction.Out)
     }
@@ -86,51 +119,105 @@ extension USBTMCInstrument {
     private func nextMessage() {
         messageIndex = (messageIndex % 255) + 1
     }
-}
-extension USBTMCInstrument : MessageBasedInstrument {
-    /// Read from a device until the terminator is reached.
-    /// - Parameters:
-    ///    - terminator: The string to end reading at.
-    ///    - srtippingTerminator:If `true`, the terminator is stripped from the string before being returned, otherwise the string is returned with the terminator at the end.
-    ///   - encoding: The encoding used to encode the string.
-    ///   - chunkSize: The number of bytes to read into a buffer at a time.
-    /// - Returns: The data read from the device as a string.
-    func read(until terminator: String, strippingTerminator: Bool, encoding: String.Encoding, chunkSize: Int) throws -> String {
-        throw USBError.notSupported
-    }
     
-    /// Read the given number of bytes from a device..
-    /// - Parameters:
-    ///    - length: The number of bytes to read.
-    ///   - chunkSize: The number of bytes to read into a buffer at a time.
-    /// - Returns: The data read from the device as bytes.
-    func readBytes(length: Int, chunkSize: Int) throws -> Data {
-        // Send read request to out endpoint
-        let readBufferSize = 1024
-        // Part 1 of header: Read In (constant 2), message index, inverse of message index, padding
-        var message = Data([2, messageIndex, 255-messageIndex, 0])
+    private func makeHeader(read: Bool = false, bufferSize: Int = 1028) -> Data {
+        // Part 1 of header: message type, message index, inverse of message index, padding
+        var firstByte : UInt8 = read ? 2 : 1 // Reads are type 2, writes are type 1
+        var message = Data([firstByte, messageIndex, 255-messageIndex, 0])
+
         // Part 2 of header: Little Endian length of the buffer
-        withUnsafeBytes(of: Int32(readBufferSize).littleEndian) { lengthBytes in
+        withUnsafeBytes(of: Int32(bufferSize).littleEndian) { lengthBytes in
             message.append(Data(Array(lengthBytes)))
         }
-        // Part 3 of header: Bit to indicate presence of terminator byte, Optional terminator byte (not used here), two bytes of padding
-        message.append(Data([0,0,0,0]))
+        return message
+    }
+    
+    /// Get the capabilities of the device.
+    ///
+    /// Available capabilities include whether the device supports sending data, receiving data, pulsing, or using a terminator character on reads
+    private func getCapabilities(){
+        do {
+            // These arguments are defined by the USBTMC specification, table 36
+            let capabilities: Data = try _session.usbDevice.sendControlTransfer(
+                direction: .In,
+                type: .Class,
+                recipient: .Interface,
+                request: ControlMessages.getCapabilities.toByte(),
+                value: 0,
+                index: UInt16(activeInterface?.index ?? 0),
+                data: Data(count: 24),
+                length: 24,
+                timeout: 10000
+            )
+            let termCapability = [UInt8](capabilities.subdata(in: 5..<6))[0]
+            canUseTerminator = termCapability == 1
+        } catch {
+            // Ignore errors for now
+            canUseTerminator = false
+        }
+    }
+    
+    func receiveUntilEndOfMessage(headerSuffix: Data, length: Int?, chunkSize: Int) throws -> Data {
+        var readData = Data()
+        var endOfMessage = false
         
-        // Clear halt for the in endpoint
-        inEndpoint.unsafelyUnwrapped.clearHalt()
+        // TODO: get max transfer size
         
-        // Send the request message to a bulk out endpoint
-        let num = try outEndpoint.unsafelyUnwrapped.sendBulkTransfer(data: &message)
-        print("Sent \(num) bytes")
-        print("Sent request message")
+        while !endOfMessage {
+            var message : Data
+            
+            // Send read request to out endpoint
+            if length != nil {
+                message = makeHeader(read: true, bufferSize: min(chunkSize, length! - readData.count))
+            } else {
+                message = makeHeader(read: true, bufferSize: chunkSize)
+            }
+            
+            message += headerSuffix
+            
+            // Clear halt for the in endpoint
+            inEndpoint!.clearHalt()
+            
+            // Send the request message to a bulk out endpoint
+            let num = try outEndpoint!.sendBulkTransfer(data: &message)
+            print("Sent \(num) bytes")
+            print("Sent request message")
+            
+            // Get the response message from a bulk in endpoint and print it
+            let data = try inEndpoint.unsafelyUnwrapped.receiveBulkTransfer()
+            print([UInt8](data))
+            
+            nextMessage()
+            
+            endOfMessage = data[Self.TRANSFER_ATTRIBUTES_BYTE] & Self.END_OF_MESSAGE_BIT != 0
+            
+            // Don't add the header to the data buffer
+            readData += data[Self.HEADER_SIZE...]
+        }
         
-        // Get the response message from a bulk in endpoint and print it
-        let data = try inEndpoint.unsafelyUnwrapped.receiveBulkTransfer()
-        print([UInt8](data))
+        return readData
+    }
+}
+extension USBTMCInstrument : MessageBasedInstrument {
+    func read(until terminator: String, strippingTerminator: Bool, encoding: String.Encoding, chunkSize: Int) throws -> String {
+        // Prepare the parameters
+        guard let terminatorBytes = terminator.data(using:encoding) else {
+            throw Error.invalidTerminator
+        }
         
-        nextMessage()
+        // Make the call to readBytes
+        var dataRead = try readBytes(maxLength: nil, until: terminatorBytes, strippingTerminator: strippingTerminator, chunkSize: chunkSize)
         
-        return data[12...]
+        // Encode the output as a string
+        var outputString : String? = String(data: dataRead, encoding: encoding)
+        if outputString == nil{
+            throw Error.cannotEncode
+        }
+        return outputString!
+    }
+    
+    func readBytes(length: Int, chunkSize: Int) throws -> Data {
+        return try receiveUntilEndOfMessage(headerSuffix: Data([0, 0, 0, 0]), length: length, chunkSize: chunkSize)
     }
     
     /// Reads bytes from a device until the terminator is reached.
@@ -142,7 +229,18 @@ extension USBTMCInstrument : MessageBasedInstrument {
     /// - Throws: Error if the device could not be read from.
     /// - Returns: The data read from the device as bytes.
     func readBytes(maxLength: Int?, until terminator: Data, strippingTerminator: Bool, chunkSize: Int) throws -> Data {
-        throw USBError.notSupported
+        //check if terminator is ok
+        if !canUseTerminator { throw Error.notSupported }
+        if terminator.count != 1 { throw Error.invalidTerminator }
+        
+        var received: Data = try receiveUntilEndOfMessage(headerSuffix: Data([2, terminator[0], 0, 0]),
+                                                          length: maxLength, chunkSize: chunkSize)
+        
+        if strippingTerminator {
+           return received.dropLast(1)
+        } else {
+            return received
+        }
     }
     
     /// Write data to the device as a string.

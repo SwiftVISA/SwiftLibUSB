@@ -22,6 +22,12 @@ final class SwiftLibUSBTests: XCTestCase {
     func testLargeCommand() throws {
         try instrument?.write(":SOURCE:VOLTAGE MINIMUM; :SOURCE:CURRENT MINIMUM", appending: "\n", encoding: .ascii)
     }
+    
+    func testRawResponse() throws {
+        try instrument?.write("VOLT 1;VOLT?")
+        let response = try instrument!.readBytes(length: 1024, chunkSize: 16)
+        XCTAssert(response == "+1.000000E+00 \n".data(using: .utf8))
+    }
 
     func testPerformanceExample() throws {
         // This is an example of a performance test case.

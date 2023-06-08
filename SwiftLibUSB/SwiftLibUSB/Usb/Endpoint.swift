@@ -94,12 +94,12 @@ class Endpoint {
     /// * `.busy` if libUSB is currently handling events (if you call this from an asynchronous transfer callback, for example)
     /// * `.invalidParam` if the transfer size is larger than the OS or device support
     /// * `.overflow` if more data was sent than was requested
-    func receiveBulkTransfer() throws -> Data {
+    func receiveBulkTransfer(length: Int32 = 1024) throws -> Data {
         //clearHalt()
         var sent: Int32 = 0;
-        var innerData = [UInt8](repeating: 0, count: 1024)
-        let length: Int32 = 1024
-        let error = libusb_bulk_transfer(altSetting.raw_handle, descriptor.pointee.bEndpointAddress, &innerData, length, &sent, 1000)
+        var innerData = [UInt8](repeating: 0, count: Int(length))
+        let error = libusb_bulk_transfer(altSetting.raw_handle, descriptor.pointee.bEndpointAddress,
+                                         &innerData, length, &sent, 1000)
         print("Amount sent: \(sent), with error \(error) \(USBError.from(code: error))")
         if error < 0 {
             throw USBError.from(code: error)
@@ -109,26 +109,4 @@ class Endpoint {
         }
         return Data(innerData[..<Int(sent)])
     }
-}
-
-/// Describes the direction of data transfer on an endpoint.
-///
-/// `In` endpoints can only transfer data from the device to the program, while
-/// `Out` endpoints only transfer data from the program to the device.
-enum Direction {
-    case In
-    case Out
-}
-
-/// Describes the type of data transfer an endpoint can send
-///
-/// `bulk` endpoints transfer individual blocks of data.
-/// `isochronous` endpoints transfer streams, such as audio or video, that need to be received quickly, but that can be dropped occasionally without problems.
-/// `interrupt` endpoints transfer incidental messages from the device
-/// `control` endpoints send status messages, such as the ones used to select an alternate setting. These are not exposed in an `AltSetting`
-enum TransferType {
-    case bulk
-    case isochronous
-    case interrupt
-    case control
 }

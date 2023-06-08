@@ -20,7 +20,6 @@ class Interface : Hashable {
     
     init(config: ConfigurationRef, index: Int) {
         interface = InterfaceRef(config: config, index: Int32(index))
-        
         altSettings = []
         for i in 0..<Int(interface.numAltsetting) {
             altSettings.append(AltSetting(interface: interface, index: i))

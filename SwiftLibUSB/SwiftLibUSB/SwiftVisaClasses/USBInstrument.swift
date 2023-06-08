@@ -24,6 +24,9 @@ extension USBInstrument {
     /// An error associated with a  USB Instrument.
     /// 
     public enum Error: Swift.Error {
+        //unknown error occured resulting in failed operation
+        case operationFailed
+        
         /// Could not find a device with the specified vendorID and productID and Serial Number(If not null).
         case couldNotFind
         
@@ -42,12 +45,20 @@ extension USBInstrument {
         /// When looking for USB endpoints to send messages through, no alternative setting could be found that has compliant endpoints
         /// Or an altsetting claims to have endpoints it doesn't have
         case couldNotFindEndpoint
+        
+        ///The terminator given could not be accepted by the device
+        case invalidTerminator
+        
+        //The requested operation is not supported by the device
+        case notSupported
     }
 }
 
 extension USBInstrument.Error {
     public var localizedDescription: String {
         switch self {
+        case .operationFailed:
+            return "An unknown error occured causing the operation to fail"
         case .couldNotFind:
             return "Could not find device with given IDs"
         case .identificationNotUnique:
@@ -59,7 +70,11 @@ extension USBInstrument.Error {
         case .cannotEncode:
             return "Could not encode given string with given encoding"
         case .couldNotFindEndpoint:
-            return "Could not find at least 1 required endpoint that satisfies requirements"
+            return "Could not find at least one required endpoint that satisfies requirements"
+        case .invalidTerminator:
+            return "Invalid terminator given"
+        case .notSupported:
+            return "The device does not support this operation"
         }
     }
 }

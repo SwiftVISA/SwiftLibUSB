@@ -94,7 +94,49 @@ class Device: Hashable {
         
         return String(bytes: buffer, encoding: .ascii) ?? "Vendor: \(vendorId) Product: \(productId)"
     }
-
+    
+    
+    func sendControlTransfer(
+        requestType: UInt8,
+        request: UInt8,
+        value: UInt16,
+        index: UInt16,
+        data: Data,
+        length: UInt16,
+        timeout: UInt32
+    ) throws -> Data {
+        var charArrayData = [UInt8](data)
+        let returnVal = libusb_control_transfer(device.raw_handle,
+                                                requestType,request,value,index,
+                                                &charArrayData,length,timeout)
+        if returnVal < 0 {
+            throw USBError.from(code: returnVal)
+        }
+        return Data(charArrayData)
+    }
+    
+    func sendControlTransfer(
+        direction: Direction,
+        type: LibUSBControlType,
+        recipient: LibUSBRecipient,
+        request: UInt8,
+        value: UInt16,
+        index: UInt16,
+        data: Data,
+        length: UInt16,
+        timeout: UInt32
+    ) throws -> Data {
+        // Fill in bits of request Type
+        var requestType : UInt8 = direction.val << 5
+        requestType += type.val << 7
+        requestType += recipient.val << 0
+        
+        // Make the control transfer
+        return try sendControlTransfer(requestType: requestType, request: request,
+                                       value: value, index: index, data: data, length: length,
+                                       timeout: timeout)
+    }
+    
     /// A hash representation of the device
     func hash(into hasher: inout Hasher) {
         device.raw_device.hash(into: &hasher)
@@ -124,3 +166,5 @@ internal class DeviceRef {
         libusb_close(raw_handle)
     }
 }
+
+
