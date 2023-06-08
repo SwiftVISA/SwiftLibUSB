@@ -97,18 +97,18 @@ class Device: Hashable {
     
     
     func sendControlTransfer(
-        bmRequestTypeL: UInt8,
-        bRequest: UInt8,
-        wValue: UInt16,
-        wIndex: UInt16,
+        requestType: UInt8,
+        request: UInt8,
+        value: UInt16,
+        index: UInt16,
         data: Data,
-        wLength: UInt16,
+        length: UInt16,
         timeout: UInt32
     ) throws -> Data {
         var charArrayData = [UInt8](data)
         let returnVal = libusb_control_transfer(device.raw_handle,
-                                                bmRequestTypeL,bRequest,wValue,wIndex,
-                                                &charArrayData,wLength,timeout)
+                                                requestType,request,value,index,
+                                                &charArrayData,length,timeout)
         if returnVal < 0 {
             throw USBError.from(code: returnVal)
         }
@@ -119,11 +119,11 @@ class Device: Hashable {
         direction: Direction,
         type: LibUSBControlType,
         recipeint: LibUSBRecipient,
-        bRequest: UInt8,
-        wValue: UInt16,
-        wIndex: UInt16,
+        request: UInt8,
+        value: UInt16,
+        index: UInt16,
         data: Data,
-        wLength: UInt16,
+        length: UInt16,
         timeout: UInt32
     ) throws -> Data {
         // Fill in bits of request Type
@@ -132,8 +132,8 @@ class Device: Hashable {
         requestType += LibUSBRecipient.Interface.val << 0
         
         // Make the control transfer
-        return try sendControlTransfer(bmRequestTypeL: requestType, bRequest: bRequest,
-                                       wValue: wValue, wIndex: wIndex, data: data, wLength: wLength,
+        return try sendControlTransfer(requestType: requestType, request: request,
+                                       value: value, index: index, data: data, length: length,
                                        timeout: timeout)
     }
     
