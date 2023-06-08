@@ -94,11 +94,10 @@ class Endpoint {
     /// * `.busy` if libUSB is currently handling events (if you call this from an asynchronous transfer callback, for example)
     /// * `.invalidParam` if the transfer size is larger than the OS or device support
     /// * `.overflow` if more data was sent than was requested
-    func receiveBulkTransfer() throws -> Data {
+    func receiveBulkTransfer(length: Int32 = 1024) throws -> Data {
         //clearHalt()
         var sent: Int32 = 0;
         var innerData = [UInt8](repeating: 0, count: 1024)
-        let length: Int32 = 1024
         let error = libusb_bulk_transfer(altSetting.raw_handle, descriptor.pointee.bEndpointAddress, &innerData, length, &sent, 1000)
         print("Amount sent: \(sent), with error \(error) \(USBError.from(code: error))")
         if error < 0 {
