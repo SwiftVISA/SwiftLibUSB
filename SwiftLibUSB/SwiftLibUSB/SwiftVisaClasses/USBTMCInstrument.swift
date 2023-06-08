@@ -136,7 +136,7 @@ extension USBTMCInstrument {
             let capabilities: Data = try _session.usbDevice.sendControlTransfer(
                 direction: .In,
                 type: .Class,
-                recipeint: .Interface,
+                recipient: .Interface,
                 request: ControlMessages.getCapabilities.toByte(),
                 value: 0,
                 index: UInt16(activeInterface?.index ?? 0),

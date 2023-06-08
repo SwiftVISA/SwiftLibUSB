@@ -118,7 +118,7 @@ class Device: Hashable {
     func sendControlTransfer(
         direction: Direction,
         type: LibUSBControlType,
-        recipeint: LibUSBRecipient,
+        recipient: LibUSBRecipient,
         request: UInt8,
         value: UInt16,
         index: UInt16,
