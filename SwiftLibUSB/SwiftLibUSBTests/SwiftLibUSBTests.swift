@@ -12,10 +12,10 @@ final class SwiftLibUSBTests: XCTestCase {
     var instrument: USBTMCInstrument?
 
     override func setUpWithError() throws {
-        try instrument = USBTMCInstrument(vendorID: 10893, productID: 5634, SerialNumber: nil)
+        try instrument = USBTMCInstrument(vendorID: 10893, productID: 5634, serialNumber: nil)
     }
 
-    override func tearDownWithError() throws {
+    override func tearDown() {
         instrument = nil
     }
 

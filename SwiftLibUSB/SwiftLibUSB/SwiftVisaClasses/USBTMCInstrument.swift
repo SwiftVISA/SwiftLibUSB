@@ -29,13 +29,13 @@ class USBTMCInstrument : USBInstrument {
     ///    These can be found from the VISA identification string in the following format: `USB::<vendorID>::<productID>::<SerialNumber>::...`
     ///
     /// - Throws: an error if the device was not found, or if it doesn't support the USBTMC interface.
-    override init(vendorID: Int, productID: Int, SerialNumber: String?) throws {
+    override init(vendorID: Int, productID: Int, serialNumber: String?) throws {
         messageIndex = 1
         inEndpoint = nil
         outEndpoint = nil
         activeInterface = nil
         canUseTerminator = false
-        try super.init(vendorID: vendorID, productID: productID, SerialNumber: SerialNumber)
+        try super.init(vendorID: vendorID, productID: productID, serialNumber: serialNumber)
         try findEndpoints()
         getCapabilities()
     }
@@ -124,6 +124,7 @@ extension USBTMCInstrument {
         // Part 1 of header: message type, message index, inverse of message index, padding
         var firstByte : UInt8 = read ? 2 : 1 // Reads are type 2, writes are type 1
         var message = Data([firstByte, messageIndex, 255-messageIndex, 0])
+
         // Part 2 of header: Little Endian length of the buffer
         withUnsafeBytes(of: Int32(bufferSize).littleEndian) { lengthBytes in
             message.append(Data(Array(lengthBytes)))
@@ -219,6 +220,14 @@ extension USBTMCInstrument : MessageBasedInstrument {
         return try receiveUntilEndOfMessage(headerSuffix: Data([0, 0, 0, 0]), length: length, chunkSize: chunkSize)
     }
     
+    /// Reads bytes from a device until the terminator is reached.
+    /// - Parameters:
+    ///   - maxLength: The maximum number of bytes to read.
+    ///   - terminator: The byte sequence to end reading at.
+    ///   - strippingTerminator: If `true`, the terminator is stripped from the data before being returned, otherwise the data is returned with the terminator at the end.
+    ///   - chunkSize: The number of bytes to read into a buffer at a time.
+    /// - Throws: Error if the device could not be read from.
+    /// - Returns: The data read from the device as bytes.
     func readBytes(maxLength: Int?, until terminator: Data, strippingTerminator: Bool, chunkSize: Int) throws -> Data {
         //check if terminator is ok
         if !canUseTerminator { throw Error.notSupported }
@@ -234,6 +243,13 @@ extension USBTMCInstrument : MessageBasedInstrument {
         }
     }
     
+    /// Write data to the device as a string.
+    /// - Parameters:
+    ///   - string: The string to write to the device.
+    ///   - terminator: The terminator to add to the end of `string`.
+    ///   - encoding: The method to encode the string with.
+    /// - Throws: Error if the device could not be written to.
+    /// - Returns: The number of bytes that were written to the device.
     func write(_ string: String, appending terminator: String?, encoding: String.Encoding) throws -> Int {
         let message = string + (terminator ?? "")
         let messageData = message.data(using: encoding)
@@ -244,10 +260,16 @@ extension USBTMCInstrument : MessageBasedInstrument {
         return try writeBytes(messageData!, appending: nil)
     }
     
+    /// Write data to a device as bytes.
+    /// - Parameters:
+    ///   - bytes: The data to write to the device.
+    ///   - terminator: The sequence of bytes to append to the end of `bytes`.
+    /// - Returns: The number of bytes that were written to the device.
     func writeBytes(_ data: Data, appending terminator: Data?) throws -> Int {
         let messageData = data + (terminator ?? Data())
         let writeSize = 12 // TODO: Increase to a larger number
         
+        // Split the message if necessary
         var sliceNum = 0
         var lastMessage = false
         while !lastMessage {
