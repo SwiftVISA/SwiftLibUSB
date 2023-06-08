@@ -152,15 +152,21 @@ extension USBTMCInstrument {
         }
     }
     
-    func receiveUntilEndOfMessage(headerSuffix: Data, length: Int, chunkSize: Int) throws -> Data {
+    func receiveUntilEndOfMessage(headerSuffix: Data, length: Int?, chunkSize: Int) throws -> Data {
         var readData = Data()
         var endOfMessage = false
         
         // TODO: get max transfer size
         
         while !endOfMessage {
+            var message : Data
+            
             // Send read request to out endpoint
-            var message : Data = makeHeader(read: true, bufferSize: min(chunkSize, length - readData.count))
+            if(length != nil){
+                message = makeHeader(read: true, bufferSize: min(chunkSize, length! - readData.count))
+            }else{
+                message = makeHeader(read: true, bufferSize: chunkSize)
+            }
             
             // Add zeros to get basic behavior
             message += headerSuffix
@@ -222,7 +228,7 @@ extension USBTMCInstrument : MessageBasedInstrument {
         
         message.append(Data([0,0]))// bytes are reserved
         
-        var received: Data = try readUntilEndOfMessage(message, maxLength, chunkSize)
+        var received: Data = try receiveUntilEndOfMessage(headerSuffix: message, length: maxLength, chunkSize: chunkSize)
         
         if(strippingTerminator){
            return received.dropLast(1)
