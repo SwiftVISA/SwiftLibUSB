@@ -73,7 +73,7 @@ extension USBTMCInstrument {
             for interface in config.interfaces {
                 for altSetting in interface.altSettings {
                     var validEndpoint = endpointCheck(altSetting: altSetting)
-                    if(validEndpoint){
+                    if validEndpoint {
                         try setupEndpoints(config: config, interface: interface, altSetting: altSetting)
                         return
                     }
@@ -197,7 +197,7 @@ extension USBTMCInstrument : MessageBasedInstrument {
     func read(until terminator: String, strippingTerminator: Bool, encoding: String.Encoding, chunkSize: Int) throws -> String {
         // Prepare the parameters
         var terminatorBytes : Data? = terminator.data(using:encoding)
-        if terminatorBytes == nil{
+        if terminatorBytes == nil {
             throw Error.invalidTerminator
         }
         
@@ -218,8 +218,8 @@ extension USBTMCInstrument : MessageBasedInstrument {
     
     func readBytes(maxLength: Int?, until terminator: Data, strippingTerminator: Bool, chunkSize: Int) throws -> Data {
         //check if terminator is ok
-        if !canUseTerminator {throw Error.notSupported}
-        if terminator.count != 1 { throw Error.invalidTerminator}
+        if !canUseTerminator { throw Error.notSupported }
+        if terminator.count != 1 { throw Error.invalidTerminator }
         
         //create read message to inform device that we would like to read
         var message : Data = makeHeader(read: true, bufferSize: chunkSize)
@@ -254,12 +254,12 @@ extension USBTMCInstrument : MessageBasedInstrument {
         
         var sliceNum = 0
         var lastMessage = false
-        while(!lastMessage) {
+        while !lastMessage {
             sliceNum += 1
             let lowerBound = (sliceNum - 1) * writeSize
             var upperBound = sliceNum * writeSize
             
-            if(upperBound >= messageData.count){
+            if upperBound >= messageData.count {
                 lastMessage = true
                 upperBound = messageData.count
             }
@@ -272,9 +272,9 @@ extension USBTMCInstrument : MessageBasedInstrument {
                 dataToSend.append(Data(Array(lengthBytes)))
             }
             // Part 3 of header: end of field
-            if(lastMessage){
+            if lastMessage {
                 dataToSend.append(1)
-            }else{
+            } else {
                 dataToSend.append(0)
             }
             // Part 4 of header: Three bytes of padding
