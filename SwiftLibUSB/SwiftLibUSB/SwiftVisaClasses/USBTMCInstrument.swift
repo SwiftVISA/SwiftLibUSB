@@ -228,9 +228,10 @@ extension USBTMCInstrument : MessageBasedInstrument {
         
         message.append(Data([0,0]))// bytes are reserved
         
-        var received: Data = try receiveUntilEndOfMessage(headerSuffix: message, length: maxLength, chunkSize: chunkSize)
+        var received: Data = try receiveUntilEndOfMessage(headerSuffix: Data([2, terminator[0], 0, 0]),
+                                                          length: maxLength, chunkSize: chunkSize)
         
-        if strippingTerminator{
+        if strippingTerminator {
            return received.dropLast(1)
         } else {
             return received
