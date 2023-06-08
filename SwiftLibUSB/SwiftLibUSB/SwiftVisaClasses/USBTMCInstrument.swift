@@ -200,13 +200,12 @@ extension USBTMCInstrument {
 extension USBTMCInstrument : MessageBasedInstrument {
     func read(until terminator: String, strippingTerminator: Bool, encoding: String.Encoding, chunkSize: Int) throws -> String {
         // Prepare the parameters
-        var terminatorBytes : Data? = terminator.data(using:encoding)
-        if terminatorBytes == nil {
+        guard let terminatorBytes = terminator.data(using:encoding) else {
             throw Error.invalidTerminator
         }
         
         // Make the call to readBytes
-        var dataRead = try readBytes(maxLength: nil, until: terminatorBytes!, strippingTerminator: strippingTerminator, chunkSize: chunkSize)
+        var dataRead = try readBytes(maxLength: nil, until: terminatorBytes, strippingTerminator: strippingTerminator, chunkSize: chunkSize)
         
         // Encode the output as a string
         var outputString : String? = String(data: dataRead, encoding: encoding)
