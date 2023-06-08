@@ -11,6 +11,7 @@
 		0162E1E82A2926940006EE63 /* CoreSwiftVISA in Frameworks */ = {isa = PBXBuildFile; productRef = 0162E1E72A2926940006EE63 /* CoreSwiftVISA */; };
 		0162E1EA2A2932D40006EE63 /* USBInstrument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0162E1E92A2932D40006EE63 /* USBInstrument.swift */; };
 		024F52722A1FE9B700E93233 /* AltSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 024F52712A1FE9B700E93233 /* AltSetting.swift */; };
+		02A5A1DE2A2A78190000D947 /* USBTMCInstrument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02A5A1DD2A2A78190000D947 /* USBTMCInstrument.swift */; };
 		912860CD2A1D46E9001AB351 /* SwiftLibUSBApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 912860CC2A1D46E9001AB351 /* SwiftLibUSBApp.swift */; };
 		912860CF2A1D46E9001AB351 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 912860CE2A1D46E9001AB351 /* ContentView.swift */; };
 		912860D12A1D46EC001AB351 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 912860D02A1D46EC001AB351 /* Assets.xcassets */; };
@@ -51,6 +52,7 @@
 		0162E1E42A29258E0006EE63 /* USBSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = USBSession.swift; sourceTree = "<group>"; };
 		0162E1E92A2932D40006EE63 /* USBInstrument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = USBInstrument.swift; sourceTree = "<group>"; };
 		024F52712A1FE9B700E93233 /* AltSetting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AltSetting.swift; sourceTree = "<group>"; };
+		02A5A1DD2A2A78190000D947 /* USBTMCInstrument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = USBTMCInstrument.swift; sourceTree = "<group>"; };
 		912860C92A1D46E9001AB351 /* SwiftLibUSB.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftLibUSB.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		912860CC2A1D46E9001AB351 /* SwiftLibUSBApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftLibUSBApp.swift; sourceTree = "<group>"; };
 		912860CE2A1D46E9001AB351 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -108,6 +110,7 @@
 			children = (
 				0162E1E42A29258E0006EE63 /* USBSession.swift */,
 				0162E1E92A2932D40006EE63 /* USBInstrument.swift */,
+				02A5A1DD2A2A78190000D947 /* USBTMCInstrument.swift */,
 			);
 			path = SwiftVisaClasses;
 			sourceTree = "<group>";
@@ -340,6 +343,7 @@
 				91DE961D2A1D5818006D2047 /* Controller.swift in Sources */,
 				91DE965C2A1FECB8006D2047 /* Endpoint.swift in Sources */,
 				912860CF2A1D46E9001AB351 /* ContentView.swift in Sources */,
+				02A5A1DE2A2A78190000D947 /* USBTMCInstrument.swift in Sources */,
 				0162E1EA2A2932D40006EE63 /* USBInstrument.swift in Sources */,
 				0162E1E52A29258E0006EE63 /* USBSession.swift in Sources */,
 				DEC6043B2A1E881900ACE746 /* Context.swift in Sources */,
@@ -596,6 +600,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = /usr/local/include;
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = Mines.SwiftLibUSBTests;
@@ -615,6 +620,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = /usr/local/include;
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = Mines.SwiftLibUSBTests;
