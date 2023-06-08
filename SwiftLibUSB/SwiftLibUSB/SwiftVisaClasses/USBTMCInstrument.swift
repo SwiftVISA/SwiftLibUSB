@@ -152,28 +152,7 @@ extension USBTMCInstrument {
         }
     }
     
-}
-extension USBTMCInstrument : MessageBasedInstrument {
-    func read(until terminator: String, strippingTerminator: Bool, encoding: String.Encoding, chunkSize: Int) throws -> String {
-        
-        // Prepare the parameters
-        var terminatorBytes : Data? = terminator.data(using:encoding)
-        if(terminatorBytes == nil){
-            throw Error.cannotEncode
-        }
-        
-        // Make the call to readBytes
-        var dataRead = try readBytes(maxLength: nil, until: terminatorBytes!, strippingTerminator: strippingTerminator, chunkSize: chunkSize)
-        
-        // Encode the output as a string
-        var outputString : String? = String(data: dataRead, encoding: encoding)
-        if(outputString == nil){
-            throw Error.cannotEncode
-        }
-        return outputString!
-    }
-    
-    func readBytes(length: Int, chunkSize: Int) throws -> Data {
+    func receiveUntilEndOfMessage(headerSuffix: Data, length: Int, chunkSize: Int) throws -> Data {
         var readData = Data()
         var endOfMessage = false
         
@@ -184,7 +163,7 @@ extension USBTMCInstrument : MessageBasedInstrument {
             var message : Data = makeHeader(read: true, bufferSize: min(chunkSize, length - readData.count))
             
             // Add zeros to get basic behavior
-            message.append(Data([0,0,0,0]))
+            message += headerSuffix
             
             // Clear halt for the in endpoint
             inEndpoint.unsafelyUnwrapped.clearHalt()
@@ -206,6 +185,29 @@ extension USBTMCInstrument : MessageBasedInstrument {
         }
         
         return readData
+    }
+}
+extension USBTMCInstrument : MessageBasedInstrument {
+    func read(until terminator: String, strippingTerminator: Bool, encoding: String.Encoding, chunkSize: Int) throws -> String {
+        // Prepare the parameters
+        var terminatorBytes : Data? = terminator.data(using:encoding)
+        if(terminatorBytes == nil){
+            throw Error.cannotEncode
+        }
+        
+        // Make the call to readBytes
+        var dataRead = try readBytes(maxLength: nil, until: terminatorBytes!, strippingTerminator: strippingTerminator, chunkSize: chunkSize)
+        
+        // Encode the output as a string
+        var outputString : String? = String(data: dataRead, encoding: encoding)
+        if(outputString == nil){
+            throw Error.cannotEncode
+        }
+        return outputString!
+    }
+    
+    func readBytes(length: Int, chunkSize: Int) throws -> Data {
+        return try receiveUntilEndOfMessage(headerSuffix: Data([0, 0, 0, 0]), length: length, chunkSize: chunkSize)
     }
     
     func readBytes(maxLength: Int?, until terminator: Data, strippingTerminator: Bool, chunkSize: Int) throws -> Data {
