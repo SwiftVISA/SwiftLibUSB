@@ -9,7 +9,7 @@ import Foundation
 
 /// USB Error is a return code given by many libUSB methods. A value of zero indicates the method returned with no errors thrown
 /// Negative values indicate an error with different values indicating type
-enum USBError: Error {
+public enum USBError: Error {
     /// The libUSB method returned with no issues
     ///
     /// Integer value: `0`
@@ -68,7 +68,7 @@ enum USBError: Error {
     case other
 }
 
-extension USBError {
+public extension USBError {
     /// Converts a libUSB error value into a USBError
     /// - parameters: the libUSB error value as an Int32
     /// - returns: a USBError representing the same error

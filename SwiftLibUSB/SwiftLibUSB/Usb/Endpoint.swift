@@ -11,7 +11,7 @@ import Foundation
 ///
 /// Before transferring data, you should activate the configuration, claim the interface, and activate the alternate setting
 /// that contain this endpoint.
-class Endpoint {
+public class Endpoint {
     var descriptor: UnsafePointer<libusb_endpoint_descriptor>
     var altSetting: AltSettingRef
     
@@ -24,18 +24,21 @@ class Endpoint {
         
     }
     
+    /// Address of the endpoint
     var address: Int {
         get {
             Int(descriptor.pointee.bEndpointAddress)
         }
     }
     
+    /// Attributes which apply to the endpoint
     var attributes: Int {
         get {
             Int(descriptor.pointee.bmAttributes)
         }
     }
     
+    /// Direction of the data transfer of the endpoint
     var direction: Direction {
         get {
             switch descriptor.pointee.bEndpointAddress >> 7 {
@@ -46,6 +49,7 @@ class Endpoint {
         }
     }
     
+    /// The type of the data transfer the endpoint can send
     var transferType: TransferType {
         get {
             switch libusb_endpoint_transfer_type(UInt32(descriptor.pointee.bmAttributes & 3)) {
