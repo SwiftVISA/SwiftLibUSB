@@ -9,9 +9,12 @@ import Foundation
 
 /// A setting that controls how endpoints behave. This must be activated using `setActive` before sending or receiving data.
 public class AltSetting : Hashable{
+    /// An array of Endpoints
     var endpoints: [Endpoint]
+    /// An internal class to manage the lifetime of the AltSetting
     var setting: AltSettingRef
     
+    /// Construct an AltSetting from an Interface and an index.
     init(interface: InterfaceRef, index: Int) {
         setting = AltSettingRef(interface: interface, index: index)
         
@@ -25,7 +28,7 @@ public class AltSetting : Hashable{
         lhs.setting.raw_device == rhs.setting.raw_device && lhs.index == rhs.index && lhs.interfaceIndex == rhs.interfaceIndex
     }
     
-    /// The name of the `AltSetting` to be displayed.
+    /// The name of the AltSetting to be displayed
     var displayName: String {
         get {
             // If the index is 0 this is an unnamed alt setting
@@ -60,7 +63,7 @@ public class AltSetting : Hashable{
         }
     }
     
-    /// A code describing what kind of communication this setting handles.
+    /// A code describing what kind of communication this setting handles
     var interfaceClass: ClassCode {
         get {
             setting.interfaceClass
@@ -74,18 +77,18 @@ public class AltSetting : Hashable{
         }
     }
     
-    /// If the `interfaceClass` and `interfaceSubClass` has protocols, this gives the protocol
+    /// If the `interfaceClass` and `interfaceSubClass` have protocols, this gives the protocol
     var interfaceProtocol: Int {
         get {
             setting.interfaceProtocol
         }
     }
     
-    /// Makes the setting active.
+    /// Make the setting active.
     ///
     /// This must be done before sending data through the endpoints. The parent configuration and interface should have been activated and claimed first.
     ///
-    /// - throws: a USBError if activating the setting fails
+    /// - throws: A `USBError` if activating the setting fails
     /// * `.notFound` if the interface was not claimed
     /// * `.noDevice` if the device was disconnected
     func setActive() throws {
@@ -103,7 +106,7 @@ public class AltSetting : Hashable{
     }
 }
 
-/// Internal class for managing lifetimes.
+/// An internal class for managing lifetimes.
 ///
 /// This exists to make sure the device and context live longer than any Endpoints that are in use.
 internal class AltSettingRef {

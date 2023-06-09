@@ -8,7 +8,7 @@
 import Foundation
 
 /// Class representing an available USB device.
-/// Communicating with the device requires opening the device
+/// Communicating with the device requires opening the device.
 public class Device: Hashable {
     /// The device as libUSB understands it. It is managed as a pointer
     var device: DeviceRef
@@ -19,9 +19,9 @@ public class Device: Hashable {
     
     /// Contruct a device from a context and a pointer to the device
     /// - Parameters:
-    ///   - context: the associated context class
-    ///   - pointer: the pointer to the device
-    /// - Throws:  ``USBError`` if libsub returns an error
+    ///   - context: The associated context class
+    ///   - pointer: The pointer to the device
+    /// - Throws:  `USBError` if libUSB returns an error
     init(context: ContextRef, pointer: OpaquePointer) throws {
         try device = DeviceRef(context: context, device: pointer)
         
@@ -38,13 +38,14 @@ public class Device: Hashable {
             } catch {} // Ignore configurations with errors
         }
     }
-    /// Compares devices by their internal pointer. Two device classes that point to the same libUSB device are considered the same
+    
+    /// Compare devices by their internal pointer. Two device classes that point to the same libUSB device are considered the same
     public static func == (lhs: Device, rhs: Device) -> Bool {
         lhs.device.raw_device == rhs.device.raw_device
     }
     
-    /// Get the product ID of the device
-    /// Can be accessed prior to a connection
+    /// The product ID of the device.
+    /// Can be accessed prior to a connection.
     ///  - Returns: An integer representing the product ID
     var productId: Int {
         get {
@@ -52,8 +53,8 @@ public class Device: Hashable {
         }
     }
     
-    /// Simple getter for the vendor ID of the device.
-    /// Can be accessed prior to connection
+    /// The vendor ID of the device.
+    /// Can be accessed prior to connection.
     ///  - Returns: An integer representing the vendor ID
     var vendorId: Int {
         get {
@@ -61,8 +62,8 @@ public class Device: Hashable {
         }
     }
     
-    /// Serial number of the devic. Useful in identifying a device if there are multiple with the same product and vendor ID.
-    ///  - Returns: A string containing the serial number of the device, or a blank string if the serial number cannot be found
+    /// The serial number of the device. Useful in identifying a device if there are multiple with the same product and vendor ID.
+    ///  - Returns: A string representing the serial number of the device, or a blank string if the serial number cannot be found
     var serialCode: String {
         get{
             if(descriptor.iSerialNumber == 0){
@@ -74,7 +75,7 @@ public class Device: Hashable {
             if(returnCode <= 0){
                 return ""
             }
-            // Buffer is now filled with the bytes of the serial code. We convert to string
+            // Buffer is now filled with the bytes of the serial code. Convert to string
             let asciibuffer = String(bytes: buffer, encoding: .ascii)  ?? ("")
             // If we cannot encode, we use a blank string, we then remove all extra bytes on the end
             return String(asciibuffer.prefix(Int(returnCode)))
@@ -82,7 +83,7 @@ public class Device: Hashable {
         }
     }
     
-    /// Get a human readable version descriptor of a device by indicating both its vendor and product ID. Together they form a primary key that can uniquely indentify the connected device.
+    /// Get a human readable version descriptor of a device by indicating both its vendor and product IDs. Together they form a primary key that can uniquely indentify the connected device.
     /// - Returns: A string in the format "Vendor: [vendorID] Product: [productID]"
     var displayName: String {
         // If the index is 0 give the name as indicated
@@ -114,7 +115,7 @@ public class Device: Hashable {
     ///   - length: The length of the data to transfer
     ///   - timeout: Timeout (in milliseconds) that this function should wait before stopping due to no response being received. For an unlimited timeout, use value 0.
     /// - Returns: The data sent back from the device
-    /// - Throws: a ``USBError`` if libUSB encounters an internal error
+    /// - Throws: a `USBError` if libUSB encounters an internal error
     func sendControlTransfer(
         requestType: UInt8,
         request: UInt8,
@@ -143,10 +144,10 @@ public class Device: Hashable {
     ///   - value: The value for the setup packet
     ///   - index: The index for the setup packet
     ///   - data: The data sent in the control transfer
-    ///   - length:The length of the data to transfer
+    ///   - length: The length of the data to transfer
     ///   - timeout: Timeout (in milliseconds) that this function should wait before stopping due to no response being received. For an unlimited timeout, use value 0.
-    ///- Returns: the data sent back from the device
-    ///- Throws: a ``USBError`` if libusb encounters and internal error
+    ///- Returns: The data sent back from the device
+    ///- Throws: a `USBError` if libUSB encounters and internal error
     func sendControlTransfer(
         direction: Direction,
         type: LibUSBControlType,
