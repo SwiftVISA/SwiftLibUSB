@@ -78,9 +78,18 @@ public class Endpoint {
         }
     }
     
-    /// Clear halts or stalls for the endpoint. If a device does not like the inputs it was sent, it haults. Before more messages can proceed the hault to the endpoint must be cleared. For consistant operation through errors, an endpoint should be cleared of haults before it should be used
-    func clearHalt() {
-        libusb_clear_halt(altSetting.raw_handle, descriptor.pointee.bEndpointAddress)
+    /// Clear halts or stalls for the endpoint. If a device does not like the inputs it was sent, it haults. Before more messages can proceed the halt to the endpoint must be cleared. For consistant operation through errors, an endpoint should be cleared of halts before it should be used
+    /// - Throws:
+    /// * ``USBError/connectionClosed`` if the device was closed using ``Device/close()``
+    /// * ``USBError/noDevice`` if the device was disconnected
+    func clearHalt() throws {
+        guard let handle = altSetting.raw_handle else {
+            throw USBError.connectionClosed
+        }
+        let error = libusb_clear_halt(handle, descriptor.pointee.bEndpointAddress)
+        if error < 0 {
+            throw USBError.from(code: error)
+        }
     }
     
     /// Send a message to a bulk out endpoint. This does **not** manipulate the data in any way. It does **not** add any required padding and it does **not** add any header, it simply sends the data as it was given.
@@ -94,6 +103,7 @@ public class Endpoint {
     /// * ``USBError/busy`` if libUSB is currently handling events (if you call this from an asynchronous transfer callback, for example)
     /// * ``USBError/invalidParam`` if the transfer size is larger than the OS or device support
     /// * ``USBError/notSupported`` if you are attempting to do a bulk transfer on a non-bulk endpoint or are using the wrong direction. This is not thrown by libUSB but is instead thrown in this method
+    /// * ``USBError/connectionClosed`` if the device was closed using ``Device/close()``
     /// - Parameters:
     ///   - data: the raw bytes to send unaltered to the device through this endpoint
     ///   - timeout: The time, in millisecounds, to wait before timeout. This is by default one second
@@ -102,6 +112,12 @@ public class Endpoint {
         if transferType != .bulk || direction != .Out {
             throw USBError.notSupported
         }
+
+        // Make sure the device is open
+        guard let handle = altSetting.raw_handle else {
+            throw USBError.connectionClosed
+        }
+
         // Define the parameters, these will be passed by reference to libUSB
         var sent: Int32 = 0;
         var data = [UInt8](data)
@@ -110,7 +126,7 @@ public class Endpoint {
         let length: Int32 = Int32(data.count)
         
         // Attempt to perform a bulk out transfer
-        let error = libusb_bulk_transfer(altSetting.raw_handle, descriptor.pointee.bEndpointAddress, &data, length, &sent, UInt32(timeout))
+        let error = libusb_bulk_transfer(handle, descriptor.pointee.bEndpointAddress, &data, length, &sent, UInt32(timeout))
         
         // Throw if the transfer had any errors. Errors are given by sending back a negative value
         if error < 0 {
@@ -133,6 +149,7 @@ public class Endpoint {
     /// * ``USBError/overflow`` if more data was sent than was requested
     /// * ``USBError/other`` if some unspecified error occured
     /// * ``USBError/notSupported`` if you are attempting to do a bulk transfer on a non-bulk endpoint or are using the wrong direction. This is not thrown by libUSB but is instead thrown in this method
+    /// * ``USBError/connectionClosed`` if the device was closed using ``Device/close()``
     /// - Parameters:
     ///   - length: The length of the buffer to send to this out endpoint. Measured in bytes, the default is 1024 bytes
     ///   - timeout: The amount of time, in milliseconds to wait before timing out of the message. The default is 1000(1 second)
@@ -142,12 +159,17 @@ public class Endpoint {
             throw USBError.notSupported
         }
         
+        // Make sure the device is open
+        guard let handle = altSetting.raw_handle else {
+            throw USBError.connectionClosed
+        }
+        
         // Create the buffer and an integer that will be set to the length of the data recieved
         var sent: Int32 = 0;
         var innerData = [UInt8](repeating: 0, count: Int(length))
         
         // Attempt to perform a bulk in transfer
-        let error = libusb_bulk_transfer(altSetting.raw_handle, descriptor.pointee.bEndpointAddress,
+        let error = libusb_bulk_transfer(handle, descriptor.pointee.bEndpointAddress,
                                          &innerData, Int32(length), &sent, timeout)
         
         // Throw if the transfer had any errors

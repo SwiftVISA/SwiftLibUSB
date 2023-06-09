@@ -67,6 +67,10 @@ public enum USBError: Error {
     ///
     /// Integer value: `-99`
     case other
+    /// The device was closed
+    ///
+    /// This does not correspond to a libUSB error code.
+    case connectionClosed
 }
 
 public extension USBError {

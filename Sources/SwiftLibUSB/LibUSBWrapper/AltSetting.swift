@@ -32,16 +32,24 @@ public class AltSetting : Hashable{
     }
     
     /// The name of the AltSetting to be displayed
+    ///
+    /// This requires the device to be open.
     var displayName: String {
         get {
             // If the index is 0 this is an unnamed alt setting
             if(setting.interfaceName == 0){
                 return "(\(index)) unnamed alt setting"
             }
+            
+            // Return a default value if the device is closed
+            guard let handle = setting.raw_handle else {
+                return "\(index) alt setting on closed device"
+            }
+            
             // Make a buffer for the name of the alt setting
             let size = 256;
             var buffer: [UInt8] = Array(repeating: 0, count: size)
-            let returnCode = libusb_get_string_descriptor_ascii(setting.raw_handle, UInt8(setting.interfaceName), &buffer, Int32(size))
+            let returnCode = libusb_get_string_descriptor_ascii(handle, UInt8(setting.interfaceName), &buffer, Int32(size))
             
             // Check if there is an error when filling the buffer with the name
             if(returnCode <= 0){
@@ -94,8 +102,12 @@ public class AltSetting : Hashable{
     /// - throws: A ``USBError`` if activating the setting fails
     /// * `.notFound` if the interface was not claimed
     /// * `.noDevice` if the device was disconnected
+    /// * `.connectionClosed` if the connection was closed using ``Device/close()``.
     public func setActive() throws {
-        let error = libusb_set_interface_alt_setting(setting.raw_handle, Int32(setting.interfaceNumber), Int32(setting.index))
+        guard let handle = setting.raw_handle else {
+            throw USBError.connectionClosed
+        }
+        let error = libusb_set_interface_alt_setting(handle, Int32(setting.interfaceNumber), Int32(setting.index))
         if error < 0 {
             throw USBError.from(code: error)
         }

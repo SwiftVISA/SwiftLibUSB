@@ -244,7 +244,7 @@ extension USBTMCInstrument {
             message += headerSuffix
             
             // Clear halt for the in endpoint
-            inEndpoint!.clearHalt()
+            try inEndpoint!.clearHalt()
             
             // Send the request message to a bulk out endpoint
             try outEndpoint!.sendBulkTransfer(data: &message)
@@ -358,7 +358,7 @@ extension USBTMCInstrument : MessageBasedInstrument {
         let writeSize = min(data.count,1024)
 
         
-        outEndpoint!.clearHalt()
+        try outEndpoint!.clearHalt()
 
         var lastMessage = false
         var lowerBound = 0
