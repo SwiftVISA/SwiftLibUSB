@@ -90,6 +90,8 @@ extension USBTMCInstrument {
         case getCapabilities
         case indicatorPulse
         
+        /// Convert a ControlMessage to a byte
+        /// - Returns: The control message as a byte
         func toByte() -> UInt8 {
             switch self {
             // 0 is reserved
@@ -104,7 +106,10 @@ extension USBTMCInstrument {
             }
         }
     }
+    
+    
     /// Looks through the available configurations and interfaces for an AltSetting that supports USBTMC
+    /// - throws: A ``USBTMCError`` if no endpoints can be found that fit the requiements of USBTMC
     private func findEndpoints() throws {
         let device = self._session.usbDevice
         
@@ -123,14 +128,22 @@ extension USBTMCInstrument {
         throw USBTMCError.couldNotFindEndpoint
     }
     
-    /// Checks if an AltSetting supports USBTMC
+    /// Checks if an ``AltSetting`` supports USBTMC
+    /// - Parameter altSetting: The ``AltSetting`` whose endpoints to check
+    /// - Returns: True if the endpoint is compatible false otherwise
     private func endpointCheck(altSetting: AltSetting) -> Bool {
         return altSetting.interfaceClass == .application &&
                 altSetting.interfaceSubClass == 0x03 &&
         (altSetting.interfaceProtocol == 0 || altSetting.interfaceProtocol == 1)
     }
     
+    
     /// Claims the interfaces and selects the in and out endpoints for communicating with a device
+    /// - Parameters:
+    ///   - config: The chosen device ``Configuration``
+    ///   - interface: The chosen ``Interface``
+    ///   - altSetting: The chosen ``AltSetting``
+    /// - Throws: A ``USBTMCError`` if no suitable endpoint could be found
     private func setupEndpoints(config: Configuration, interface: Interface, altSetting: AltSetting) throws {
         try config.setActive()
         try interface.claim()
@@ -140,7 +153,13 @@ extension USBTMCInstrument {
         outEndpoint = try getEndpoint(endpoints: altSetting.endpoints,direction: Direction.Out)
     }
     
-    /// Finds a bulk trasnfer endpoint with the intended direction
+    
+    /// Finds the first bulk trasnfer endpoint with the intended direction
+    /// - Parameters:
+    ///   - endpoints: An array of ``Endpoint`` to check
+    ///   - direction: The ``Direction``
+    /// - Returns: The first bulk transfer ``Endpoint`` with the requested ``Direction``
+    /// - Throws: A ``USBTMCError`` if no suitable endpoint can be found in the array
     private func getEndpoint(endpoints: [Endpoint], direction: Direction) throws -> Endpoint {
         for endpoint in endpoints {
             if endpoint.direction == direction && endpoint.transferType == .bulk {
@@ -203,6 +222,7 @@ extension USBTMCInstrument {
     ///   - length: The maximum amount of data to receive
     ///   - chunkSize: The amount of data to receive each time
     /// - Returns: The data read from the device
+    /// - Throws: a ``USBError`` if at any point a data transfer fails
     func receiveUntilEndOfMessage(headerSuffix: Data, length: Int?, chunkSize: Int) throws -> Data {
         var readData = Data()
         var endOfMessage = false
@@ -243,7 +263,16 @@ extension USBTMCInstrument {
     }
 }
 extension USBTMCInstrument : MessageBasedInstrument {
-    func read(until terminator: String, strippingTerminator: Bool, encoding: String.Encoding, chunkSize: Int) throws -> String {
+    
+    /// Read data from a device until the sepcified terminator is reached and return it as a string
+    /// - Parameters:
+    ///   - terminator: A string representing the terminator sequence
+    ///   - strippingTerminator: If true removes the terminator from the data returned
+    ///   - encoding: The encoding for the returned string and the terminator
+    ///   - chunkSize: The number of bytes to read into a buffer at a time.
+    /// - Returns: The data received as a string with the specified encoding
+    /// - Throws: A ``USBError`` if a failure occurs during a data transfer or a ``USBTMCError`` if the data cannot be encoded
+    public func read(until terminator: String, strippingTerminator: Bool, encoding: String.Encoding, chunkSize: Int) throws -> String {
         // Prepare the parameters
         guard let terminatorBytes = terminator.data(using:encoding) else {
             throw USBTMCError.invalidTerminator
@@ -260,7 +289,13 @@ extension USBTMCInstrument : MessageBasedInstrument {
         return outputString!
     }
     
-    func readBytes(length: Int, chunkSize: Int) throws -> Data {
+    /// Read bytes from a device with no terminator
+    /// - Parameters:
+    ///   - length: The maximum number of bytes to read
+    ///   - chunkSize: The number of bytes to read into a buffer at a time.
+    /// - Returns: The data received
+    /// - Throws: - Throws: A ``USBError`` if a failure occurs during a data transfer
+    public func readBytes(length: Int, chunkSize: Int) throws -> Data {
         return try receiveUntilEndOfMessage(headerSuffix: Data([0, 0, 0, 0]), length: length, chunkSize: chunkSize)
     }
     
@@ -272,7 +307,8 @@ extension USBTMCInstrument : MessageBasedInstrument {
     ///   - chunkSize: The number of bytes to read into a buffer at a time.
     /// - Throws: Error if the device could not be read from.
     /// - Returns: The data read from the device as bytes.
-    func readBytes(maxLength: Int?, until terminator: Data, strippingTerminator: Bool, chunkSize: Int) throws -> Data {
+    /// - Throws: A ``USBError`` if a failure occurs during a data transfer
+    public func readBytes(maxLength: Int?, until terminator: Data, strippingTerminator: Bool, chunkSize: Int) throws -> Data {
         //check if terminator is ok
         if !canUseTerminator { throw Error.notSupported }
         if terminator.count != 1 { throw USBTMCError.invalidTerminator }
@@ -294,7 +330,8 @@ extension USBTMCInstrument : MessageBasedInstrument {
     ///   - encoding: The method to encode the string with.
     /// - Throws: Error if the device could not be written to.
     /// - Returns: The number of bytes that were written to the device.
-    func write(_ string: String, appending terminator: String?, encoding: String.Encoding) throws -> Int {
+    /// - Throws: A ``USBError`` if a failure occurs during a data transfer or a ``USBTMCError`` if the data cannot be encoded
+    public func write(_ string: String, appending terminator: String?, encoding: String.Encoding) throws -> Int {
         let message = string + (terminator ?? "")
         let messageData = message.data(using: encoding)
         
@@ -309,7 +346,8 @@ extension USBTMCInstrument : MessageBasedInstrument {
     ///   - bytes: The data to write to the device.
     ///   - terminator: The sequence of bytes to append to the end of `bytes`.
     /// - Returns: The number of bytes that were written to the device.
-    func writeBytes(_ data: Data, appending terminator: Data?) throws -> Int {
+    /// - Throws: A ``USBError`` if a failure occurs during a data transfer
+    public func writeBytes(_ data: Data, appending terminator: Data?) throws -> Int {
         let messageData = data + (terminator ?? Data())
         let writeSize = min(data.count,1024)
         
