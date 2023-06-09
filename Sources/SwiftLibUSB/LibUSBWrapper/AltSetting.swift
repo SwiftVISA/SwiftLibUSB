@@ -88,7 +88,7 @@ public class AltSetting : Hashable{
     /// - throws: a USBError if activating the setting fails
     /// * `.notFound` if the interface was not claimed
     /// * `.noDevice` if the device was disconnected
-    func setActive() throws {
+    public func setActive() throws {
         let error = libusb_set_interface_alt_setting(setting.raw_handle, Int32(setting.interfaceNumber), Int32(setting.index))
         if error < 0 {
             throw USBError.from(code: error)

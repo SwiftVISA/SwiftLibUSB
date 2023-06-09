@@ -100,7 +100,7 @@ public class Configuration: Hashable{
     /// - throws: A USBError if activating the configuration fails
     /// * `.busy` if interfaces have already been claimed
     /// * `.noDevice` if the device has been unplugged
-    func setActive() throws {
+    public func setActive() throws {
         libusb_set_configuration(config.raw_handle, // The handle we are configuring ourselves with
                                  Int32(value)) // our value
     }

@@ -40,7 +40,7 @@ public class Interface : Hashable {
     /// - throws: a USBError if claiming fails
     /// * `.busy` if another program has claimed the interface
     /// * `.noDevice` if the device has been disconnected
-    func claim() throws {
+    public func claim() throws {
         try interface.claim()
     }
     
