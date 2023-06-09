@@ -12,15 +12,23 @@ import CoreSwiftVISA
 ///
 /// This does nothing on its own; use USBTMCInstrument or another subclass to communicate with a device.
 public class USBInstrument {
-    var _session: USBSession
+    ///Holds a ``USBSession`` internally
+    private var _session: USBSession
     
+    
+    /// Initalize a usb instrument with a vendorID productID and serial number
+    /// - Parameters:
+    ///   - vendorID: The vendorID of the device
+    ///   - productID: The productID of the device
+    ///   - serialNumber: The serial number of the device
+    ///- Throws: ``Error`` if there is an error initalizing the session. ``USBError`` if libUSB encounted an error
     init(vendorID: Int, productID: Int, serialNumber: String?) throws {
         _session = try USBSession(vendorID: vendorID, productID: productID, serialNumber: serialNumber)
     }
     
 }
 
-extension USBInstrument {
+public extension USBInstrument {
     /// An error associated with a USB Instrument.
     public enum Error: Swift.Error {
         /// Unknown error occured resulting in failed operation.
@@ -43,7 +51,7 @@ extension USBInstrument {
     }
 }
 
-extension USBInstrument.Error {
+public extension USBInstrument.Error {
     /// A more descritive explanation of what each error associated with a USB Instrument is.
     public var localizedDescription: String {
         switch self {
@@ -64,7 +72,7 @@ extension USBInstrument.Error {
 }
 
 extension USBInstrument : Instrument {
-    var session: CoreSwiftVISA.Session {
+    public var session: CoreSwiftVISA.Session {
         get{
             return _session
         }
