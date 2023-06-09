@@ -61,7 +61,7 @@ public class USBTMCInstrument : USBInstrument {
     ///     - visaString: A properly formatted visa string that corresponds to a physically connected device
     /// - Throws: ``USBInstrument/Error`` if there is an error establishing the instrument, ``USBError`` if the libUSB library encounters an error, and ``USBTMCInstrument/Error`` if there is any other problem.
     public convenience init (visaString: String) throws {
-        let sections = visaString.split(separator: "::")
+        let sections = visaString.components(separatedBy: "::")
         if sections.count < 4 {
             throw Error.operationFailed // TODO: use a USBTMCInstrument Error
         }
