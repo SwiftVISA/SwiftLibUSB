@@ -79,7 +79,7 @@ internal class InterfaceRef {
         }
     }
     
-    var raw_handle: OpaquePointer {
+    var raw_handle: OpaquePointer? {
         get {
             config.raw_handle
         }

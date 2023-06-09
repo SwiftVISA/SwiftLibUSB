@@ -127,7 +127,7 @@ internal class ConfigurationRef {
         self.descriptor = descriptor
     }
     
-    var raw_handle: OpaquePointer {
+    var raw_handle: OpaquePointer? {
         get {
             device.raw_handle
         }

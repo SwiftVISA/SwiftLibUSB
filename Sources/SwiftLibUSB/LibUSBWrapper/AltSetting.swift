@@ -127,7 +127,7 @@ internal class AltSettingRef {
         }
     }
     
-    var raw_handle: OpaquePointer {
+    var raw_handle: OpaquePointer? {
         get {
             interface.raw_handle
         }

@@ -183,17 +183,18 @@ public class Device: Hashable {
 internal class DeviceRef {
     let context: ContextRef
     let raw_device: OpaquePointer
-    let raw_handle: OpaquePointer
+    var raw_handle: OpaquePointer?
+    var open: Bool
     
     init(context: ContextRef, device: OpaquePointer) throws {
         self.context = context
         raw_device = device
-        var base_handle: OpaquePointer? = nil
-        let error = libusb_open(device, &base_handle)
+        raw_handle = nil
+        let error = libusb_open(device, &raw_handle)
         if error < 0 {
             throw USBError.from(code: error)
         }
-        raw_handle = base_handle!
+        open = raw_handle != nil
     }
     
     deinit {
