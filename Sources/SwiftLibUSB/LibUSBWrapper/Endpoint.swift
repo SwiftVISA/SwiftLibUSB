@@ -131,7 +131,7 @@ public class Endpoint {
     /// * ``USBError/busy`` if libUSB is currently handling events (if you call this from an asynchronous transfer callback, for example)
     /// * ``USBError/invalidParam`` if the transfer size is larger than the OS or device support
     /// * ``USBError/overflow`` if more data was sent than was requested
-    /// * ``USBError/other`` if some unspecified error occured or if the returned message was too small to contain a header
+    /// * ``USBError/other`` if some unspecified error occured
     /// * ``USBError/notSupported`` if you are attempting to do a bulk transfer on a non-bulk endpoint or are using the wrong direction. This is not thrown by libUSB but is instead thrown in this method
     /// - Parameters:
     ///   - length: The length of the buffer to send to this out endpoint. Measured in bytes, the default is 1024 bytes
@@ -153,9 +153,6 @@ public class Endpoint {
         // Throw if the transfer had any errors
         if error < 0 {
             throw USBError.from(code: error)
-        }
-        if(sent <= 12){
-            throw USBError.other
         }
         
         // Turn the returned array into type Data, then return it.
