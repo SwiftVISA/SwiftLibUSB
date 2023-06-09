@@ -148,7 +148,7 @@ public class Endpoint {
         
         // Attempt to perform a bulk in transfer
         let error = libusb_bulk_transfer(altSetting.raw_handle, descriptor.pointee.bEndpointAddress,
-                                         &innerData, Int32(length), &sent, timeout)
+                                         &innerData, Int32(length), &sent, UInt32(timeout))
         
         // Throw if the transfer had any errors
         if error < 0 {
