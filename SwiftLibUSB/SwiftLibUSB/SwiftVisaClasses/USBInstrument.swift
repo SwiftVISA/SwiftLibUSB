@@ -39,16 +39,6 @@ extension USBInstrument {
         /// Found multiple devices with the same product id, vendor id and serial number.
         case serialCodeNotUnique
         
-        /// When attempting to encode a user given string with a user given encoding, an error occurs
-        case cannotEncode
-        
-        /// When looking for USB endpoints to send messages through, no alternative setting could be found that has compliant endpoints
-        /// Or an altsetting claims to have endpoints it doesn't have
-        case couldNotFindEndpoint
-        
-        ///The terminator given could not be accepted by the device
-        case invalidTerminator
-        
         //The requested operation is not supported by the device
         case notSupported
     }
@@ -67,12 +57,6 @@ extension USBInstrument.Error {
             return "No devices were found"
         case .serialCodeNotUnique:
             return "Identification of USB devices with serial number was not unique"
-        case .cannotEncode:
-            return "Could not encode given string with given encoding"
-        case .couldNotFindEndpoint:
-            return "Could not find at least one required endpoint that satisfies requirements"
-        case .invalidTerminator:
-            return "Invalid terminator given"
         case .notSupported:
             return "The device does not support this operation"
         }

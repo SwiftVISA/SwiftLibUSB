@@ -28,8 +28,8 @@ class USBTMCInstrument : USBInstrument {
     ///
     ///    These can be found from the VISA identification string in the following format: `USB::<vendorID>::<productID>::<SerialNumber>::...`
     ///
-    /// - Throws: an error if the device was not found, or if it doesn't support the USBTMC interface.
-    override init(vendorID: Int, productID: Int, serialNumber: String?) throws {
+    /// - Throws: ``USBInstrument/Error`` if there is an error establishing the instrument, ``USBError`` if the libUSB library encounters an error and ``USBTMCInstrument/Error`` if there is any other problem.
+    override init(vendorID: Int, productID: Int, serialNumber: String? = nil) throws {
         messageIndex = 1
         inEndpoint = nil
         outEndpoint = nil
@@ -38,6 +38,27 @@ class USBTMCInstrument : USBInstrument {
         try super.init(vendorID: vendorID, productID: productID, serialNumber: serialNumber)
         try findEndpoints()
         getCapabilities()
+    }
+    
+    /// An alternarte initiliser for creating a USB Test and Measurment Class Device
+    ///
+    /// This initliser uses a raw Visa String instead of the individual parameters. An example is
+    /// `USB0::10893::5634::MY59001442::0::INSTR`
+    /// - Parameters:
+    ///     - visaString: A properly formatted visa string that corresponds to a physically connected device
+    /// - Throws: ``USBInstrument/Error`` if there is an error establishing the instrument, ``USBError`` if the libUSB library encounters an error and ``USBTMCInstrument/Error`` if there is any other problem.
+    convenience init (visaString: String) throws {
+        let sections = visaString.split(separator: "::")
+        if sections.count < 4 {
+            throw Error.operationFailed // TODO: use a USBTMCInstrument Error
+        }
+        let vendorID = Int(sections[1])
+        let productID = Int(sections[2])
+        if vendorID == nil || productID == nil {
+            throw Error.operationFailed // TODO: use a USBTMCInstrument Error
+        }
+        
+        try self.init(vendorID:vendorID!,productID:productID!, serialNumber: String(sections[3]))
     }
 }
 extension USBTMCInstrument {
@@ -87,7 +108,7 @@ extension USBTMCInstrument {
             }
         }
         // If the loop finishes without finding endpoints that meet our requirements, we must throw
-        throw Error.couldNotFindEndpoint
+        throw USBTMCError.couldNotFindEndpoint
     }
     
     /// Checks if an AltSetting supports USBTMC
@@ -114,7 +135,7 @@ extension USBTMCInstrument {
                 return endpoint
             }
         }
-        throw Error.couldNotFindEndpoint
+        throw USBTMCError.couldNotFindEndpoint
     }
     
     /// Increment the message index such that it remains in the range [1-255] inclusive
@@ -204,7 +225,7 @@ extension USBTMCInstrument : MessageBasedInstrument {
     func read(until terminator: String, strippingTerminator: Bool, encoding: String.Encoding, chunkSize: Int) throws -> String {
         // Prepare the parameters
         guard let terminatorBytes = terminator.data(using:encoding) else {
-            throw Error.invalidTerminator
+            throw USBTMCError.invalidTerminator
         }
         
         // Make the call to readBytes
@@ -213,7 +234,7 @@ extension USBTMCInstrument : MessageBasedInstrument {
         // Encode the output as a string
         var outputString : String? = String(data: dataRead, encoding: encoding)
         if outputString == nil{
-            throw Error.cannotEncode
+            throw USBTMCError.cannotEncode
         }
         return outputString!
     }
@@ -233,7 +254,7 @@ extension USBTMCInstrument : MessageBasedInstrument {
     func readBytes(maxLength: Int?, until terminator: Data, strippingTerminator: Bool, chunkSize: Int) throws -> Data {
         //check if terminator is ok
         if !canUseTerminator { throw Error.notSupported }
-        if terminator.count != 1 { throw Error.invalidTerminator }
+        if terminator.count != 1 { throw USBTMCError.invalidTerminator }
         
         var received: Data = try receiveUntilEndOfMessage(headerSuffix: Data([2, terminator[0], 0, 0]),
                                                           length: maxLength, chunkSize: chunkSize)
@@ -257,7 +278,7 @@ extension USBTMCInstrument : MessageBasedInstrument {
         let messageData = message.data(using: encoding)
         
         if messageData == nil {
-            throw Error.cannotEncode
+            throw USBTMCError.cannotEncode
         }
         return try writeBytes(messageData!, appending: nil)
     }
@@ -312,5 +333,34 @@ extension USBTMCInstrument : MessageBasedInstrument {
             nextMessage()
         }
         return lowerBound
+    }
+}
+
+extension USBTMCInstrument {
+    /// An error associated with a  USB Instrument.
+    ///
+    public enum USBTMCError: Swift.Error {
+        /// When looking for USB endpoints to send messages through, no alternative setting could be found that has compliant endpoints
+        /// Or an altsetting claims to have endpoints it doesn't have
+        case couldNotFindEndpoint
+        
+        ///The terminator given could not be accepted by the device
+        case invalidTerminator
+        
+        /// When attempting to encode a user given string with a user given encoding, an error occurs
+        case cannotEncode
+    }
+}
+
+extension USBTMCInstrument.USBTMCError {
+    public var localizedDescription: String {
+        switch self {
+        case .couldNotFindEndpoint:
+            return "Could not find at least one required endpoint that satisfies requirements"
+        case .invalidTerminator:
+            return "Invalid terminator given"
+        case .cannotEncode:
+            return "Could not encode given string with given encoding"
+        }
     }
 }

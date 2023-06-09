@@ -9,7 +9,7 @@ import Foundation
 
 /// Class representing an available USB device.
 /// Communicating with the device requires opening the device
-class Device: Hashable {
+public class Device: Hashable {
     /// The device as libUSB understands it. It is managed as a pointer
     var device: DeviceRef
     /// A C struct containing information about the device
@@ -17,6 +17,11 @@ class Device: Hashable {
     /// Each device has "configurations" which manage their operation.
     var configurations: [Configuration]
     
+    /// contruct a device from a context and a pointer to the device
+    /// - Parameters:
+    ///   - context: the associated context class
+    ///   - pointer: the pointer to the device
+    /// - Throws:  ``USBError`` if libsub returns an error
     init(context: ContextRef, pointer: OpaquePointer) throws {
         try device = DeviceRef(context: context, device: pointer)
         
@@ -34,7 +39,7 @@ class Device: Hashable {
         }
     }
     /// Compares devices by their internal pointer. Two device classes that point to the same libUSB device are considered the same
-    static func == (lhs: Device, rhs: Device) -> Bool {
+    public static func == (lhs: Device, rhs: Device) -> Bool {
         lhs.device.raw_device == rhs.device.raw_device
     }
     
@@ -69,13 +74,17 @@ class Device: Hashable {
             if(returnCode <= 0){
                 return ""
             }
-            return String(bytes: buffer, encoding: .ascii) ?? ("")
+            // Buffer is now filled with the bytes of the serial code. We convert to string
+            let asciibuffer = String(bytes: buffer, encoding: .ascii)  ?? ("")
+            // If we cannot encode, we use a blank string, we then remove all extra bytes on the end
+            return String(asciibuffer.prefix(Int(returnCode)))
+            
         }
     }
     
     /// Gets a human readable version of a device by indicating both the vendor and product id
     /// Together they form a primary key that can uniquely indentify the connected device
-    /// - Returns: A string in the format "Vendor: [vendorID] Product: [productID]"
+    /// - Returns: A ``String`` in the format "Vendor: [vendorID] Product: [productID]"
     var displayName: String {
         // If the index is 0 give the name as indicated
         if(descriptor.iProduct == 0){
@@ -96,6 +105,17 @@ class Device: Hashable {
     }
     
     
+    ///Send a control transfer to a device
+    /// - Parameters:
+    ///   - requestType:
+    ///   - request:
+    ///   - value:
+    ///   - index:
+    ///   - data: the data of the control transfer
+    ///   - length: the length of the data to transfer
+    ///   - timeout: timeout (in milliseconds) that this function should wait before giving up due to no response being received. For an unlimited timeout, use value 0.
+    /// - Returns: the data sent back from the device
+    /// - Throws: a ``USBError`` if libusb encounters and internal error
     func sendControlTransfer(
         requestType: UInt8,
         request: UInt8,
@@ -115,6 +135,19 @@ class Device: Hashable {
         return Data(charArrayData)
     }
     
+    ///
+    /// - Parameters:
+    ///   - direction:
+    ///   - type:
+    ///   - recipient:
+    ///   - request:
+    ///   - value:
+    ///   - index:
+    ///   - data:
+    ///   - length:
+    ///   - timeout: timeout (in milliseconds) that this function should wait before giving up due to no response being received. For an unlimited timeout, use value 0.
+    ///- Returns: the data sent back from the device
+    ///- Throws: a ``USBError`` if libusb encounters and internal error
     func sendControlTransfer(
         direction: Direction,
         type: LibUSBControlType,
@@ -138,7 +171,7 @@ class Device: Hashable {
     }
     
     /// A hash representation of the device
-    func hash(into hasher: inout Hasher) {
+    public func hash(into hasher: inout Hasher) {
         device.raw_device.hash(into: &hasher)
     }
 }
