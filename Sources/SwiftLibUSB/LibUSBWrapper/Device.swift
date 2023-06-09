@@ -22,7 +22,7 @@ public class Device: Hashable {
     /// - Parameters:
     ///   - context: The associated context class
     ///   - pointer: The pointer to the device
-    /// - Throws:  `USBError` if libUSB returns an error
+    /// - Throws:  ``USBError`` if libUSB returns an error
     init(context: ContextRef, pointer: OpaquePointer) throws {
         try device = DeviceRef(context: context, device: pointer)
         
