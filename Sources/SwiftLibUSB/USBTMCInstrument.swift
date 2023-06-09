@@ -116,7 +116,7 @@ extension USBTMCInstrument {
         for config in device.configurations {
             for interface in config.interfaces {
                 for altSetting in interface.altSettings {
-                    var validEndpoint = endpointCheck(altSetting: altSetting)
+                    let validEndpoint = endpointCheck(altSetting: altSetting)
                     if validEndpoint {
                         try setupEndpoints(config: config, interface: interface, altSetting: altSetting)
                         return
@@ -181,7 +181,7 @@ extension USBTMCInstrument {
     /// - Returns: The filled header of the message to be sent or received.
     private func makeHeader(read: Bool = false, bufferSize: Int = 1028) -> Data {
         // Part 1 of header: message type, message index, inverse of message index, padding
-        var firstByte : UInt8 = read ? 2 : 1 // Reads are type 2, writes are type 1
+        let firstByte : UInt8 = read ? 2 : 1 // Reads are type 2, writes are type 1
         var message = Data([firstByte, messageIndex, 255-messageIndex, 0])
 
         // Part 2 of header: Little Endian length of the buffer
@@ -245,7 +245,7 @@ extension USBTMCInstrument {
             inEndpoint!.clearHalt()
             
             // Send the request message to a bulk out endpoint
-            let num = try outEndpoint!.sendBulkTransfer(data: &message)
+            try outEndpoint!.sendBulkTransfer(data: &message)
             
             // Get the response message from a bulk in endpoint and print it
             let data = try inEndpoint.unsafelyUnwrapped.receiveBulkTransfer()
@@ -279,10 +279,10 @@ extension USBTMCInstrument : MessageBasedInstrument {
         }
         
         // Make the call to readBytes
-        var dataRead = try readBytes(maxLength: nil, until: terminatorBytes, strippingTerminator: strippingTerminator, chunkSize: chunkSize)
+        let dataRead = try readBytes(maxLength: nil, until: terminatorBytes, strippingTerminator: strippingTerminator, chunkSize: chunkSize)
         
         // Encode the output as a string
-        var outputString : String? = String(data: dataRead, encoding: encoding)
+        let outputString : String? = String(data: dataRead, encoding: encoding)
         if outputString == nil{
             throw USBTMCError.cannotEncode
         }
@@ -313,7 +313,7 @@ extension USBTMCInstrument : MessageBasedInstrument {
         if !canUseTerminator { throw Error.notSupported }
         if terminator.count != 1 { throw USBTMCError.invalidTerminator }
         
-        var received: Data = try receiveUntilEndOfMessage(headerSuffix: Data([2, terminator[0], 0, 0]),
+        let received: Data = try receiveUntilEndOfMessage(headerSuffix: Data([2, terminator[0], 0, 0]),
                                                           length: maxLength, chunkSize: chunkSize)
         
         if strippingTerminator {
@@ -363,7 +363,7 @@ extension USBTMCInstrument : MessageBasedInstrument {
                 lastMessage = true
                 upperBound = messageData.count
             }
-            var dataSlice = messageData.subdata(in: lowerBound..<upperBound)
+            let dataSlice = messageData.subdata(in: lowerBound..<upperBound)
             
             // Part 1 of header: Write Out (constant 1), message index, inverse of message index, padding
             var dataToSend = Data([1, messageIndex, 255-messageIndex, 0])
@@ -387,7 +387,7 @@ extension USBTMCInstrument : MessageBasedInstrument {
             
             // Send the command message to a bulk out endpoint
             (outEndpoint!).clearHalt()
-            let num = try (outEndpoint!).sendBulkTransfer(data: &dataToSend)
+            try (outEndpoint!).sendBulkTransfer(data: &dataToSend)
             nextMessage()
         }
         return 0
