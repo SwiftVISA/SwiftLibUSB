@@ -74,7 +74,11 @@ public class Device: Hashable {
             if(returnCode <= 0){
                 return ""
             }
-            return String(bytes: buffer, encoding: .ascii) ?? ("")
+            // Buffer is now filled with the bytes of the serial code. We convert to string
+            let asciibuffer = String(bytes: buffer, encoding: .ascii)  ?? ("")
+            // If we cannot encode, we use a blank string, we then remove all extra bytes on the end
+            return String(asciibuffer.prefix(Int(returnCode)))
+            
         }
     }
     

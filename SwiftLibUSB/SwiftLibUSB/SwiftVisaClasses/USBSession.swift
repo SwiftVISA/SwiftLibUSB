@@ -62,17 +62,17 @@ extension USBSession {
         var didFind = false;
         var foundDevice: Device?
         for device in context.devices {
-            if(device.productId == productID &&
-               device.vendorId == vendorID
-            ){
-                if(SerialNumber == nil){
-                    if(didFind == true){
+            if device.productId == productID &&
+               device.vendorId == vendorID {
+                
+                if SerialNumber == nil {
+                    if didFind == true {
                         throw Error.identificationNotUnique
                     }
                     didFind = true
                     foundDevice = device
-                }else if (SerialNumber! == device.serialCode){
-                    if(didFind == true){
+                }else if (SerialNumber!) == device.serialCode {
+                    if didFind == true {
                         throw Error.serialCodeNotUnique
                     }
                     didFind = true
@@ -80,7 +80,7 @@ extension USBSession {
                 }
             }
         }
-        if(didFind == false){
+        if didFind == false {
             throw Error.couldNotFind
         }
         return foundDevice!

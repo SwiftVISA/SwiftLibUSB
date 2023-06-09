@@ -104,7 +104,6 @@ public class Endpoint {
         var innerData = [UInt8](repeating: 0, count: Int(length))
         let error = libusb_bulk_transfer(altSetting.raw_handle, descriptor.pointee.bEndpointAddress,
                                          &innerData, length, &sent, 1000)
-        print("Amount sent: \(sent), with error \(error) \(USBError.from(code: error))")
         if error < 0 {
             throw USBError.from(code: error)
         }
