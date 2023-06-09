@@ -41,9 +41,11 @@ class USBTMCInstrument : USBInstrument {
     }
 }
 extension USBTMCInstrument {
-    private static let HEADER_SIZE = 12
-    private static let TRANSFER_ATTRIBUTES_BYTE = 8
-    private static let END_OF_MESSAGE_BIT: UInt8 = 1
+    private static let headerSize = 12
+    private static let transferAttributesByteIndex = 8
+    private static let endOfMessageBit: UInt8 = 1
+    private static let readLengthStartIndex = 4
+    private static let readLengthEndIndex = 8
     
     /// Message types defined by USBTMC specification, table 15
     private enum ControlMessages {
@@ -180,19 +182,19 @@ extension USBTMCInstrument {
             
             // Send the request message to a bulk out endpoint
             let num = try outEndpoint!.sendBulkTransfer(data: &message)
-            print("Sent \(num) bytes")
-            print("Sent request message")
             
-            // Get the response message from a bulk in endpoint and print it
-            let data = try inEndpoint.unsafelyUnwrapped.receiveBulkTransfer()
-            print([UInt8](data))
+            // Get the response message from a bulk in endpoint
+            let data = try inEndpoint!.receiveBulkTransfer(length: chunkSize + Self.headerSize + 3)
             
             nextMessage()
             
-            endOfMessage = data[Self.TRANSFER_ATTRIBUTES_BYTE] & Self.END_OF_MESSAGE_BIT != 0
-            
             // Don't add the header to the data buffer
-            readData += data[Self.HEADER_SIZE...]
+            readData += data[Self.headerSize...]
+            
+            let resultLength = UInt32(littleEndian: data[Self.readLengthStartIndex..<Self.readLengthEndIndex].withUnsafeBytes { $0.pointee })
+            if resultLength <= readData.count + data.count - Self.headerSize {
+                endOfMessage = data[Self.transferAttributesByteIndex] & Self.endOfMessageBit != 0
+            }
         }
         
         return readData
@@ -267,15 +269,14 @@ extension USBTMCInstrument : MessageBasedInstrument {
     /// - Returns: The number of bytes that were written to the device.
     func writeBytes(_ data: Data, appending terminator: Data?) throws -> Int {
         let messageData = data + (terminator ?? Data())
-        let writeSize = 12 // TODO: Increase to a larger number
+        let writeSize = 1024
         
-        // Split the message if necessary
-        var sliceNum = 0
+        outEndpoint!.clearHalt()
+
         var lastMessage = false
+        var lowerBound = 0
         while !lastMessage {
-            sliceNum += 1
-            let lowerBound = (sliceNum - 1) * writeSize
-            var upperBound = sliceNum * writeSize
+            var upperBound = lowerBound + writeSize
             
             if upperBound >= messageData.count {
                 lastMessage = true
@@ -300,17 +301,16 @@ extension USBTMCInstrument : MessageBasedInstrument {
             // Add the message as bytes
             dataToSend.append(dataSlice)
             
-            // Pad to 4 byte boundary
-            dataToSend.append(Data(Array(repeating: 0, count: (4 - dataSlice.count % 4) % 4)))
+            let paddingLength = (4 - dataSlice.count % 4) % 4
             
-            print([UInt8](dataToSend)) // TODO: Remove debug print
+            // Pad to 4 byte boundary
+            dataToSend.append(Data(Array(repeating: 0, count: paddingLength)))
             
             // Send the command message to a bulk out endpoint
-            (outEndpoint!).clearHalt()
             let num = try (outEndpoint!).sendBulkTransfer(data: &dataToSend)
-            print("Sent \(num) bytes") // TODO: Remove debug print
+            lowerBound += num - Self.headerSize - paddingLength // Move up by the amount sent rather than a constant
             nextMessage()
         }
-        return 0
+        return lowerBound
     }
 }
