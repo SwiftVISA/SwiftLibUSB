@@ -184,13 +184,11 @@ extension USBTMCInstrument {
         }
     }
     
-    
-    
     /// Send a USBTMC request message as defined in section 3.2.1.2 of the USBTMC specifications.
     /// - Parameters:
-    ///   - headerSuffix: Automatically added to
-    ///   - length: <#length description#>
-    ///   - chunkSize: <#chunkSize description#>
+    ///   - headerSuffix: Header for the read request
+    ///   - length: The maximum amount of data to receive
+    ///   - chunkSize: The amount of data to pull in each time
     /// - Returns: The data read from the device.
     func receiveUntilEndOfMessage(headerSuffix: Data, length: Int?, chunkSize: Int) throws -> Data {
         var readData = Data()
