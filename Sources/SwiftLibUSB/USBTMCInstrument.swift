@@ -22,11 +22,11 @@ import CoreSwiftVISA
 public class USBTMCInstrument : USBInstrument {
     // USB instruments are required to have various attributes, we use the defaults
     public var attributes = MessageBasedInstrumentAttributes()
-    var messageIndex: UInt8
-    var inEndpoint: Endpoint?
-    var outEndpoint: Endpoint?
-    var activeInterface: AltSetting?
-    var canUseTerminator: Bool
+    private var messageIndex: UInt8
+    private var inEndpoint: Endpoint?
+    private var outEndpoint: Endpoint?
+    private var activeInterface: AltSetting?
+    private var canUseTerminator: Bool
     
     /// Attempts to connect to a USB device with the given identification.
     ///
@@ -39,8 +39,8 @@ public class USBTMCInstrument : USBInstrument {
     ///
     /// `USB::<vendorID>::<productID>::<SerialNumber>::...`
     ///
-    /// - Throws: ``USBInstrument/Error`` if there is an error establishing the instrument, ``USBError`` if the libUSB library encounters an error and ``USBTMCInstrument/Error`` if there is any other problem.
-    override init(vendorID: Int, productID: Int, serialNumber: String? = nil) throws {
+    /// - Throws: ``USBInstrument/Error`` if there is an error establishing the instrument, ``USBError`` if the libUSB library encounters an error and ``USBTMCInstrument/USBTMCError`` if there is any other problem.
+    public override init(vendorID: Int, productID: Int, serialNumber: String? = nil) throws {
         messageIndex = 1
         inEndpoint = nil
         outEndpoint = nil
@@ -59,7 +59,7 @@ public class USBTMCInstrument : USBInstrument {
     ///
     /// - Parameters:
     ///     - visaString: A properly formatted visa string that corresponds to a physically connected device
-    /// - Throws: ``USBInstrument/Error`` if there is an error establishing the instrument, ``USBError`` if the libUSB library encounters an error, and ``USBTMCInstrument/Error`` if there is any other problem.
+    /// - Throws: ``USBInstrument/Error`` if there is an error establishing the instrument, ``USBError`` if the libUSB library encounters an error, and ``USBTMCInstrument/USBTMCError`` if there is any other problem.
     public convenience init (visaString: String) throws {
         let sections = visaString.components(separatedBy: "::")
         if sections.count < 4 {
@@ -247,7 +247,7 @@ extension USBTMCInstrument {
             inEndpoint!.clearHalt()
             
             // Send the request message to a bulk out endpoint
-            try outEndpoint!.sendBulkTransfer(data: &message)
+            _ = try outEndpoint!.sendBulkTransfer(data: &message)
 
             
             // Get the response message from a bulk in endpoint
