@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Usb
 
 ///Description
 ///All libUSB calls exist in some "context". While many of these methods allow for using

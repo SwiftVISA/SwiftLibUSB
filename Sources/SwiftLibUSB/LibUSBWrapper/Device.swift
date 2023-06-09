@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Usb
 
 /// Class representing an available USB device.
 /// Communicating with the device requires opening the device

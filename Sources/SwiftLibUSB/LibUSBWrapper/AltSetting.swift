@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Usb
 
 /// A setting that controls how endpoints behave. This must be activated using `setActive` before sending or receiving data.
 public class AltSetting : Hashable{
