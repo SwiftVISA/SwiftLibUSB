@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Usb
 
 /// A description used by `AltSetting`s to describe the communication method for the interface.
 ///

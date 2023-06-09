@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Usb
 
 /// Each device has at least 1 configuration, often more. libUSB keeps track of these with libusb config descriptors.
 /// Each instance manages 1 of these descriptors, inclduing managing the getting and freeing of this descriptor
