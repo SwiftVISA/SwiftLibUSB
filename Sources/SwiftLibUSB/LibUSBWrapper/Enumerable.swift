@@ -69,7 +69,7 @@ public enum LibUSBControlType{
 
 /// Describes what is receiving the request.
 ///
-/// A `Device`, `Interface`, `Endpoint`, or something else (`Other`) could be receiving the request.
+/// A ``Device``, ``Interface``, ``Endpoint``, or something else (`Other`) could be receiving the request.
 enum LibUSBRecipient{
     case Device
     case Interface

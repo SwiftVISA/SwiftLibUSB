@@ -88,7 +88,7 @@ public class Endpoint {
     /// - important: This will only work properly if this endpoint is bulk out (`direction == .out` and `.transferType == .bulk`)
     ///
     /// - returns: the number of bytes sent. All of the bytes being sent does not imply that the message was read or interpreted successfully. This is not always the length of the given data, but it should never be greater
-    /// - throws: a USBError if the transfer fails
+    /// - throws: a ``USBError`` if the transfer fails
     /// * ``USBError/pipe`` if the endpoint halts
     /// * ``USBError/noDevice`` if the device disconnected
     /// * ``USBError/busy`` if libUSB is currently handling events (if you call this from an asynchronous transfer callback, for example)
@@ -125,7 +125,7 @@ public class Endpoint {
     /// - important: This will only work properly if this endpoint is bulk in (`direction == .in` and `.transferType == .bulk`)
     ///
     /// - returns: the number of bytes received
-    /// - throws: a USBError if the transfer fails
+    /// - throws: a ``USBError`` if the transfer fails
     /// * ``USBError/pipe`` if the endpoint halts
     /// * ``USBError/noDevice`` if the device disconnected
     /// * ``USBError/busy`` if libUSB is currently handling events (if you call this from an asynchronous transfer callback, for example)

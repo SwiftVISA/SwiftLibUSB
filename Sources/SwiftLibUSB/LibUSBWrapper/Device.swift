@@ -116,7 +116,7 @@ public class Device: Hashable {
     ///   - length: The length of the data to transfer
     ///   - timeout: Timeout (in milliseconds) that this function should wait before stopping due to no response being received. For an unlimited timeout, use value 0.
     /// - Returns: The data sent back from the device
-    /// - Throws: a `USBError` if libUSB encounters an internal error
+    /// - Throws: a ``USBError`` if libUSB encounters an internal error
     func sendControlTransfer(
         requestType: UInt8,
         request: UInt8,
@@ -148,7 +148,7 @@ public class Device: Hashable {
     ///   - length: The length of the data to transfer
     ///   - timeout: Timeout (in milliseconds) that this function should wait before stopping due to no response being received. For an unlimited timeout, use value 0.
     ///- Returns: The data sent back from the device
-    ///- Throws: a `USBError` if libUSB encounters and internal error
+    ///- Throws: a ``USBError`` if libUSB encounters and internal error
     func sendControlTransfer(
         direction: Direction,
         type: LibUSBControlType,

@@ -101,7 +101,7 @@ public class Configuration: Hashable{
     ///
     /// Activating the configuration should be done before claiming an interface or sending data.
     ///
-    /// - throws: A USBError if activating the configuration fails
+    /// - throws: A ``USBError`` if activating the configuration fails
     /// * `.busy` if interfaces have already been claimed
     /// * `.noDevice` if the device has been unplugged
     public func setActive() throws {

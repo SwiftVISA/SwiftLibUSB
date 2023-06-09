@@ -15,7 +15,7 @@ import Usb
 /// The main job of the context class is to hold the device list. This is the master list of all connected devices. It is stored in the read-only variable "devices" and stores objects of type ``Device``
 /// - Note: While many libUSB methods allow for using a null context, using a context is preferred. For this reason, all of the events will occur in some given context.
 ///
-/// - Throws: USBError if libUSB encounters an error attempting some task.
+/// - Throws: ``USBError`` if libUSB encounters an error attempting some task.
 public class Context {
     
     /// The class that manages the pointer to the context. Extra references to this generally should not be made as they may impede deconstruction
@@ -25,7 +25,7 @@ public class Context {
     var devices: [Device]
     
     /// Initialize libUSB, and create the device list.
-    /// - throws: A USBError if creating the context fails
+    /// - throws: A ``USBError`` if creating the context fails
     init() throws {
         // Create the class that holds the reference to the context pointer
         try context = ContextRef()
@@ -64,7 +64,7 @@ internal class ContextRef {
     let context: OpaquePointer
     
     /// Create the internal context reference class
-    ///  - Throws: A USBError if libUSB returns an error code while initializing
+    ///  - Throws: A ``USBError`` if libUSB returns an error code while initializing
     init() throws {
         var context: OpaquePointer? = nil;
         let error = libusb_init(&context)
