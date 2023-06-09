@@ -79,7 +79,7 @@ internal class InterfaceRef {
         }
     }
     
-    var raw_handle: OpaquePointer {
+    var raw_handle: OpaquePointer? {
         get {
             config.raw_handle
         }
@@ -93,7 +93,10 @@ internal class InterfaceRef {
     }
     
     func claim() throws {
-        let error = libusb_claim_interface(config.raw_handle, Int32(index))
+        guard let handle = config.raw_handle else {
+            throw USBError.connectionClosed
+        }
+        let error = libusb_claim_interface(handle, Int32(index))
         if error < 0 {
             throw USBError.from(code: error)
         }
@@ -101,7 +104,7 @@ internal class InterfaceRef {
     }
     
     deinit {
-        if claimed {
+        if claimed && config.raw_handle != nil {
             libusb_release_interface(config.raw_handle, index)
         }
     }

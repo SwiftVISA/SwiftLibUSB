@@ -69,17 +69,24 @@ public class Configuration: Hashable{
     }
     
     /// The name of the `Configuration` to be displayed.
+    ///
+    /// This requires the device to be open.
     public var displayName: String {
         get {
             // If the index is 0 this is an unnamed configuration
             if(config.index == 0){
                 return "(\(index)) unnamed configuration"
             }
+            
+            // Return a default value if the device is closed
+            guard let handle = config.raw_handle else {
+                return "\(index) configuration on closed device"
+            }
 
             // Make a buffer for the name of the configuration
             let size = 256;
             var buffer: [UInt8] = Array(repeating: 0, count: size)
-            let returnCode = libusb_get_string_descriptor_ascii(config.raw_handle, UInt8(config.index), &buffer, Int32(size))
+            let returnCode = libusb_get_string_descriptor_ascii(handle, UInt8(config.index), &buffer, Int32(size))
             
             // Check if there is an error when filling the buffer with the name
             if(returnCode <= 0){
@@ -104,8 +111,12 @@ public class Configuration: Hashable{
     /// - throws: A ``USBError`` if activating the configuration fails
     /// * `.busy` if interfaces have already been claimed
     /// * `.noDevice` if the device has been unplugged
+    /// * `.connectionClosed` if the device was closed using ``Device/close()``
     public func setActive() throws {
-        libusb_set_configuration(config.raw_handle, // The handle we are configuring ourselves with
+        guard let handle = config.raw_handle else {
+            throw USBError.connectionClosed
+        }
+        libusb_set_configuration(handle, // The handle we are configuring ourselves with
                                  Int32(value)) // our value
     }
     
@@ -127,7 +138,7 @@ internal class ConfigurationRef {
         self.descriptor = descriptor
     }
     
-    var raw_handle: OpaquePointer {
+    var raw_handle: OpaquePointer? {
         get {
             device.raw_handle
         }

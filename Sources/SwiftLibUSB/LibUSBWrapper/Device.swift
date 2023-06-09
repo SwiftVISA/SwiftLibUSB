@@ -105,6 +105,24 @@ public class Device: Hashable {
         return String(bytes: buffer, encoding: .ascii) ?? "Vendor: \(vendorId) Product: \(productId)"
     }
     
+    /// Close the connection to the device
+    ///
+    /// No communication can be done with the device while it is closed. It can be reopened by calling
+    /// ``reopen``. This does nothing if the device is already closed.
+    public func close() {
+        device.close()
+    }
+    
+    /// Reopen the connection to the device
+    ///
+    /// Use this to restart a connection that has been closed using ``close``. This does nothing if the device was already open.
+    /// - Throws:
+    ///    * ``USBError/noMemory`` if the device handle could not be allocated
+    ///    * ``USBError/access`` if the user has insufficient permissions
+    ///    * ``USBError/noDevice`` if the device was disconnected
+    public func reopen() throws {
+        try device.reopen()
+    }
     
     /// Send a control transfer to a device.
     /// - Parameters:
@@ -183,21 +201,41 @@ public class Device: Hashable {
 internal class DeviceRef {
     let context: ContextRef
     let raw_device: OpaquePointer
-    let raw_handle: OpaquePointer
+    var raw_handle: OpaquePointer?
+    var open: Bool
     
     init(context: ContextRef, device: OpaquePointer) throws {
         self.context = context
         raw_device = device
-        var base_handle: OpaquePointer? = nil
-        let error = libusb_open(device, &base_handle)
+        raw_handle = nil
+        let error = libusb_open(device, &raw_handle)
         if error < 0 {
             throw USBError.from(code: error)
         }
-        raw_handle = base_handle!
+        open = raw_handle != nil
+    }
+    
+    func close() {
+        if open {
+            libusb_close(raw_handle)
+            open = false
+        }
+    }
+    
+    func reopen() throws {
+        if !open {
+            let error = libusb_open(raw_device, &raw_handle)
+            if error < 0 {
+                throw USBError.from(code: error)
+            }
+            open = raw_handle != nil
+        }
     }
     
     deinit {
-        libusb_close(raw_handle)
+        if open {
+            libusb_close(raw_handle)
+        }
     }
 }
 

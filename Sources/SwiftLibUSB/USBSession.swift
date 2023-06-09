@@ -104,9 +104,8 @@ private extension USBSession {
 
 extension USBSession: Session {
     /// Closes the session. The instrument owning this session will no longer be able to read or write data.
-    /// - Throws: ``USBInstrument/Error`` if the session cannot be closed
-    public func close() throws {
-        throw Error.notSupported
+    public func close() {
+        usbDevice.close()
     }
     
     /// Tries to reestablish the session's connection.
@@ -114,6 +113,6 @@ extension USBSession: Session {
     ///  - timeout: The amount of time in milliseconds to attempt to reconnect. A timeout of 0 will try forever
     /// - Throws: ``USBInstrument/Error`` if the session cannot be reconnected
     public func reconnect(timeout: TimeInterval) throws {
-        throw Error.notSupported
+        try usbDevice.reopen()
     }
 }
