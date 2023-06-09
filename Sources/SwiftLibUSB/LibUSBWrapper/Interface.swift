@@ -8,9 +8,9 @@
 import Foundation
 import Usb
 
-/// A group of endpoints
+/// A group of endpoints.
 ///
-/// An `AltSetting` determines what functions these endpoints have.
+/// An ``AltSetting`` determines what functions these endpoints have.
 public class Interface : Hashable {
     public static func == (lhs: Interface, rhs: Interface) -> Bool {
         return lhs.interface.raw_device == rhs.interface.raw_device && lhs.interface.index == rhs.interface.index
@@ -33,15 +33,15 @@ public class Interface : Hashable {
         }
     }
     
-    /// Informs the operating system that this interface will be used.
+    /// Inform the operating system that this interface will be used.
     ///
     /// The parent configuration should be made active before calling this, and this must be called before activating
     /// an alternate setting.
     ///
-    /// - throws: a USBError if claiming fails
+    /// - throws: a ``USBError`` if claiming fails
     /// * `.busy` if another program has claimed the interface
     /// * `.noDevice` if the device has been disconnected
-    func claim() throws {
+    public func claim() throws {
         try interface.claim()
     }
     
@@ -52,7 +52,7 @@ public class Interface : Hashable {
     }
 }
 
-/// Internal class for managing lifetimes.
+/// An internal class for managing lifetimes.
 ///
 /// This exists to make sure the libUSB device and context outlive any interfaces even if the Device and Context are freed.
 internal class InterfaceRef {

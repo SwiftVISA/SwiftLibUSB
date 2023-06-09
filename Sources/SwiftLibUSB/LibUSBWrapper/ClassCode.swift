@@ -8,7 +8,7 @@
 import Foundation
 import Usb
 
-/// A description used by `AltSetting`s to describe the communication method for the interface.
+/// A description used by ``AltSetting``s to describe the communication method for the interface.
 ///
 /// The individual protocols are documented on the [USB website](https://www.usb.org/documents).
 ///

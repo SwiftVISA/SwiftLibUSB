@@ -8,16 +8,18 @@
 import Foundation
 import Usb
 
-/// Each device has at least 1 configuration, often more. libUSB keeps track of these with libusb config descriptors.
-/// Each instance manages 1 of these descriptors, inclduing managing the getting and freeing of this descriptor
+/// Each device has at least one configuration, often more. LibUSB keeps track of these with `libusb_config_descriptor`s.
+/// Each instance manages one of these descriptors, including managing the getting and freeing of this descriptor.
 public class Configuration: Hashable{
+    /// An array of Interfaces
     var interfaces : [Interface]
+    /// An internal class to manage the lifetime of the configuration
     var config: ConfigurationRef
     
-    /// Loads the configuration with the given index
+    /// Load the configuration with the given index
     ///
-    /// - throws: a ``USBError`` if getting the configuration fails
-    /// * `.notFound` if the index is invalid
+    /// - throws: A ``USBError`` if getting the configuration fails
+    /// * `.notFound` if the index is invalid.
     init(_ device: DeviceRef, index: UInt8) throws {
         var desc: UnsafeMutablePointer<libusb_config_descriptor>? = nil
         let error = libusb_get_config_descriptor(device.raw_device, index, &desc)
@@ -29,9 +31,9 @@ public class Configuration: Hashable{
         getInterfaces()
     }
     
-    /// Gets the descriptor of the active configuration.
+    /// Get the descriptor of the active configuration.
     ///
-    /// - throws: a USBError if getting the configuration fails
+    /// - throws: A ``USBError`` if getting the configuration fails
     /// * `.notFound` if the device is not configured
     init(_ device: DeviceRef) throws {
         var desc: UnsafeMutablePointer<libusb_config_descriptor>? = nil
@@ -44,6 +46,7 @@ public class Configuration: Hashable{
         getInterfaces()
     }
     
+    /// Get the interfces of the configuration.
     func getInterfaces(){
         let size = Int(config.numInterfaces)
         for i in 0..<size {
@@ -87,21 +90,21 @@ public class Configuration: Hashable{
         }
     }
     
-    /// Compares configuration by their internal pointer. Two configurations classes that point to the same libUSB config descriptor are considered the same
+    /// Compare configurations by their internal pointer. Two configuration classes that point to the same `libUSB_config_descriptor` are considered the same
     public static func == (lhs: Configuration, rhs: Configuration) -> Bool {
         lhs.config.descriptor == rhs.config.descriptor
     }
     
-    /// Makes this configuration active, if possible
+    /// Make this configuration active, if possible.
     ///
     /// The device should have been opened with `device.open` first.
     ///
     /// Activating the configuration should be done before claiming an interface or sending data.
     ///
-    /// - throws: A USBError if activating the configuration fails
+    /// - throws: A ``USBError`` if activating the configuration fails
     /// * `.busy` if interfaces have already been claimed
     /// * `.noDevice` if the device has been unplugged
-    func setActive() throws {
+    public func setActive() throws {
         libusb_set_configuration(config.raw_handle, // The handle we are configuring ourselves with
                                  Int32(value)) // our value
     }
@@ -112,7 +115,7 @@ public class Configuration: Hashable{
     }
 }
 
-/// Internal class for managing lifetimes
+/// An internal class for managing lifetimes
 ///
 /// This exists to ensure the libUSB device and context outlive any child objects.
 internal class ConfigurationRef {
