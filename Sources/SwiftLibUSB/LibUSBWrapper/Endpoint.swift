@@ -24,21 +24,21 @@ public class Endpoint {
         
     }
     
-    /// Address of the endpoint
+    /// The address of the endpoint
     var address: Int {
         get {
             Int(descriptor.pointee.bEndpointAddress)
         }
     }
     
-    /// Attributes which apply to the endpoint
+    /// The attributes which apply to the endpoint
     var attributes: Int {
         get {
             Int(descriptor.pointee.bmAttributes)
         }
     }
     
-    /// Direction of the data transfer of the endpoint
+    /// The direction of the data transfer of the endpoint
     var direction: Direction {
         get {
             switch descriptor.pointee.bEndpointAddress >> 7 {
@@ -62,11 +62,11 @@ public class Endpoint {
     }
     
     /// Clear halts or stalls for the endpoint
-    func clearHalt(){
+    func clearHalt() {
         libusb_clear_halt(altSetting.raw_handle, descriptor.pointee.bEndpointAddress)
     }
     
-    /// Sends a message to a bulk out endpoint
+    /// Send a message to a bulk out endpoint
     ///
     /// This will only work properly if this endpoint is bulk out (`direction == .out` and `.transferType == .bulk`)
     ///
@@ -80,14 +80,19 @@ public class Endpoint {
         var sent: Int32 = 0;
         var data = [UInt8](data)
         let length: Int32 = Int32(data.count)
+        
+        // Attempt to perform a bulk out transfer
         let error = libusb_bulk_transfer(altSetting.raw_handle, descriptor.pointee.bEndpointAddress, &data, length, &sent, 1000)
+        
+        // Throw if the transfer had any errors
         if error < 0 {
             throw USBError.from(code: error)
         }
+        
         return Int(sent)
     }
     
-    /// Receives a message from a bulk in endpoint
+    /// Receive a message from a bulk in endpoint
     ///
     /// This will only work properly if this endpoint is bulk in (`direction == .in` and `.transferType == .bulk`)
     ///
@@ -99,17 +104,21 @@ public class Endpoint {
     /// * `.invalidParam` if the transfer size is larger than the OS or device support
     /// * `.overflow` if more data was sent than was requested
     func receiveBulkTransfer(length: Int32 = 1024) throws -> Data {
-        //clearHalt()
         var sent: Int32 = 0;
         var innerData = [UInt8](repeating: 0, count: Int(length))
+        
+        // Attempt to perform a bulk in transfer
         let error = libusb_bulk_transfer(altSetting.raw_handle, descriptor.pointee.bEndpointAddress,
                                          &innerData, length, &sent, 1000)
+        
+        // Throw if the transfer had any errors
         if error < 0 {
             throw USBError.from(code: error)
         }
         if(sent <= 12){
             throw USBError.other
         }
+        
         return Data(innerData[..<Int(sent)])
     }
 }

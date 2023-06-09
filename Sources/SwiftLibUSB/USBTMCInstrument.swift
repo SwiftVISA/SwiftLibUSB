@@ -31,11 +31,13 @@ public class USBTMCInstrument : USBInstrument {
     /// Attempts to connect to a USB device with the given identification.
     ///
     /// - Parameters:
-    ///    - vendorID: the number assigned to the manufacturer of the device
-    ///    - productID: the number assigned to this type of device
-    ///    - SerialNumber: an optional string assigned uniquely to this device. This is needed if multiple of the same type of device are connected.
+    ///    - vendorID: The number assigned to the manufacturer of the device
+    ///    - productID: The number assigned to this type of device
+    ///    - serialNumber: An optional string assigned uniquely to this device. This is needed if multiple of the same type of device are connected.
     ///
-    ///    These can be found from the VISA identification string in the following format: `USB::<vendorID>::<productID>::<SerialNumber>::...`
+    ///- note: The productID, vendorID, and serialNumber can be found from the VISA identification string in the following format:
+    ///
+    /// `USB::<vendorID>::<productID>::<SerialNumber>::...`
     ///
     /// - Throws: ``USBInstrument/Error`` if there is an error establishing the instrument, ``USBError`` if the libUSB library encounters an error and ``USBTMCInstrument/Error`` if there is any other problem.
     override init(vendorID: Int, productID: Int, serialNumber: String? = nil) throws {
@@ -49,14 +51,16 @@ public class USBTMCInstrument : USBInstrument {
         getCapabilities()
     }
     
-    /// An alternarte initiliser for creating a USB Test and Measurment Class Device
+    /// An alternarte initalizer for creating a USB Test and Measurment Class Device
     ///
-    /// This initliser uses a raw Visa String instead of the individual parameters. An example is
+    /// This initliser uses a raw Visa String instead of the individual parameters. An example is:
+    ///
     /// `USB0::10893::5634::MY59001442::0::INSTR`
+    ///
     /// - Parameters:
     ///     - visaString: A properly formatted visa string that corresponds to a physically connected device
-    /// - Throws: ``USBInstrument/Error`` if there is an error establishing the instrument, ``USBError`` if the libUSB library encounters an error and ``USBTMCInstrument/Error`` if there is any other problem.
-    convenience init (visaString: String) throws {
+    /// - Throws: ``USBInstrument/Error`` if there is an error establishing the instrument, ``USBError`` if the libUSB library encounters an error, and ``USBTMCInstrument/Error`` if there is any other problem.
+    public convenience init (visaString: String) throws {
         let sections = visaString.split(separator: "::")
         if sections.count < 4 {
             throw Error.operationFailed // TODO: use a USBTMCInstrument Error
