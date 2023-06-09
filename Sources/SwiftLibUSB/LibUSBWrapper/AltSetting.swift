@@ -11,7 +11,7 @@ import Usb
 /// A setting that controls how endpoints behave. Each alternate estting has the information that describes how the endpoints are arranged and it holds the endpoints itself.
 /// This must be activated using ``AltSetting/setActive()`` before sending or receiving data through any of the ``Endpoint`` objects it contains.
 public class AltSetting : Hashable{
-    /// An array of Endpoints
+    /// The endpoints defined by this alternate setting
     var endpoints: [Endpoint]
     /// An internal class to manage the lifetime of the AltSetting
     var setting: AltSettingRef
@@ -20,6 +20,7 @@ public class AltSetting : Hashable{
     init(interface: InterfaceRef, index: Int) {
         setting = AltSettingRef(interface: interface, index: index)
         
+        // Fill the endpoint array with each endpoint defined
         endpoints = []
         for i in 0..<setting.numEndpoints {
             endpoints.append(Endpoint(altSetting: setting, index: i))
