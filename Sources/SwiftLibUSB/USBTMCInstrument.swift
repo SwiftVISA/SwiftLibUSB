@@ -22,11 +22,11 @@ import CoreSwiftVISA
 public class USBTMCInstrument : USBInstrument {
     // USB instruments are required to have various attributes, we use the defaults
     public var attributes = MessageBasedInstrumentAttributes()
-    var messageIndex: UInt8
-    var inEndpoint: Endpoint?
-    var outEndpoint: Endpoint?
-    var activeInterface: AltSetting?
-    var canUseTerminator: Bool
+    private var messageIndex: UInt8
+    private var inEndpoint: Endpoint?
+    private var outEndpoint: Endpoint?
+    private var activeInterface: AltSetting?
+    private var canUseTerminator: Bool
     
     /// Attempts to connect to a USB device with the given identification.
     ///
@@ -40,7 +40,7 @@ public class USBTMCInstrument : USBInstrument {
     /// `USB::<vendorID>::<productID>::<SerialNumber>::...`
     ///
     /// - Throws: ``USBInstrument/Error`` if there is an error establishing the instrument, ``USBError`` if the libUSB library encounters an error and ``USBTMCInstrument/USBTMCError`` if there is any other problem.
-    override init(vendorID: Int, productID: Int, serialNumber: String? = nil) throws {
+    public override init(vendorID: Int, productID: Int, serialNumber: String? = nil) throws {
         messageIndex = 1
         inEndpoint = nil
         outEndpoint = nil
@@ -248,7 +248,6 @@ extension USBTMCInstrument {
             
             // Send the request message to a bulk out endpoint
             try outEndpoint!.sendBulkTransfer(data: &message, timeout: Int(attributes.operationDelay * 1000))
-
             
             // Get the response message from a bulk in endpoint
             let data = try inEndpoint!.receiveBulkTransfer(length: chunkSize + Self.headerSize + 3, timeout: Int(attributes.operationDelay * 1000))

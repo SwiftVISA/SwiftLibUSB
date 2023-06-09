@@ -19,14 +19,14 @@ import Usb
 public class Context {
     
     /// The class that manages the pointer to the context. Extra references to this generally should not be made as they may impede deconstruction
-    var context: ContextRef
+    private var context: ContextRef
     
     /// The device list. Its job is to store all devices that were connected to the device when the context was initialized.
-    var devices: [Device]
+    public var devices: [Device]
     
     /// Initialize libUSB, and create the device list.
     /// - throws: A ``USBError`` if creating the context fails
-    init() throws {
+    public init() throws {
         // Create the class that holds the reference to the context pointer
         try context = ContextRef()
         

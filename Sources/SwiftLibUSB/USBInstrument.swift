@@ -22,7 +22,7 @@ public class USBInstrument {
     ///   - productID: The productID of the device
     ///   - serialNumber: The serial number of the device
     ///- Throws: ``Error`` if there is an error initalizing the session. ``USBError`` if libUSB encounted an error
-    init(vendorID: Int, productID: Int, serialNumber: String?) throws {
+    public init(vendorID: Int, productID: Int, serialNumber: String?) throws {
         _session = try USBSession(vendorID: vendorID, productID: productID, serialNumber: serialNumber)
     }
     

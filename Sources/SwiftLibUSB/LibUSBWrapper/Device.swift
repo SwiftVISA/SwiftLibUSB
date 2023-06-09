@@ -12,11 +12,11 @@ import Usb
 /// Communicating with the device requires opening the device.
 public class Device: Hashable {
     /// The device as libUSB understands it. It is managed as a pointer
-    var device: DeviceRef
+    private var device: DeviceRef
     /// A C struct containing information about the device
-    var descriptor: libusb_device_descriptor
+    private var descriptor: libusb_device_descriptor
     /// Each device has "configurations" which manage their operation.
-    var configurations: [Configuration]
+    public var configurations: [Configuration]
     
     /// Contruct a device from a context and a pointer to the device
     /// - Parameters:
@@ -48,7 +48,7 @@ public class Device: Hashable {
     /// The product ID of the device.
     /// Can be accessed prior to a connection.
     ///  - Returns: An integer representing the product ID
-    var productId: Int {
+    public var productId: Int {
         get {
             Int(descriptor.idProduct)
         }
@@ -57,7 +57,7 @@ public class Device: Hashable {
     /// The vendor ID of the device.
     /// Can be accessed prior to connection.
     ///  - Returns: An integer representing the vendor ID
-    var vendorId: Int {
+    public var vendorId: Int {
         get {
             Int(descriptor.idVendor)
         }
@@ -65,7 +65,7 @@ public class Device: Hashable {
     
     /// The serial number of the device. Useful in identifying a device if there are multiple with the same product and vendor ID.
     ///  - Returns: A string representing the serial number of the device, or a blank string if the serial number cannot be found
-    var serialCode: String {
+    public var serialCode: String {
         get{
             if(descriptor.iSerialNumber == 0){
                 return ""
@@ -86,7 +86,7 @@ public class Device: Hashable {
     
     /// Get a human readable version descriptor of a device by indicating both its vendor and product IDs. Together they form a primary key that can uniquely indentify the connected device.
     /// - Returns: A string in the format "Vendor: [vendorID] Product: [productID]"
-    var displayName: String {
+    public var displayName: String {
         // If the index is 0 give the name as indicated
         if(descriptor.iProduct == 0){
             return "Vendor: \(vendorId) Product: \(productId)"
@@ -117,7 +117,7 @@ public class Device: Hashable {
     ///   - timeout: Timeout (in milliseconds) that this function should wait before stopping due to no response being received. For an unlimited timeout, use value 0.
     /// - Returns: The data sent back from the device
     /// - Throws: a ``USBError`` if libUSB encounters an internal error
-    func sendControlTransfer(
+    public func sendControlTransfer(
         requestType: UInt8,
         request: UInt8,
         value: UInt16,
@@ -149,7 +149,7 @@ public class Device: Hashable {
     ///   - timeout: Timeout (in milliseconds) that this function should wait before stopping due to no response being received. For an unlimited timeout, use value 0.
     ///- Returns: The data sent back from the device
     ///- Throws: a ``USBError`` if libUSB encounters and internal error
-    func sendControlTransfer(
+    public func sendControlTransfer(
         direction: Direction,
         type: LibUSBControlType,
         recipient: LibUSBRecipient,
