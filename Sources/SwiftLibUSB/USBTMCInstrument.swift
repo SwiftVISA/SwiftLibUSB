@@ -188,8 +188,8 @@ extension USBTMCInstrument {
     /// - Parameters:
     ///   - headerSuffix: Header for the read request
     ///   - length: The maximum amount of data to receive
-    ///   - chunkSize: The amount of data to pull in each time
-    /// - Returns: The data read from the device.
+    ///   - chunkSize: The amount of data to receive each time
+    /// - Returns: The data read from the device
     func receiveUntilEndOfMessage(headerSuffix: Data, length: Int?, chunkSize: Int) throws -> Data {
         var readData = Data()
         var endOfMessage = false
