@@ -273,11 +273,11 @@ extension USBTMCInstrument : MessageBasedInstrument {
     /// - Parameters:
     ///   - terminator: A string representing the terminator sequence
     ///   - strippingTerminator: If true removes the terminator from the data returned
-    ///   - encoding: The encoding for the returned string and the terminator
+    ///   - encoding: The encoding for the returned string and the terminator. If unspecified, ascii is assumed
     ///   - chunkSize: The number of bytes to read into a buffer at a time.
     /// - Returns: The data received as a string with the specified encoding
     /// - Throws: A ``USBError`` if a failure occurs during a data transfer or a ``USBTMCError`` if the data cannot be encoded
-    public func read(until terminator: String, strippingTerminator: Bool, encoding: String.Encoding, chunkSize: Int) throws -> String {
+    public func read(until terminator: String, strippingTerminator: Bool, encoding: String.Encoding = .ascii, chunkSize: Int) throws -> String {
         // Prepare the parameters
         guard let terminatorBytes = terminator.data(using:encoding) else {
             throw USBTMCError.invalidTerminator
@@ -331,12 +331,12 @@ extension USBTMCInstrument : MessageBasedInstrument {
     /// Write data to the device as a string.
     /// - Parameters:
     ///   - string: The string to write to the device.
-    ///   - terminator: The terminator to add to the end of `string`.
-    ///   - encoding: The method to encode the string with.
+    ///   - terminator: The terminator to add to the end of `string`. Can be nil or blank. nil is default
+    ///   - encoding: The method to encode the string with. If unspecified, ascii is assumed
     /// - Throws: Error if the device could not be written to.
     /// - Returns: The number of bytes that were written to the device.
     /// - Throws: A ``USBError`` if a failure occurs during a data transfer or a ``USBTMCError`` if the data cannot be encoded
-    public func write(_ string: String, appending terminator: String?, encoding: String.Encoding) throws -> Int {
+    public func write(_ string: String, appending terminator: String? = nil, encoding: String.Encoding = .ascii) throws -> Int {
         let message = string + (terminator ?? "")
         let messageData = message.data(using: encoding)
         
@@ -349,10 +349,10 @@ extension USBTMCInstrument : MessageBasedInstrument {
     /// Write data to a device as bytes.
     /// - Parameters:
     ///   - bytes: The data to write to the device.
-    ///   - terminator: The sequence of bytes to append to the end of `bytes`.
+    ///   - terminator: The sequence of bytes to append to the end of `bytes`. Can be nil if no terminator should be added. nil is default
     /// - Returns: The number of bytes that were written to the device.
     /// - Throws: A ``USBError`` if a failure occurs during a data transfer
-    public func writeBytes(_ data: Data, appending terminator: Data?) throws -> Int {
+    public func writeBytes(_ data: Data, appending terminator: Data? = nil) throws -> Int {
         let messageData = data + (terminator ?? Data())
 
         let writeSize = min(data.count,1024)
