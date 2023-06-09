@@ -8,10 +8,19 @@
 import Foundation
 import CoreSwiftVISA
 
-/// An Instrument connected over USB
+
+/// A common type of instrument connected over USB.
+/// This class controlls USB Test and Measurement Class Devices. [The specification for which can be found here](https://www.usb.org/document-library/test-measurement-class-specification).
+/// This classification of devices is used for VISA-compatible instruments. If you need to connect to a USB device that does not support this protocol, you will need a new class to communicate with it.
 ///
-/// This depends on the USB device using the USBTMC interface, which should be the case for all VISA-compatible instruments. If you need to connect to a USB device that does not support this protocol, you will need a new class to communicate with it.
-class USBTMCInstrument : USBInstrument {
+/// A USBTMCInstrument is a USBInstrument, meaning it holds a USB session. The USBSession handles the connection and finding the device
+/// This class a Message Based Instrument meaning it can read and write messages
+///
+/// A USBTMCInstrument can be created using either identifiying characteristics(vendorID,productID,serialNumber) or by the devices Visa String. For more detail on constructing, see the initlisers
+///
+/// Instruments are automatically found and connected to, and prepepared for communication on inilitisation. They can be written to and read from immedietly. If a problem is encountered, a ``USBTMCInstrument/USBTMCError`` is thrown
+public class USBTMCInstrument : USBInstrument {
+    // USB instruments are required to have various attributes, we use the defaults
     public var attributes = MessageBasedInstrumentAttributes()
     var messageIndex: UInt8
     var inEndpoint: Endpoint?
@@ -178,7 +187,7 @@ extension USBTMCInstrument {
         }
     }
     
-    func receiveUntilEndOfMessage(headerSuffix: Data, length: Int?, chunkSize: Int) throws -> Data {
+    private func receiveUntilEndOfMessage(headerSuffix: Data, length: Int?, chunkSize: Int) throws -> Data {
         var readData = Data()
         var endOfMessage = false
         
@@ -288,7 +297,7 @@ extension USBTMCInstrument : MessageBasedInstrument {
     /// - Returns: The number of bytes that were written to the device.
     func writeBytes(_ data: Data, appending terminator: Data?) throws -> Int {
         let messageData = data + (terminator ?? Data())
-        let writeSize = 12 // TODO: Increase to a larger number
+        let writeSize = min(data.count,1024)
         
         // Split the message if necessary
         var sliceNum = 0
@@ -324,12 +333,9 @@ extension USBTMCInstrument : MessageBasedInstrument {
             // Pad to 4 byte boundary
             dataToSend.append(Data(Array(repeating: 0, count: (4 - dataSlice.count % 4) % 4)))
             
-            print([UInt8](dataToSend)) // TODO: Remove debug print
-            
             // Send the command message to a bulk out endpoint
             (outEndpoint!).clearHalt()
             let num = try (outEndpoint!).sendBulkTransfer(data: &dataToSend)
-            print("Sent \(num) bytes") // TODO: Remove debug print
             nextMessage()
         }
         return 0
@@ -341,7 +347,7 @@ extension USBTMCInstrument {
     ///
     public enum USBTMCError: Swift.Error {
         /// When looking for USB endpoints to send messages through, no alternative setting could be found that has compliant endpoints
-        /// Or an altsetting claims to have endpoints it doesn't have
+        /// Or an altsetting claims to have endpoints it doesn't have.
         case couldNotFindEndpoint
         
         ///The terminator given could not be accepted by the device
