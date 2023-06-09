@@ -18,7 +18,7 @@ public class Interface : Hashable {
     var altSettings: [AltSetting]
     var interface: InterfaceRef
     
-    init(config: ConfigurationRef, index: Int) {
+    public init(config: ConfigurationRef, index: Int) {
         interface = InterfaceRef(config: config, index: Int32(index))
         altSettings = []
         for i in 0..<Int(interface.numAltsetting) {
@@ -40,7 +40,7 @@ public class Interface : Hashable {
     /// - throws: a USBError if claiming fails
     /// * `.busy` if another program has claimed the interface
     /// * `.noDevice` if the device has been disconnected
-    func claim() throws {
+    public func claim() throws {
         try interface.claim()
     }
     
