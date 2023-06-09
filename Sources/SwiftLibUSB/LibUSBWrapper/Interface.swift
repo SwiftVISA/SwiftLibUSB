@@ -16,8 +16,8 @@ public class Interface : Hashable {
         return lhs.interface.raw_device == rhs.interface.raw_device && lhs.interface.index == rhs.interface.index
     }
     
-    var altSettings: [AltSetting]
-    var interface: InterfaceRef
+    public var altSettings: [AltSetting]
+    private var interface: InterfaceRef
     
     init(config: ConfigurationRef, index: Int) {
         interface = InterfaceRef(config: config, index: Int32(index))
@@ -27,7 +27,7 @@ public class Interface : Hashable {
         }
     }
     
-    var index: Int {
+    public var index: Int {
         get {
             Int(interface.index)
         }
