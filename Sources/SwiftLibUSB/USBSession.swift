@@ -16,7 +16,7 @@ public class USBSession {
     public private(set) var productID: Int
     
     /// Stores the vendor ID. Each vendor is given an ID used to identify their products. Forms part of the primary key
-    public private(set) var vendorID: Int { get }
+    public private(set) var vendorID: Int
     
     /// Stores the serial number, if defined. This must be specified if more than one device has the same vendor and product id
     public private(set) var serialNumber: String?
@@ -102,7 +102,7 @@ private extension USBSession {
     }
 }
 
-public extension USBSession: Session {
+extension USBSession: Session {
     /// Closes the session. The instrument owning this session will no longer be able to read or write data.
     /// - Throws: ``USBInstrument.Error`` if the session cannot be closed
     public func close() throws {

@@ -13,7 +13,7 @@ import CoreSwiftVISA
 /// This does nothing on its own; use USBTMCInstrument or another subclass to communicate with a device.
 public class USBInstrument {
     ///Holds a ``USBSession`` internally
-    private var _session: USBSession
+    public private(set) var _session: USBSession
     
     
     /// Initalize a usb instrument with a vendorID productID and serial number
@@ -30,7 +30,7 @@ public class USBInstrument {
 
 public extension USBInstrument {
     /// An error associated with a USB Instrument.
-    public enum Error: Swift.Error {
+    enum Error: Swift.Error {
         /// Unknown error occured resulting in failed operation.
         case operationFailed
         
@@ -53,7 +53,7 @@ public extension USBInstrument {
 
 public extension USBInstrument.Error {
     /// A more descritive explanation of what each error associated with a USB Instrument is.
-    public var localizedDescription: String {
+    var localizedDescription: String {
         switch self {
         case .operationFailed:
             return "An unknown error occured causing the operation to fail"
