@@ -11,7 +11,7 @@ import CoreSwiftVISA
 /// A base class for instruments connected over USB.
 ///
 /// This does nothing on its own; use USBTMCInstrument or another subclass to communicate with a device.
-class USBInstrument {
+public class USBInstrument {
     var _session: USBSession
     
     init(vendorID: Int, productID: Int, serialNumber: String?) throws {
@@ -21,30 +21,30 @@ class USBInstrument {
 }
 
 extension USBInstrument {
-    /// An error associated with a  USB Instrument.
-    /// 
+    /// An error associated with a USB Instrument.
     public enum Error: Swift.Error {
-        //unknown error occured resulting in failed operation
+        /// Unknown error occured resulting in failed operation.
         case operationFailed
         
         /// Could not find a device with the specified vendorID and productID and Serial Number(If not null).
         case couldNotFind
         
-        /// Found multiple devices with the same vendor and product ID, but Serial Number was not specified. Serial number **must** be specified if there can be multiple devices with the same product ID and vendor ID
+        /// Found multiple devices with the same vendor and product ID, but Serial Number was not specified. Serial number **must** be specified if there can be multiple devices with the same product ID and vendor ID.
         case identificationNotUnique
         
-        /// Found no devices when searching
+        /// Found no devices when searching.
         case noDevices
         
         /// Found multiple devices with the same product id, vendor id and serial number.
         case serialCodeNotUnique
         
-        //The requested operation is not supported by the device
+        /// The requested operation is not supported by the device.
         case notSupported
     }
 }
 
 extension USBInstrument.Error {
+    /// A more descritive explanation of what each error associated with a USB Instrument is.
     public var localizedDescription: String {
         switch self {
         case .operationFailed:

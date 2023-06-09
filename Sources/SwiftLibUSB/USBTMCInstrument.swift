@@ -88,6 +88,7 @@ extension USBTMCInstrument {
         
         func toByte() -> UInt8 {
             switch self {
+            // 0 is reserved
             case .initiateAbortBulkOut: return 1
             case .checkAbortBulkOutStatus: return 2
             case .initiateAbortBulkIn: return 3
@@ -125,8 +126,8 @@ extension USBTMCInstrument {
         (altSetting.interfaceProtocol == 0 || altSetting.interfaceProtocol == 1)
     }
     
-    /// Claims the interfaces and selects the endpoints for communicating
-    private func setupEndpoints(config: Configuration, interface: Interface, altSetting: AltSetting) throws{
+    /// Claims the interfaces and selects the in and out endpoints for communicating with a device
+    private func setupEndpoints(config: Configuration, interface: Interface, altSetting: AltSetting) throws {
         try config.setActive()
         try interface.claim()
         try altSetting.setActive()
@@ -135,8 +136,8 @@ extension USBTMCInstrument {
         outEndpoint = try getEndpoint(endpoints: altSetting.endpoints,direction: Direction.Out)
     }
     
-    /// Finds an endpoint with the intended direction
-    private func getEndpoint(endpoints: [Endpoint],direction: Direction) throws -> Endpoint  {
+    /// Finds a bulk trasnfer endpoint with the intended direction
+    private func getEndpoint(endpoints: [Endpoint], direction: Direction) throws -> Endpoint {
         for endpoint in endpoints {
             if endpoint.direction == direction && endpoint.transferType == .bulk {
                 return endpoint
@@ -150,6 +151,11 @@ extension USBTMCInstrument {
         messageIndex = (messageIndex % 255) + 1
     }
     
+    /// Creates the portion of the header described in Table 8 of the USBTMC specifications. It then adds the transfer size parameter. Almost all messages to and from a device include this header.
+    /// - Parameters:
+    ///   - read: Boolean describing whether the information flows to or from a device. Use `true` if reading from the devide, and `false` if writing to the device. By default, this value is `false`.
+    ///   - bufferSize:The amount of data being sent or received. The default value is 1028.
+    /// - Returns: The filled header of the message to be sent or received.
     private func makeHeader(read: Bool = false, bufferSize: Int = 1028) -> Data {
         // Part 1 of header: message type, message index, inverse of message index, padding
         var firstByte : UInt8 = read ? 2 : 1 // Reads are type 2, writes are type 1
@@ -164,8 +170,8 @@ extension USBTMCInstrument {
     
     /// Get the capabilities of the device.
     ///
-    /// Available capabilities include whether the device supports sending data, receiving data, pulsing, or using a terminator character on reads
-    private func getCapabilities(){
+    /// Available capabilities include whether the device supports sending data, receiving data, pulsing, or using a terminator character on reads.
+    private func getCapabilities() {
         do {
             // These arguments are defined by the USBTMC specification, table 36
             let capabilities: Data = try _session.usbDevice.sendControlTransfer(
@@ -186,7 +192,13 @@ extension USBTMCInstrument {
             canUseTerminator = false
         }
     }
-    
+
+    /// Send a USBTMC request message as defined in section 3.2.1.2 of the USBTMC specifications.
+    /// - Parameters:
+    ///   - headerSuffix: Header for the read request
+    ///   - length: The maximum amount of data to receive
+    ///   - chunkSize: The amount of data to pull in each time
+    /// - Returns: The data read from the device.
     private func receiveUntilEndOfMessage(headerSuffix: Data, length: Int?, chunkSize: Int) throws -> Data {
         var readData = Data()
         var endOfMessage = false
@@ -210,8 +222,6 @@ extension USBTMCInstrument {
             
             // Send the request message to a bulk out endpoint
             let num = try outEndpoint!.sendBulkTransfer(data: &message)
-            print("Sent \(num) bytes")
-            print("Sent request message")
             
             // Get the response message from a bulk in endpoint and print it
             let data = try inEndpoint.unsafelyUnwrapped.receiveBulkTransfer()
