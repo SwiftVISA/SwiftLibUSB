@@ -28,8 +28,8 @@ class USBTMCInstrument : USBInstrument {
     ///
     ///    These can be found from the VISA identification string in the following format: `USB::<vendorID>::<productID>::<SerialNumber>::...`
     ///
-    /// - Throws: an error if the device was not found, or if it doesn't support the USBTMC interface.
-    override init(vendorID: Int, productID: Int, serialNumber: String?) throws {
+    /// - Throws: ``USBInstrument/Error`` if there is an error establishing the instrument, ``USBError`` if the libUSB library encounters an error and ``USBTMCInstrument/Error`` if there is any other problem.
+    override init(vendorID: Int, productID: Int, serialNumber: String? = nil) throws {
         messageIndex = 1
         inEndpoint = nil
         outEndpoint = nil
@@ -38,6 +38,27 @@ class USBTMCInstrument : USBInstrument {
         try super.init(vendorID: vendorID, productID: productID, serialNumber: serialNumber)
         try findEndpoints()
         getCapabilities()
+    }
+    
+    /// An alternarte initiliser for creating a USB Test and Measurment Class Device
+    ///
+    /// This initliser uses a raw Visa String instead of the individual parameters. An example is
+    /// `USB0::10893::5634::MY59001442::0::INSTR`
+    /// - Parameters:
+    ///     - visaString: A properly formatted visa string that corresponds to a physically connected device
+    /// - Throws: ``USBInstrument/Error`` if there is an error establishing the instrument, ``USBError`` if the libUSB library encounters an error and ``USBTMCInstrument/Error`` if there is any other problem.
+    convenience init (visaString: String) throws {
+        let sections = visaString.split(separator: "::")
+        if sections.count < 4 {
+            throw Error.operationFailed // TODO: use a USBTMCInstrument Error
+        }
+        let vendorID = Int(sections[1])
+        let productID = Int(sections[2])
+        if vendorID == nil || productID == nil {
+            throw Error.operationFailed // TODO: use a USBTMCInstrument Error
+        }
+        
+        try self.init(vendorID:vendorID!,productID:productID!, serialNumber: String(sections[3]))
     }
 }
 extension USBTMCInstrument {

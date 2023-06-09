@@ -71,7 +71,7 @@ extension USBSession {
                     }
                     didFind = true
                     foundDevice = device
-                }else if (SerialNumber! == device.serialCode){
+                }else if ((SerialNumber!) == device.serialCode){
                     if(didFind == true){
                         throw Error.serialCodeNotUnique
                     }
