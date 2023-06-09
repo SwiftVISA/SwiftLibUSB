@@ -136,7 +136,7 @@ public class Endpoint {
     /// - Parameters:
     ///   - length: The length of the buffer to send to this out endpoint. Measured in bytes, the default is 1024 bytes
     ///   - timeout: The amount of time, in milliseconds to wait before timing out of the message. The default is 1000(1 second)
-    func receiveBulkTransfer(length: Int32 = 1024, timeout: UInt32 = 1000) throws -> Data {
+    func receiveBulkTransfer(length: Int = 1024, timeout: UInt32 = 1000) throws -> Data {
         // Throw an error if this is the wrong kind of endpoint
         if transferType != .bulk || direction != .In {
             throw USBError.notSupported
@@ -148,7 +148,7 @@ public class Endpoint {
         
         // Attempt to perform a bulk in transfer
         let error = libusb_bulk_transfer(altSetting.raw_handle, descriptor.pointee.bEndpointAddress,
-                                         &innerData, length, &sent, timeout)
+                                         &innerData, Int32(length), &sent, timeout)
         
         // Throw if the transfer had any errors
         if error < 0 {

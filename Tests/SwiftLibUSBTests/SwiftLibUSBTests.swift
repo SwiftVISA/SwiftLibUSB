@@ -28,6 +28,14 @@ final class SwiftLibUSBTests: XCTestCase {
         let response = try instrument!.readBytes(length: 1024, chunkSize: 16)
         XCTAssert(response == "+1.000000E+00 \n".data(using: .utf8))
     }
+    
+    func testMultipleChunks() throws {
+        let repetitions = 66  // This might be the biggest response the power supply can send
+        instrument?.attributes.chunkSize = 128
+        let query = String(repeating: "VOLT?;", count: repetitions) + "VOLT?"
+        let response = try instrument!.query(query)
+        XCTAssert(response.count == repetitions * 15 + 14) // Every response takes 15 bytes, including the removed newline
+    }
 
     func testPerformanceExample() throws {
         // This is an example of a performance test case.
