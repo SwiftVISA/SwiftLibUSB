@@ -17,7 +17,7 @@ public class Device: Hashable {
     /// Each device has "configurations" which manage their operation.
     var configurations: [Configuration]
     
-    /// contruct a device from a context and a pointer to the device
+    /// Contruct a device from a context and a pointer to the device
     /// - Parameters:
     ///   - context: the associated context class
     ///   - pointer: the pointer to the device
@@ -52,7 +52,7 @@ public class Device: Hashable {
         }
     }
     
-    /// Simple getter for the vendor ID of the device
+    /// Simple getter for the vendor ID of the device.
     /// Can be accessed prior to connection
     ///  - Returns: An integer representing the vendor ID
     var vendorId: Int {
@@ -61,8 +61,8 @@ public class Device: Hashable {
         }
     }
     
-    /// Serial number of the device, useful in identifying a device if there are multiple with the same product and vendor id
-    /// Returns a blank string if the serial number cannot be found
+    /// Serial number of the devic. Useful in identifying a device if there are multiple with the same product and vendor ID.
+    ///  - Returns: A string containing the serial number of the device, or a blank string if the serial number cannot be found
     var serialCode: String {
         get{
             if(descriptor.iSerialNumber == 0){
@@ -82,9 +82,8 @@ public class Device: Hashable {
         }
     }
     
-    /// Gets a human readable version of a device by indicating both the vendor and product id
-    /// Together they form a primary key that can uniquely indentify the connected device
-    /// - Returns: A ``String`` in the format "Vendor: [vendorID] Product: [productID]"
+    /// Get a human readable version descriptor of a device by indicating both its vendor and product ID. Together they form a primary key that can uniquely indentify the connected device.
+    /// - Returns: A string in the format "Vendor: [vendorID] Product: [productID]"
     var displayName: String {
         // If the index is 0 give the name as indicated
         if(descriptor.iProduct == 0){
@@ -105,17 +104,17 @@ public class Device: Hashable {
     }
     
     
-    ///Send a control transfer to a device
+    /// Send a control transfer to a device.
     /// - Parameters:
-    ///   - requestType:
-    ///   - request:
-    ///   - value:
-    ///   - index:
-    ///   - data: the data of the control transfer
-    ///   - length: the length of the data to transfer
-    ///   - timeout: timeout (in milliseconds) that this function should wait before giving up due to no response being received. For an unlimited timeout, use value 0.
-    /// - Returns: the data sent back from the device
-    /// - Throws: a ``USBError`` if libusb encounters and internal error
+    ///   - requestType: The request type for the setup packet
+    ///   - request: The request for the setup packet
+    ///   - value: The value for the setup packet
+    ///   - index: The index for the setup packet
+    ///   - data: The data sent in the control transfer
+    ///   - length: The length of the data to transfer
+    ///   - timeout: Timeout (in milliseconds) that this function should wait before stopping due to no response being received. For an unlimited timeout, use value 0.
+    /// - Returns: The data sent back from the device
+    /// - Throws: a ``USBError`` if libUSB encounters an internal error
     func sendControlTransfer(
         requestType: UInt8,
         request: UInt8,
@@ -135,17 +134,17 @@ public class Device: Hashable {
         return Data(charArrayData)
     }
     
-    ///
+    /// Send a control transfer to a device.
     /// - Parameters:
-    ///   - direction:
-    ///   - type:
-    ///   - recipient:
-    ///   - request:
-    ///   - value:
-    ///   - index:
-    ///   - data:
-    ///   - length:
-    ///   - timeout: timeout (in milliseconds) that this function should wait before giving up due to no response being received. For an unlimited timeout, use value 0.
+    ///   - direction: The direction of the transfer
+    ///   - type: The request type
+    ///   - recipient: Specifies what is receiving the request
+    ///   - request: The request for the setup packet
+    ///   - value: The value for the setup packet
+    ///   - index: The index for the setup packet
+    ///   - data: The data sent in the control transfer
+    ///   - length:The length of the data to transfer
+    ///   - timeout: Timeout (in milliseconds) that this function should wait before stopping due to no response being received. For an unlimited timeout, use value 0.
     ///- Returns: the data sent back from the device
     ///- Throws: a ``USBError`` if libusb encounters and internal error
     func sendControlTransfer(
@@ -178,7 +177,7 @@ public class Device: Hashable {
 
 /// Internal class for managing lifetimes
 ///
-/// This ensures the libUSB context isn't freed until all devices have been closed.
+/// This ensures the libUSB context is not freed until all the devices have been closed.
 internal class DeviceRef {
     let context: ContextRef
     let raw_device: OpaquePointer
