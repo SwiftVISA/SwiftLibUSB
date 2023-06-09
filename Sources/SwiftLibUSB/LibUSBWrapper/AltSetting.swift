@@ -12,9 +12,9 @@ import Usb
 /// This must be activated using ``AltSetting/setActive()`` before sending or receiving data through any of the ``Endpoint`` objects it contains.
 public class AltSetting : Hashable{
     /// The endpoints defined by this alternate setting
-    var endpoints: [Endpoint]
+    public var endpoints: [Endpoint]
     /// An internal class to manage the lifetime of the AltSetting
-    var setting: AltSettingRef
+    private var setting: AltSettingRef
     
     /// Construct an AltSetting from an Interface and an index.
     init(interface: InterfaceRef, index: Int) {
@@ -34,7 +34,7 @@ public class AltSetting : Hashable{
     /// The name of the AltSetting to be displayed
     ///
     /// This requires the device to be open.
-    var displayName: String {
+    public var displayName: String {
         get {
             // If the index is 0 this is an unnamed alt setting
             if(setting.interfaceName == 0){
@@ -61,35 +61,35 @@ public class AltSetting : Hashable{
     }
     
     /// The number of this interface
-    var interfaceIndex: Int {
+    public var interfaceIndex: Int {
         get {
             setting.interfaceNumber
         }
     }
     
     /// The value used to select this alternate setting for this interface
-    var index: Int {
+    public var index: Int {
         get {
             setting.index
         }
     }
     
     /// A code describing what kind of communication this setting handles
-    var interfaceClass: ClassCode {
+    public var interfaceClass: ClassCode {
         get {
             setting.interfaceClass
         }
     }
     
     /// If the `interfaceClass` has subtypes, this gives that type.
-    var interfaceSubClass: Int {
+    public var interfaceSubClass: Int {
         get {
             setting.interfaceSubClass
         }
     }
     
     /// If the `interfaceClass` and `interfaceSubClass` have protocols, this gives the protocol
-    var interfaceProtocol: Int {
+    public var interfaceProtocol: Int {
         get {
             setting.interfaceProtocol
         }

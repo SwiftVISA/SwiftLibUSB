@@ -104,8 +104,7 @@ private extension USBSession {
 
 extension USBSession: Session {
     /// Closes the session. The instrument owning this session will no longer be able to read or write data.
-    /// - Throws: ``USBInstrument/Error`` if the session cannot be closed
-    public func close() throws {
+    public func close() {
         usbDevice.close()
     }
     

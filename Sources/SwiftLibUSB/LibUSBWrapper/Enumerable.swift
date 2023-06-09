@@ -15,7 +15,7 @@ import Foundation
 public enum Direction {
     case In
     case Out
-    var val: UInt8 {
+    public var val: UInt8 {
         get {
             switch self {
             case .In:
@@ -51,7 +51,7 @@ public enum LibUSBControlType{
     case Class
     case Vendor
     case Reserved
-    var val: UInt8 {
+    public var val: UInt8 {
         get {
             switch self {
             case .Standard:
@@ -70,7 +70,7 @@ public enum LibUSBControlType{
 /// Describes what is receiving the request.
 ///
 /// A ``Device``, ``Interface``, ``Endpoint``, or something else (`Other`) could be receiving the request.
-enum LibUSBRecipient{
+public enum LibUSBRecipient{
     case Device
     case Interface
     case Endpoint

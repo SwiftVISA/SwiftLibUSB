@@ -12,9 +12,9 @@ import Usb
 /// Each instance manages one of these descriptors, including managing the getting and freeing of this descriptor.
 public class Configuration: Hashable{
     /// An array of Interfaces
-    var interfaces : [Interface]
+    public var interfaces : [Interface]
     /// An internal class to manage the lifetime of the configuration
-    var config: ConfigurationRef
+    private var config: ConfigurationRef
     
     /// Load the configuration with the given index
     ///
@@ -47,7 +47,7 @@ public class Configuration: Hashable{
     }
     
     /// Get the interfces of the configuration.
-    func getInterfaces(){
+    public func getInterfaces(){
         let size = Int(config.numInterfaces)
         for i in 0..<size {
             interfaces.append(Interface(config: config, index: i))
@@ -55,14 +55,14 @@ public class Configuration: Hashable{
     }
     
     /// The index used to get a string descriptor of this configuration
-    var index: Int {
+    public var index: Int {
         get {
             config.index
         }
     }
     
     /// The number used to identify this configuration
-    var value: Int {
+    public var value: Int {
         get {
             config.value
         }
@@ -71,7 +71,7 @@ public class Configuration: Hashable{
     /// The name of the `Configuration` to be displayed.
     ///
     /// This requires the device to be open.
-    var displayName: String {
+    public var displayName: String {
         get {
             // If the index is 0 this is an unnamed configuration
             if(config.index == 0){

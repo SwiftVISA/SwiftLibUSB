@@ -13,10 +13,10 @@ import Usb
 /// - Note: Before transferring data, libUSB requires that the configuration be active, the interface be claimed and the alternate setting that contains this endpoint be activated. The configuration can be made active by calling ``Configuration/setActive()`` in the ``Configuration`` object used. The interface is claimed by calling ``Interface/claim()`` in the ``Interface`` used.  The altsetting that this endpoint is a part of can be activated by ``AltSetting/setActive()``
 public class Endpoint {
     /// The descriptor of the endpoint is pointed to by this pointer. This is the raw descriptor as given by libUSB, which is hard to use. Getter methods should be used instead of referencing this directly. [It is documented here](https://libusb.sourceforge.io/api-1.0/structlibusb__endpoint__descriptor.html)
-    var descriptor: UnsafePointer<libusb_endpoint_descriptor>
+    private var descriptor: UnsafePointer<libusb_endpoint_descriptor>
     
     /// Because all endpoints belong to an altsetting, the altsetting the endpoint belongs to is stored by the endpoint
-    var altSetting: AltSettingRef
+    private var altSetting: AltSettingRef
     
     /// Creates the endpoint itself. This is generally done automatically.
     /// - Parameters:
@@ -29,7 +29,7 @@ public class Endpoint {
     
     /// The address of the endpoint.
     /// It corresponds to the value bEndpointAddress as defined by libUSB
-    var address: Int {
+    public var address: Int {
         get {
             Int(descriptor.pointee.bEndpointAddress)
         }
@@ -78,11 +78,11 @@ public class Endpoint {
         }
     }
     
-    /// Clear halts or stalls for the endpoint. If a device does not like the inputs it was sent, it haults. Before more messages can proceed the halt to the endpoint must be cleared. For consistant operation through errors, an endpoint should be cleared of halts before it should be used
+    /// Clear halts or stalls for the endpoint. If a device does not like the inputs it was sent, it halts. Before more messages can proceed the halt to the endpoint must be cleared. For consistant operation through errors, an endpoint should be cleared of halts before it should be used
     /// - Throws:
     /// * ``USBError/connectionClosed`` if the device was closed using ``Device/close()``
     /// * ``USBError/noDevice`` if the device was disconnected
-    func clearHalt() throws {
+    public func clearHalt() throws {
         guard let handle = altSetting.raw_handle else {
             throw USBError.connectionClosed
         }
@@ -107,7 +107,7 @@ public class Endpoint {
     /// - Parameters:
     ///   - data: the raw bytes to send unaltered to the device through this endpoint
     ///   - timeout: The time, in millisecounds, to wait before timeout. This is by default one second
-    func sendBulkTransfer(data: inout Data, timeout: UInt32 = 1000) throws -> Int {
+    public func sendBulkTransfer(data: inout Data, timeout: Int = 1000) throws -> Int {
         // Only work if we are the right kind of endpoint
         if transferType != .bulk || direction != .Out {
             throw USBError.notSupported
@@ -153,7 +153,7 @@ public class Endpoint {
     /// - Parameters:
     ///   - length: The length of the buffer to send to this out endpoint. Measured in bytes, the default is 1024 bytes
     ///   - timeout: The amount of time, in milliseconds to wait before timing out of the message. The default is 1000(1 second)
-    func receiveBulkTransfer(length: Int = 1024, timeout: UInt32 = 1000) throws -> Data {
+    public func receiveBulkTransfer(length: Int = 1024, timeout: Int = 1000) throws -> Data {
         // Throw an error if this is the wrong kind of endpoint
         if transferType != .bulk || direction != .In {
             throw USBError.notSupported
@@ -170,7 +170,7 @@ public class Endpoint {
         
         // Attempt to perform a bulk in transfer
         let error = libusb_bulk_transfer(handle, descriptor.pointee.bEndpointAddress,
-                                         &innerData, Int32(length), &sent, timeout)
+                                         &innerData, Int32(length), &sent, UInt32(timeout))
         
         // Throw if the transfer had any errors
         if error < 0 {

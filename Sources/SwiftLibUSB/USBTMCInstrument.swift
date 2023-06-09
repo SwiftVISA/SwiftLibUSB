@@ -22,11 +22,11 @@ import CoreSwiftVISA
 public class USBTMCInstrument : USBInstrument {
     // USB instruments are required to have various attributes, we use the defaults
     public var attributes = MessageBasedInstrumentAttributes()
-    var messageIndex: UInt8
-    var inEndpoint: Endpoint?
-    var outEndpoint: Endpoint?
-    var activeInterface: AltSetting?
-    var canUseTerminator: Bool
+    private var messageIndex: UInt8
+    private var inEndpoint: Endpoint?
+    private var outEndpoint: Endpoint?
+    private var activeInterface: AltSetting?
+    private var canUseTerminator: Bool
     
     /// Attempts to connect to a USB device with the given identification.
     ///
@@ -39,8 +39,8 @@ public class USBTMCInstrument : USBInstrument {
     ///
     /// `USB::<vendorID>::<productID>::<SerialNumber>::...`
     ///
-    /// - Throws: ``USBInstrument/Error`` if there is an error establishing the instrument, ``USBError`` if the libUSB library encounters an error and ``USBTMCInstrument/Error`` if there is any other problem.
-    override init(vendorID: Int, productID: Int, serialNumber: String? = nil) throws {
+    /// - Throws: ``USBInstrument/Error`` if there is an error establishing the instrument, ``USBError`` if the libUSB library encounters an error and ``USBTMCInstrument/USBTMCError`` if there is any other problem.
+    public override init(vendorID: Int, productID: Int, serialNumber: String? = nil) throws {
         messageIndex = 1
         inEndpoint = nil
         outEndpoint = nil
@@ -59,16 +59,16 @@ public class USBTMCInstrument : USBInstrument {
     ///
     /// - Parameters:
     ///     - visaString: A properly formatted visa string that corresponds to a physically connected device
-    /// - Throws: ``USBInstrument/Error`` if there is an error establishing the instrument, ``USBError`` if the libUSB library encounters an error, and ``USBTMCInstrument/Error`` if there is any other problem.
+    /// - Throws: ``USBInstrument/Error`` if there is an error establishing the instrument, ``USBError`` if the libUSB library encounters an error, and ``USBTMCInstrument/USBTMCError`` if there is any other problem.
     public convenience init (visaString: String) throws {
         let sections = visaString.components(separatedBy: "::")
         if sections.count < 4 {
-            throw Error.operationFailed // TODO: use a USBTMCInstrument Error
+            throw USBTMCError.invalidVisa
         }
         let vendorID = Int(sections[1])
         let productID = Int(sections[2])
         if vendorID == nil || productID == nil {
-            throw Error.operationFailed // TODO: use a USBTMCInstrument Error
+            throw USBTMCError.invalidVisa
         }
         
         try self.init(vendorID:vendorID!,productID:productID!, serialNumber: String(sections[3]))
@@ -208,7 +208,7 @@ extension USBTMCInstrument {
                 index: UInt16(activeInterface?.index ?? 0),
                 data: Data(count: 24),
                 length: 24,
-                timeout: 10000
+                timeout: UInt32(Int(attributes.operationDelay * 1000))
             )
             let termCapability = [UInt8](capabilities.subdata(in: 5..<6))[0]
             canUseTerminator = termCapability == 1
@@ -247,11 +247,10 @@ extension USBTMCInstrument {
             try inEndpoint!.clearHalt()
             
             // Send the request message to a bulk out endpoint
-            try outEndpoint!.sendBulkTransfer(data: &message)
-
+            try outEndpoint!.sendBulkTransfer(data: &message, timeout: Int(attributes.operationDelay * 1000))
             
             // Get the response message from a bulk in endpoint
-            let data = try inEndpoint!.receiveBulkTransfer(length: chunkSize + Self.headerSize + 3)
+            let data = try inEndpoint!.receiveBulkTransfer(length: chunkSize + Self.headerSize + 3, timeout: Int(attributes.operationDelay * 1000))
             
             nextMessage()
             
@@ -394,7 +393,7 @@ extension USBTMCInstrument : MessageBasedInstrument {
             dataToSend.append(Data(Array(repeating: 0, count: paddingLength)))
             
             // Send the command message to a bulk out endpoint
-            let num = try (outEndpoint!).sendBulkTransfer(data: &dataToSend)
+            let num = try (outEndpoint!).sendBulkTransfer(data: &dataToSend, timeout: Int(attributes.operationDelay * 1000))
             lowerBound += num - Self.headerSize - paddingLength // Move up by the amount sent rather than a constant
 
             nextMessage()
@@ -416,6 +415,9 @@ extension USBTMCInstrument {
         
         /// When attempting to encode a user given string with a user given encoding, an error occurs
         case cannotEncode
+        
+        /// The given VISA string was not understood
+        case invalidVisa
     }
 }
 
@@ -428,6 +430,8 @@ extension USBTMCInstrument.USBTMCError {
             return "Invalid terminator given"
         case .cannotEncode:
             return "Could not encode given string with given encoding"
+        case .invalidVisa:
+            return "The given visa string could not be interpreted"
         }
     }
 }
