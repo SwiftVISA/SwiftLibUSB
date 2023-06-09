@@ -18,7 +18,7 @@ public class Configuration: Hashable{
     
     /// Load the configuration with the given index
     ///
-    /// - throws: A `USBError` if getting the configuration fails
+    /// - throws: A ``USBError`` if getting the configuration fails
     /// * `.notFound` if the index is invalid.
     init(_ device: DeviceRef, index: UInt8) throws {
         var desc: UnsafeMutablePointer<libusb_config_descriptor>? = nil
@@ -33,7 +33,7 @@ public class Configuration: Hashable{
     
     /// Get the descriptor of the active configuration.
     ///
-    /// - throws: A `USBError` if getting the configuration fails
+    /// - throws: A ``USBError`` if getting the configuration fails
     /// * `.notFound` if the device is not configured
     init(_ device: DeviceRef) throws {
         var desc: UnsafeMutablePointer<libusb_config_descriptor>? = nil

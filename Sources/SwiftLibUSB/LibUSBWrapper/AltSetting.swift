@@ -91,7 +91,7 @@ public class AltSetting : Hashable{
     ///
     /// This must be done before sending data through the endpoints. The parent configuration and interface should have been activated and claimed first.
     ///
-    /// - throws: A `USBError` if activating the setting fails
+    /// - throws: A ``USBError`` if activating the setting fails
     /// * `.notFound` if the interface was not claimed
     /// * `.noDevice` if the device was disconnected
     public func setActive() throws {

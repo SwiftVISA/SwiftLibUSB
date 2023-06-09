@@ -12,7 +12,7 @@ import Usb
 ///
 /// This class handles both the initialization and closing of contexts automatically. It also automatically allocates and deallocates libUSB's device list.
 ///
-/// The main job of the context class is to hold the device list. This is the master list of all connected devices. It is stored in the read-only variable "devices" and stores objects of type `Device`
+/// The main job of the context class is to hold the device list. This is the master list of all connected devices. It is stored in the read-only variable "devices" and stores objects of type ``Device``
 /// - Note: While many libUSB methods allow for using a null context, using a context is preferred. For this reason, all of the events will occur in some given context.
 ///
 /// - Throws: USBError if libUSB encounters an error attempting some task.
@@ -57,7 +57,7 @@ public class Context {
 
 /// An internal class for managing the libUSB context
 ///
-/// This ensures the context will not be freed until all devices created from it are freed. It has the responsibility of managing the actual pointer that libUSB understands as the context. This class is internal and should not be used directly. It is designed to be only used by `Context`.
+/// This ensures the context will not be freed until all devices created from it are freed. It has the responsibility of managing the actual pointer that libUSB understands as the context. This class is internal and should not be used directly. It is designed to be only used by ``Context``.
 /// To ensure proper functionality, extra references to the context reference classes should generally not be made, as they must be deconstructed in a particular order.
 internal class ContextRef {
     /// This value is the context as libUSB understands it. It must be initialized during construction and deinitialized during deconstruction.

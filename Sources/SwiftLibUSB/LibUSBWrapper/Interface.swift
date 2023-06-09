@@ -10,7 +10,7 @@ import Usb
 
 /// A group of endpoints.
 ///
-/// An `AltSetting` determines what functions these endpoints have.
+/// An ``AltSetting`` determines what functions these endpoints have.
 public class Interface : Hashable {
     public static func == (lhs: Interface, rhs: Interface) -> Bool {
         return lhs.interface.raw_device == rhs.interface.raw_device && lhs.interface.index == rhs.interface.index
@@ -19,7 +19,7 @@ public class Interface : Hashable {
     var altSettings: [AltSetting]
     var interface: InterfaceRef
     
-    public init(config: ConfigurationRef, index: Int) {
+    init(config: ConfigurationRef, index: Int) {
         interface = InterfaceRef(config: config, index: Int32(index))
         altSettings = []
         for i in 0..<Int(interface.numAltsetting) {
@@ -38,7 +38,7 @@ public class Interface : Hashable {
     /// The parent configuration should be made active before calling this, and this must be called before activating
     /// an alternate setting.
     ///
-    /// - throws: a USBError if claiming fails
+    /// - throws: a ``USBError`` if claiming fails
     /// * `.busy` if another program has claimed the interface
     /// * `.noDevice` if the device has been disconnected
     public func claim() throws {

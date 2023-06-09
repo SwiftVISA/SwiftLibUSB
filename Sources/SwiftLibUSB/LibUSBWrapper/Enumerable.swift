@@ -8,7 +8,7 @@
 import Foundation
 
 
-/// Describes the direction of data transfer on an `Endpoint`.
+/// Describes the direction of data transfer on an ``Endpoint``.
 ///
 /// `In` endpoints can only transfer data from the device to the program, while
 /// `Out` endpoints only transfer data from the program to the device.
@@ -27,7 +27,7 @@ public enum Direction {
     }
 }
 
-/// Describes the type of data transfer an `Endpoint` can send.
+/// Describes the type of data transfer an ``Endpoint`` can send.
 ///
 /// `bulk` endpoints transfer individual blocks of data.
 /// `isochronous` endpoints transfer streams, such as audio or video, that need to be received quickly, but that can be dropped occasionally without problems.
