@@ -224,7 +224,7 @@ internal class DeviceRef {
     
     func reopen() throws {
         if !open {
-            let error = libusb_open(device, &raw_handle)
+            let error = libusb_open(raw_device, &raw_handle)
             if error < 0 {
                 throw USBError.from(code: error)
             }
