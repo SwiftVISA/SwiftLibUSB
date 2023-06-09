@@ -208,7 +208,7 @@ extension USBTMCInstrument {
                 index: UInt16(activeInterface?.index ?? 0),
                 data: Data(count: 24),
                 length: 24,
-                timeout: Int(attributes.operationDelay * 1000)
+                timeout: UInt32(Int(attributes.operationDelay * 1000))
             )
             let termCapability = [UInt8](capabilities.subdata(in: 5..<6))[0]
             canUseTerminator = termCapability == 1

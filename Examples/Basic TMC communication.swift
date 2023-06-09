@@ -6,3 +6,9 @@
 //
 
 import Foundation
+
+class tmcTalker(){
+    static func main() {
+        print("Starting.")
+    }
+}
