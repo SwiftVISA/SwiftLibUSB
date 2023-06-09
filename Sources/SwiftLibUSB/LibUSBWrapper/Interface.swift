@@ -7,7 +7,7 @@
 
 import Foundation
 
-/// A group of endpoints
+/// A group of endpoints.
 ///
 /// An `AltSetting` determines what functions these endpoints have.
 public class Interface : Hashable {
@@ -18,7 +18,7 @@ public class Interface : Hashable {
     var altSettings: [AltSetting]
     var interface: InterfaceRef
     
-    init(config: ConfigurationRef, index: Int) {
+    public init(config: ConfigurationRef, index: Int) {
         interface = InterfaceRef(config: config, index: Int32(index))
         altSettings = []
         for i in 0..<Int(interface.numAltsetting) {
@@ -32,7 +32,7 @@ public class Interface : Hashable {
         }
     }
     
-    /// Informs the operating system that this interface will be used.
+    /// Inform the operating system that this interface will be used.
     ///
     /// The parent configuration should be made active before calling this, and this must be called before activating
     /// an alternate setting.
@@ -51,7 +51,7 @@ public class Interface : Hashable {
     }
 }
 
-/// Internal class for managing lifetimes.
+/// An internal class for managing lifetimes.
 ///
 /// This exists to make sure the libUSB device and context outlive any interfaces even if the Device and Context are freed.
 internal class InterfaceRef {
