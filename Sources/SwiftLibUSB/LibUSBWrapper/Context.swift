@@ -68,7 +68,7 @@ internal class ContextRef {
     init() throws {
         var context: OpaquePointer? = nil;
         let error = libusb_init(&context)
-        if (error == 0) {
+        if error == 0 {
             self.context = context!
         } else {
             throw USBError.from(code: error)

@@ -11,7 +11,7 @@ import Usb
 /// A group of endpoints.
 ///
 /// An ``AltSetting`` determines what functions these endpoints have.
-public class Interface : Hashable {
+public class Interface: Hashable {
     public static func == (lhs: Interface, rhs: Interface) -> Bool {
         return lhs.interface.raw_device == rhs.interface.raw_device && lhs.interface.index == rhs.interface.index
     }

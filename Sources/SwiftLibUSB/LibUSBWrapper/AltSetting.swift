@@ -10,7 +10,7 @@ import Usb
 
 /// A setting that controls how endpoints behave. Each alternate estting has the information that describes how the endpoints are arranged and it holds the endpoints itself.
 /// This must be activated using ``AltSetting/setActive()`` before sending or receiving data through any of the ``Endpoint`` objects it contains.
-public class AltSetting : Hashable{
+public class AltSetting: Hashable {
     /// The endpoints defined by this alternate setting
     public var endpoints: [Endpoint]
     /// An internal class to manage the lifetime of the AltSetting
@@ -28,7 +28,9 @@ public class AltSetting : Hashable{
     }
     
     public static func == (lhs: AltSetting, rhs: AltSetting) -> Bool {
-        lhs.setting.raw_device == rhs.setting.raw_device && lhs.index == rhs.index && lhs.interfaceIndex == rhs.interfaceIndex
+        lhs.setting.raw_device == rhs.setting.raw_device &&
+          lhs.index == rhs.index &&
+          lhs.interfaceIndex == rhs.interfaceIndex
     }
     
     /// The name of the AltSetting to be displayed
@@ -37,7 +39,7 @@ public class AltSetting : Hashable{
     public var displayName: String {
         get {
             // If the index is 0 this is an unnamed alt setting
-            if(setting.interfaceName == 0){
+            if setting.interfaceName == 0 {
                 return "(\(index)) unnamed alt setting"
             }
             
@@ -49,10 +51,14 @@ public class AltSetting : Hashable{
             // Make a buffer for the name of the alt setting
             let size = 256;
             var buffer: [UInt8] = Array(repeating: 0, count: size)
-            let returnCode = libusb_get_string_descriptor_ascii(handle, UInt8(setting.interfaceName), &buffer, Int32(size))
+            let returnCode = libusb_get_string_descriptor_ascii(
+                handle,
+                UInt8(setting.interfaceName),
+                &buffer,
+                Int32(size))
             
             // Check if there is an error when filling the buffer with the name
-            if(returnCode <= 0){
+            if returnCode <= 0 {
                 return "\(index) error getting name: \(USBError.from(code: returnCode).localizedDescription)"
             }
             

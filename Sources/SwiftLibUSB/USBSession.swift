@@ -21,7 +21,7 @@ public class USBSession {
     /// Stores the serial number, if defined. This must be specified if more than one device has the same vendor and product id
     public private(set) var serialNumber: String?
     
-    ///stores the internal ``Context`` used by the wrapper classes for libUSB
+    /// Stores the internal ``Context`` used by the wrapper classes for libUSB
     public private(set) var usbContext: Context
     
     ///stores the internal ``Device`` used by the wrapper classes for libUSB
@@ -42,7 +42,11 @@ public class USBSession {
         self.productID = productID
         self.serialNumber = serialNumber
         try usbContext = Self.raw_connect()
-        try usbDevice = Self.raw_find_device(vendorID: vendorID, productID: productID, serialNumber: serialNumber, context: usbContext)
+        try usbDevice = Self.raw_find_device(
+            vendorID: vendorID,
+            productID: productID,
+            serialNumber: serialNumber,
+            context: usbContext)
     }
 }
 
@@ -86,7 +90,7 @@ private extension USBSession {
                     }
                     didFind = true
                     foundDevice = device
-                }else if (serialNumber!) == device.serialCode {
+                } else if serialNumber! == device.serialCode {
                     if didFind == true {
                         throw Error.serialCodeNotUnique
                     }

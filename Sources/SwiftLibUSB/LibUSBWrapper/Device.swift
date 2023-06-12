@@ -67,13 +67,17 @@ public class Device: Hashable {
     ///  - Returns: A string representing the serial number of the device, or a blank string if the serial number cannot be found
     public var serialCode: String {
         get{
-            if(descriptor.iSerialNumber == 0){
+            if descriptor.iSerialNumber == 0 {
                 return ""
             }
             let size = 256;
             var buffer: [UInt8] = Array(repeating: 0, count: size)
-            let returnCode = libusb_get_string_descriptor_ascii(device.raw_handle, descriptor.iSerialNumber, &buffer, Int32(size))
-            if(returnCode <= 0){
+            let returnCode = libusb_get_string_descriptor_ascii(
+                device.raw_handle,
+                descriptor.iSerialNumber,
+                &buffer,
+                Int32(size))
+            if returnCode <= 0 {
                 return ""
             }
             // Buffer is now filled with the bytes of the serial code. Convert to string
@@ -88,17 +92,21 @@ public class Device: Hashable {
     /// - Returns: A string in the format "Vendor: [vendorID] Product: [productID]"
     public var displayName: String {
         // If the index is 0 give the name as indicated
-        if(descriptor.iProduct == 0){
+        if descriptor.iProduct == 0 {
             return "Vendor: \(vendorId) Product: \(productId)"
         }
         
         // Make a buffer for the name of the device
         let size = 256;
         var buffer: [UInt8] = Array(repeating: 0, count: size)
-        let returnCode = libusb_get_string_descriptor_ascii(device.raw_handle, descriptor.iProduct, &buffer, Int32(size))
+        let returnCode = libusb_get_string_descriptor_ascii(
+            device.raw_handle,
+            descriptor.iProduct,
+            &buffer,
+            Int32(size))
         
         // Check if there is an error when filling the buffer with the name
-        if(returnCode <= 0){
+        if returnCode <= 0 {
             return "error getting name: \(USBError.from(code: returnCode).localizedDescription)"
         }
         
@@ -145,9 +153,15 @@ public class Device: Hashable {
         timeout: UInt32
     ) throws -> Data {
         var charArrayData = [UInt8](data)
-        let returnVal = libusb_control_transfer(device.raw_handle,
-                                                requestType,request,value,index,
-                                                &charArrayData,length,timeout)
+        let returnVal = libusb_control_transfer(
+            device.raw_handle,
+            requestType,
+            request,
+            value,
+            index,
+            &charArrayData,
+            length,
+            timeout)
         if returnVal < 0 {
             throw USBError.from(code: returnVal)
         }
@@ -184,9 +198,14 @@ public class Device: Hashable {
         requestType += recipient.val << 0
         
         // Make the control transfer
-        return try sendControlTransfer(requestType: requestType, request: request,
-                                       value: value, index: index, data: data, length: length,
-                                       timeout: timeout)
+        return try sendControlTransfer(
+            requestType: requestType,
+            request: request,
+            value: value,
+            index: index,
+            data: data,
+            length: length,
+            timeout: timeout)
     }
     
     /// A hash representation of the device

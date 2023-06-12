@@ -15,7 +15,6 @@ public class USBInstrument {
     ///Holds a ``USBSession`` internally
     public private(set) var _session: USBSession
     
-    
     /// Initalize a usb instrument with a vendorID productID and serial number
     /// - Parameters:
     ///   - vendorID: The vendorID of the device
@@ -23,7 +22,10 @@ public class USBInstrument {
     ///   - serialNumber: The serial number of the device
     ///- Throws: ``Error`` if there is an error initalizing the session. ``USBError`` if libUSB encounted an error
     public init(vendorID: Int, productID: Int, serialNumber: String?) throws {
-        _session = try USBSession(vendorID: vendorID, productID: productID, serialNumber: serialNumber)
+        _session = try USBSession(
+            vendorID: vendorID,
+            productID: productID,
+            serialNumber: serialNumber)
     }
     
 }
@@ -71,7 +73,7 @@ public extension USBInstrument.Error {
     }
 }
 
-extension USBInstrument : Instrument {
+extension USBInstrument: Instrument {
     public var session: CoreSwiftVISA.Session {
         get{
             return _session

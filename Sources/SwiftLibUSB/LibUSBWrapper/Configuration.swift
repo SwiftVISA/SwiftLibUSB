@@ -10,9 +10,9 @@ import Usb
 
 /// Each device has at least one configuration, often more. LibUSB keeps track of these with `libusb_config_descriptor`s.
 /// Each instance manages one of these descriptors, including managing the getting and freeing of this descriptor.
-public class Configuration: Hashable{
+public class Configuration: Hashable {
     /// An array of Interfaces
-    public var interfaces : [Interface]
+    public var interfaces: [Interface]
     /// An internal class to manage the lifetime of the configuration
     private var config: ConfigurationRef
     
@@ -74,7 +74,7 @@ public class Configuration: Hashable{
     public var displayName: String {
         get {
             // If the index is 0 this is an unnamed configuration
-            if(config.index == 0){
+            if config.index == 0 {
                 return "(\(index)) unnamed configuration"
             }
             
@@ -86,10 +86,14 @@ public class Configuration: Hashable{
             // Make a buffer for the name of the configuration
             let size = 256;
             var buffer: [UInt8] = Array(repeating: 0, count: size)
-            let returnCode = libusb_get_string_descriptor_ascii(handle, UInt8(config.index), &buffer, Int32(size))
+            let returnCode = libusb_get_string_descriptor_ascii(
+                handle,
+                UInt8(config.index),
+                &buffer,
+                Int32(size))
             
             // Check if there is an error when filling the buffer with the name
-            if(returnCode <= 0){
+            if returnCode <= 0 {
                 return "(\(index)) unknown configuration"
             }
             

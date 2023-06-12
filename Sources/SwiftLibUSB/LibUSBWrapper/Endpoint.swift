@@ -126,7 +126,13 @@ public class Endpoint {
         let length: Int32 = Int32(data.count)
         
         // Attempt to perform a bulk out transfer
-        let error = libusb_bulk_transfer(handle, descriptor.pointee.bEndpointAddress, &data, length, &sent, UInt32(timeout))
+        let error = libusb_bulk_transfer(
+            handle,
+            descriptor.pointee.bEndpointAddress,
+            &data,
+            length,
+            &sent,
+            UInt32(timeout))
         
         // Throw if the transfer had any errors. Errors are given by sending back a negative value
         if error < 0 {
@@ -169,8 +175,13 @@ public class Endpoint {
         var innerData = [UInt8](repeating: 0, count: Int(length))
         
         // Attempt to perform a bulk in transfer
-        let error = libusb_bulk_transfer(handle, descriptor.pointee.bEndpointAddress,
-                                         &innerData, Int32(length), &sent, UInt32(timeout))
+        let error = libusb_bulk_transfer(
+            handle,
+            descriptor.pointee.bEndpointAddress,
+            &innerData,
+            Int32(length),
+            &sent,
+            UInt32(timeout))
         
         // Throw if the transfer had any errors
         if error < 0 {
