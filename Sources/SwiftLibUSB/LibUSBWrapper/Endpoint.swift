@@ -43,12 +43,49 @@ public class Endpoint {
     /// - Bits 2:3 are only used for isochronous endpoints and correspond to libusb_iso_sync_type.
     /// - Bits 4:5 are also only used for isochronous endpoints and correspond to libusb_iso_usage_type.
     /// - Bits 6:7 are reserved.
-    /// We st
     public var attributes: Int {
         get {
             Int(descriptor.pointee.bmAttributes)
         }
     }
+    
+    ///  Endpoints have a physical limit on the amount of data they can send in a single packet.
+    ///  Each sent packet must not exceed this size
+    public var maxPacketSize: Int {
+        get{
+            Int(descriptor.pointee.wMaxPacketSize)
+        }
+    }
+    
+    ///  The Interval for polling endpoint for data transfers.
+    ///  This value is measured in frames and ranges from 1-255 depending on context
+    ///  This is irrelevant for bulk and control endpoints.
+    ///  Isochronous endpoints will always have an interval of 1 frame
+    public var interval: Int {
+        get{
+            Int(descriptor.pointee.bInterval)
+        }
+    }
+    
+    /// Holds the bRefresh value as devined by the [libusb endpoint descriptor](https://libusb.sourceforge.io/api-1.0/structlibusb__endpoint__descriptor.html)
+    /// This **only** matters for audio devices, for non audio devices this is meaningless
+    /// The rate at which synchronization feedback is provided.
+    public var audioRefresh: Int {
+        get{
+            Int(descriptor.pointee.bRefresh)
+        }
+    }
+    
+    /// Holds the bSynchAddress value as devined by the [libusb endpoint descriptor](https://libusb.sourceforge.io/api-1.0/structlibusb__endpoint__descriptor.html)
+    /// This **only** matters for audio devices, for non audio devices this is meaningless
+    /// The address to which synchronozation is provided
+    public var audioSynchAddress: Int {
+        get{
+            Int(descriptor.pointee.bSynchAddress)
+        }
+    }
+    
+    
     
     /// The direction of the data transfer of the endpoint. This is determined by the last bit of the endpoint address
     /// - In denotes LIBUSB_ENDPOINT_IN which is the host recieving data from the device.
