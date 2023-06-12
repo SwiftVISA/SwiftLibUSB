@@ -113,7 +113,10 @@ public class AltSetting: Hashable {
         guard let handle = setting.raw_handle else {
             throw USBError.connectionClosed
         }
-        let error = libusb_set_interface_alt_setting(handle, Int32(setting.interfaceNumber), Int32(setting.index))
+        let error = libusb_set_interface_alt_setting(
+            handle,
+            Int32(setting.interfaceNumber),
+            Int32(setting.index))
         if error < 0 {
             throw USBError.from(code: error)
         }

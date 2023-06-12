@@ -41,8 +41,8 @@ public class USBSession {
         self.vendorID = vendorID
         self.productID = productID
         self.serialNumber = serialNumber
-        try usbContext = Self.raw_connect()
-        try usbDevice = Self.raw_find_device(
+        try usbContext = Self.rawConnect()
+        try usbDevice = Self.rawFindDevice(
             vendorID: vendorID,
             productID: productID,
             serialNumber: serialNumber,
@@ -54,7 +54,7 @@ private extension USBSession {
     /// connect to the device via libUSB
     /// - Returns: The interal ``Context`` that communicates with libusb
     /// - Throws: ``USBError`` on initialization if libUSB cannot initialize the ``Context``
-    private static func raw_connect() throws -> Context {
+    private static func rawConnect() throws -> Context {
         let createdContext = try Context()
         return createdContext
     }
@@ -69,7 +69,7 @@ private extension USBSession {
     ///   - context: The internal ``Context``
     /// - Returns: The ``Device`` specified
     /// - Throws: ``USBInstrument/Error`` if no devices are connected, the specified device could not be found, or the given information was not unique
-    private static func raw_find_device(
+    private static func rawFindDevice(
         vendorID: Int,
         productID: Int,
         serialNumber: String?,
@@ -78,28 +78,25 @@ private extension USBSession {
         if context.devices.isEmpty {
             throw Error.noDevices
         }
-        var didFind = false;
         var foundDevice: Device?
         for device in context.devices {
             if device.productId == productID &&
                device.vendorId == vendorID {
                 
                 if serialNumber == nil {
-                    if didFind == true {
+                    if foundDevice != nil {
                         throw Error.identificationNotUnique
                     }
-                    didFind = true
                     foundDevice = device
                 } else if serialNumber! == device.serialCode {
-                    if didFind == true {
+                    if foundDevice != nil {
                         throw Error.serialCodeNotUnique
                     }
-                    didFind = true
                     foundDevice = device
                 }
             }
         }
-        if didFind == false {
+        if foundDevice == nil {
             throw Error.couldNotFind
         }
         return foundDevice!

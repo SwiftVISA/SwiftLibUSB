@@ -81,9 +81,9 @@ public class Device: Hashable {
                 return ""
             }
             // Buffer is now filled with the bytes of the serial code. Convert to string
-            let asciibuffer = String(bytes: buffer, encoding: .ascii)  ?? ("")
+            let asciiBuffer = String(bytes: buffer, encoding: .ascii) ?? ""
             // If we cannot encode, we use a blank string, we then remove all extra bytes on the end
-            return String(asciibuffer.prefix(Int(returnCode)))
+            return String(asciiBuffer.prefix(Int(returnCode)))
             
         }
     }
@@ -116,15 +116,15 @@ public class Device: Hashable {
     /// Close the connection to the device
     ///
     /// No communication can be done with the device while it is closed. It can be reopened by calling
-    /// ``reopen``. This does nothing if the device is already closed.
+    /// ``reopen()``. This does nothing if the device is already closed.
     public func close() {
         device.close()
     }
     
     /// Reopen the connection to the device
     ///
-    /// Use this to restart a connection that has been closed using ``close``. This does nothing if the device was already open.
-    /// - Throws:
+    /// Use this to restart a connection that has been closed using ``close()``. This does nothing if the device was already open.
+    /// - Throws: a ``USBError``
     ///    * ``USBError/noMemory`` if the device handle could not be allocated
     ///    * ``USBError/access`` if the user has insufficient permissions
     ///    * ``USBError/noDevice`` if the device was disconnected

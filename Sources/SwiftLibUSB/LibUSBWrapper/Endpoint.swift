@@ -43,7 +43,6 @@ public class Endpoint {
     /// - Bits 2:3 are only used for isochronous endpoints and correspond to libusb_iso_sync_type.
     /// - Bits 4:5 are also only used for isochronous endpoints and correspond to libusb_iso_usage_type.
     /// - Bits 6:7 are reserved.
-    /// We st
     public var attributes: Int {
         get {
             Int(descriptor.pointee.bmAttributes)

@@ -60,7 +60,7 @@ public class USBTMCInstrument: USBInstrument {
     /// - Parameters:
     ///     - visaString: A properly formatted visa string that corresponds to a physically connected device
     /// - Throws: ``USBInstrument/Error`` if there is an error establishing the instrument, ``USBError`` if the libUSB library encounters an error, and ``USBTMCInstrument/USBTMCError`` if there is any other problem.
-    public convenience init (visaString: String) throws {
+    public convenience init(visaString: String) throws {
         let sections = visaString.components(separatedBy: "::")
         if sections.count < 4 {
             throw USBTMCError.invalidVisa
@@ -121,12 +121,13 @@ extension USBTMCInstrument {
         
         for config in device.configurations {
             for interface in config.interfaces {
-                for altSetting in interface.altSettings {
-                    let validEndpoint = endpointCheck(altSetting: altSetting)
-                    if validEndpoint {
-                        try setupEndpoints(config: config, interface: interface, altSetting: altSetting)
-                        return
-                    }
+                for altSetting in interface.altSettings where isTMC(altSetting: altSetting) {
+                    try setupEndpoints(
+                        config: config,
+                        interface: interface,
+                        altSetting: altSetting)
+                    // Stop looking after the first USBTMC interface we find
+                    return
                 }
             }
         }
@@ -137,7 +138,7 @@ extension USBTMCInstrument {
     /// Checks if an ``AltSetting`` supports USBTMC
     /// - Parameter altSetting: The ``AltSetting`` whose endpoints to check
     /// - Returns: True if the endpoint is compatible false otherwise
-    private func endpointCheck(altSetting: AltSetting) -> Bool {
+    private func isTMC(altSetting: AltSetting) -> Bool {
         return altSetting.interfaceClass == .application &&
             altSetting.interfaceSubClass == 0x03 &&
             (altSetting.interfaceProtocol == 0 || altSetting.interfaceProtocol == 1)
