@@ -65,16 +65,19 @@ public class USBTMCInstrument: USBInstrument {
         if sections.count < 4 {
             throw USBTMCError.invalidVisa
         }
-        let vendorID = Int(sections[1])
-        let productID = Int(sections[2])
-        if vendorID == nil || productID == nil {
+        
+        let vID = Int(sections[1])
+        let pID = Int(sections[2])
+        let serialNumber = sections[3]
+        
+        guard let vendorID = vID, let productID = pID else {
             throw USBTMCError.invalidVisa
         }
         
         try self.init(
-            vendorID: vendorID!,
-            productID: productID!,
-            serialNumber: String(sections[3]))
+            vendorID: vendorID,
+            productID: productID,
+            serialNumber: serialNumber)
     }
 }
 
@@ -84,6 +87,7 @@ extension USBTMCInstrument {
     private static let endOfMessageBit: UInt8 = 1
     private static let readLengthStartIndex = 4
     private static let readLengthEndIndex = 8
+    private static let capabilitiesIndex = 5
     
     /// Message types defined by USBTMC specification, table 15
     private enum ControlMessages {
@@ -219,7 +223,7 @@ extension USBTMCInstrument {
                 length: 24,
                 timeout: UInt32(Int(attributes.operationDelay * 1000))
             )
-            let termCapability = [UInt8](capabilities.subdata(in: 5..<6))[0]
+            let termCapability = capabilities[Self.capabilitiesIndex]
             canUseTerminator = termCapability == 1
         } catch {
             // Ignore errors for now
@@ -260,10 +264,14 @@ extension USBTMCInstrument {
             try inEndpoint!.clearHalt()
             
             // Send the request message to a bulk out endpoint
-            try outEndpoint!.sendBulkTransfer(data: &message, timeout: Int(attributes.operationDelay * 1000))
+            try outEndpoint!.sendBulkTransfer(
+                data: &message,
+                timeout: Int(attributes.operationDelay * 1000))
             
             // Get the response message from a bulk in endpoint
-            let data = try inEndpoint!.receiveBulkTransfer(length: chunkSize + Self.headerSize + 3, timeout: Int(attributes.operationDelay * 1000))
+            let data = try inEndpoint!.receiveBulkTransfer(
+                length: chunkSize + Self.headerSize + 3,
+                timeout: Int(attributes.operationDelay * 1000))
             
             nextMessage()
             
@@ -369,12 +377,10 @@ extension USBTMCInstrument: MessageBasedInstrument {
         encoding: String.Encoding
     ) throws -> Int {
         let message = string + (terminator ?? "")
-        let messageData = message.data(using: encoding)
-        
-        if messageData == nil {
+        guard let messageData = message.data(using: encoding) else {
             throw USBTMCError.cannotEncode
         }
-        return try writeBytes(messageData!, appending: nil)
+        return try writeBytes(messageData, appending: nil)
     }
     
     /// Write data to a device as bytes.
