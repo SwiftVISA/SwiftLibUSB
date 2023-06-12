@@ -242,8 +242,8 @@ extension USBTMCInstrument {
             var message : Data
             
             // Send read request to out endpoint
-            if length != nil {
-                message = makeHeader(read: true, bufferSize: min(chunkSize, length! - readData.count))
+            if let length = length {
+                message = makeHeader(read: true, bufferSize: min(chunkSize, length - readData.count))
             } else {
                 message = makeHeader(read: true, bufferSize: chunkSize)
             }
@@ -302,11 +302,10 @@ extension USBTMCInstrument: MessageBasedInstrument {
             chunkSize: chunkSize)
         
         // Encode the output as a string
-        let outputString: String? = String(data: dataRead, encoding: encoding)
-        if outputString == nil {
+        guard let outputString = String(data: dataRead, encoding: encoding) else {
             throw Error.cannotEncode
         }
-        return outputString!
+        return outputString
     }
     
     /// Read bytes from a device with no terminator

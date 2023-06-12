@@ -90,7 +90,7 @@ private extension USBSession {
                         throw Error.identificationNotUnique
                     }
                     foundDevice = device
-                } else if serialNumber! == device.serialNumber {
+                } else if serialNumber == device.serialNumber {
                     if foundDevice != nil {
                         throw Error.serialNumberNotUnique
                     }
