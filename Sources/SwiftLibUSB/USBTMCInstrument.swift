@@ -107,6 +107,10 @@ extension USBTMCInstrument {
         }
     }
     
+    private enum MessageKind: UInt8 {
+        case write = 1
+        case read = 2
+    }
     
     /// Looks through the available configurations and interfaces for an AltSetting that supports USBTMC
     /// - throws: A ``USBTMCError`` if no endpoints can be found that fit the requiements of USBTMC
@@ -181,18 +185,18 @@ extension USBTMCInstrument {
     
     /// Creates the portion of the header described in Table 8 of the USBTMC specifications. It then adds the transfer size parameter. Almost all messages to and from a device include this header.
     /// - Parameters:
-    ///   - read: Boolean describing whether the information flows to or from a device. Use `true` if reading from the devide, and `false` if writing to the device. By default, this value is `false`.
-    ///   - bufferSize:The amount of data being sent or received. The default value is 1028.
+    ///   - kind: Whether this message is going to write to the device or request to read from the device
+    ///   - bufferSize:The amount of data being sent or received.
     /// - Returns: The filled header of the message to be sent or received.
-    private func makeHeader(read: Bool = false, bufferSize: Int = 1028) -> Data {
+    private func makeHeader(kind: MessageKind, bufferSize: Int) -> Data {
         // Part 1 of header: message type, message index, inverse of message index, padding
-        let firstByte : UInt8 = read ? 2 : 1 // Reads are type 2, writes are type 1
-        var message = Data([firstByte, messageIndex, 255-messageIndex, 0])
+        var message = Data([kind.rawValue, messageIndex, 255-messageIndex, 0])
 
         // Part 2 of header: Little Endian length of the buffer
         withUnsafeBytes(of: Int32(bufferSize).littleEndian) { lengthBytes in
             message.append(Data(Array(lengthBytes)))
         }
+        
         return message
     }
     
@@ -243,9 +247,11 @@ extension USBTMCInstrument {
             
             // Send read request to out endpoint
             if let length = length {
-                message = makeHeader(read: true, bufferSize: min(chunkSize, length - readData.count))
+                message = makeHeader(
+                    kind: MessageKind.read,
+                    bufferSize: min(chunkSize, length - readData.count))
             } else {
-                message = makeHeader(read: true, bufferSize: chunkSize)
+                message = makeHeader(kind: MessageKind.read, bufferSize: chunkSize)
             }
             
             message += headerSuffix
@@ -396,33 +402,23 @@ extension USBTMCInstrument: MessageBasedInstrument {
             }
             let dataSlice = messageData.subdata(in: lowerBound..<upperBound)
             
-            // Part 1 of header: Write Out (constant 1), message index, inverse of message index, padding
-            var dataToSend = Data([1, messageIndex, 255-messageIndex, 0])
-            // Part 2 of header: Little Endian length of the message (with added newline)
-            withUnsafeBytes(of: Int32(dataSlice.count).littleEndian) { lengthBytes in
-                dataToSend.append(Data(Array(lengthBytes)))
-            }
-            // Part 3 of header: end of field
-            if lastMessage {
-                dataToSend.append(1)
-            } else {
-                dataToSend.append(0)
-            }
-            // Part 4 of header: Three bytes of padding
-            dataToSend.append(Data([0, 0, 0]))
-            // Add the message as bytes
+            var dataToSend = makeHeader(kind: MessageKind.write, bufferSize: dataSlice.count)
+            
+            // After the header, there is one byte to indicate the end of message, then
+            // three bytes of padding.
+            dataToSend.append(Data([lastMessage ? 1 : 0, 0, 0, 0]))
+            
             dataToSend.append(dataSlice)
             
-            let paddingLength = (4 - dataSlice.count % 4) % 4
-            
             // Pad to 4 byte boundary
+            let paddingLength = (4 - dataSlice.count % 4) % 4
             dataToSend.append(Data(Array(repeating: 0, count: paddingLength)))
             
-            // Send the command message to a bulk out endpoint
-            let num = try outEndpoint!.sendBulkTransfer(
+            let numSent = try outEndpoint!.sendBulkTransfer(
                 data: &dataToSend,
                 timeout: Int(attributes.operationDelay * 1000))
-            lowerBound += num - Self.headerSize - paddingLength // Move up by the amount sent rather than a constant
+            
+            lowerBound += numSent - Self.headerSize - paddingLength // Move up by the amount sent
 
             nextMessage()
         }
