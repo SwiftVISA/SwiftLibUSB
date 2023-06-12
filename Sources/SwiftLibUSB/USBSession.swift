@@ -41,7 +41,7 @@ public class USBSession {
         self.vendorID = vendorID
         self.productID = productID
         self.serialNumber = serialNumber
-        try usbContext = Self.rawConnect()
+        try usbContext = Context()
         try usbDevice = Self.rawFindDevice(
             vendorID: vendorID,
             productID: productID,
@@ -51,15 +51,6 @@ public class USBSession {
 }
 
 private extension USBSession {
-    /// connect to the device via libUSB
-    /// - Returns: The interal ``Context`` that communicates with libusb
-    /// - Throws: ``USBError`` on initialization if libUSB cannot initialize the ``Context``
-    private static func rawConnect() throws -> Context {
-        let createdContext = try Context()
-        return createdContext
-    }
-    
-    
     /// Find the ``Device`` specified given a vendor id, product id, and serial number
     /// There should never be a situation where the ids and serial number is not unique, but it is acconted for anyway
     /// - Parameters:
