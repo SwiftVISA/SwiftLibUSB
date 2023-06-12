@@ -29,7 +29,7 @@ public class Device: Hashable {
         descriptor = libusb_device_descriptor()
         let error = libusb_get_device_descriptor(device.raw_device, &descriptor)
         if error < 0 {
-            throw USBError.from(code: error)
+            throw USBError(rawValue: error) ?? USBError.other
         }
 
         configurations = []
@@ -99,7 +99,7 @@ public class Device: Hashable {
         
         // Check if there is an error when filling the buffer with the name
         if(returnCode <= 0){
-            return "error getting name: \(USBError.from(code: returnCode).localizedDescription)"
+            return "error getting name: \((USBError(rawValue: returnCode) ?? USBError.other).localizedDescription)"
         }
         
         return String(bytes: buffer, encoding: .ascii) ?? "Vendor: \(vendorId) Product: \(productId)"
@@ -149,7 +149,7 @@ public class Device: Hashable {
                                                 requestType,request,value,index,
                                                 &charArrayData,length,timeout)
         if returnVal < 0 {
-            throw USBError.from(code: returnVal)
+            throw USBError(rawValue: returnVal) ?? USBError.other
         }
         return Data(charArrayData)
     }
@@ -210,7 +210,7 @@ internal class DeviceRef {
         raw_handle = nil
         let error = libusb_open(device, &raw_handle)
         if error < 0 {
-            throw USBError.from(code: error)
+            throw USBError(rawValue: error) ?? USBError.other
         }
         open = raw_handle != nil
     }
@@ -226,7 +226,7 @@ internal class DeviceRef {
         if !open {
             let error = libusb_open(raw_device, &raw_handle)
             if error < 0 {
-                throw USBError.from(code: error)
+                throw USBError(rawValue: error) ?? USBError.other
             }
             open = raw_handle != nil
         }

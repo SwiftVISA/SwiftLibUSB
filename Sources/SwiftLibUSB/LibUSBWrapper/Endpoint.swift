@@ -85,7 +85,7 @@ public class Endpoint {
         }
         let error = libusb_clear_halt(handle, descriptor.pointee.bEndpointAddress)
         if error < 0 {
-            throw USBError.from(code: error)
+            throw USBError(rawValue: error) ?? USBError.other
         }
     }
     
@@ -127,7 +127,7 @@ public class Endpoint {
         
         // Throw if the transfer had any errors. Errors are given by sending back a negative value
         if error < 0 {
-            throw USBError.from(code: error)
+            throw USBError(rawValue: error) ?? USBError.other
         }
         
         // Return the number of bytes send
@@ -171,7 +171,7 @@ public class Endpoint {
         
         // Throw if the transfer had any errors
         if error < 0 {
-            throw USBError.from(code: error)
+            throw USBError(rawValue: error) ?? USBError.other
         }
         
         // Turn the returned array into type Data, then return it.

@@ -24,7 +24,7 @@ public class Configuration: Hashable{
         var desc: UnsafeMutablePointer<libusb_config_descriptor>? = nil
         let error = libusb_get_config_descriptor(device.raw_device, index, &desc)
         if error < 0 {
-            throw USBError.from(code: error)
+            throw USBError(rawValue: error) ?? USBError.other
         }
         config = ConfigurationRef(device: device, descriptor: desc!)
         interfaces = []
@@ -39,7 +39,7 @@ public class Configuration: Hashable{
         var desc: UnsafeMutablePointer<libusb_config_descriptor>? = nil
         let error = libusb_get_active_config_descriptor(device.raw_device, &desc)
         if error < 0 {
-            throw USBError.from(code: error)
+            throw USBError(rawValue: error) ?? USBError.other
         }
         config = ConfigurationRef(device: device, descriptor: desc!)
         interfaces = []

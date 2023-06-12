@@ -53,7 +53,7 @@ public class AltSetting : Hashable{
             
             // Check if there is an error when filling the buffer with the name
             if(returnCode <= 0){
-                return "\(index) error getting name: \(USBError.from(code: returnCode).localizedDescription)"
+                return "\(index) error getting name: \((USBError(rawValue: returnCode) ?? USBError.other).localizedDescription)"
             }
             
             return String(bytes: buffer, encoding: .ascii) ?? ("(\(index)) unnamed alt setting")
@@ -109,7 +109,7 @@ public class AltSetting : Hashable{
         }
         let error = libusb_set_interface_alt_setting(handle, Int32(setting.interfaceNumber), Int32(setting.index))
         if error < 0 {
-            throw USBError.from(code: error)
+            throw USBError(rawValue: error) ?? USBError.other
         }
     }
     

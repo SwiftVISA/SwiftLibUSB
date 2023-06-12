@@ -38,7 +38,7 @@ public class Context {
         
         // The returned value from libUSB is negative if there was a problem connecting
         if size < 0 {
-            throw USBError.from(code: Int32(size))
+            throw USBError(rawValue: Int32(size)) ?? USBError.other
         }
         
         // Fill the devices variables with the information in the device list
@@ -71,7 +71,7 @@ internal class ContextRef {
         if (error == 0) {
             self.context = context!
         } else {
-            throw USBError.from(code: error)
+            throw USBError(rawValue: error) ?? USBError.other
         }
     }
     

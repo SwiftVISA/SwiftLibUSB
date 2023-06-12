@@ -91,22 +91,6 @@ extension USBTMCInstrument {
         case checkClearStatus = 6
         case getCapabilities = 7
         case indicatorPulse = 64
-        
-        /// Convert a ControlMessage to a byte
-        /// - Returns: The control message as a byte
-        func toByte() -> UInt8 {
-            switch self {
-            // 0 is reserved
-            case .initiateAbortBulkOut: return 1
-            case .checkAbortBulkOutStatus: return 2
-            case .initiateAbortBulkIn: return 3
-            case .checkAbortBulkInStatus: return 4
-            case .initiateClear: return 5
-            case .checkClearStatus: return 6
-            case .getCapabilities: return 7
-            case .indicatorPulse: return 64 // This is correct; there is a very large gap here
-            }
-        }
     }
     
     
@@ -203,7 +187,7 @@ extension USBTMCInstrument {
                 direction: .in,
                 type: .class,
                 recipient: .interface,
-                request: ControlMessages.getCapabilities.toByte(),
+                request: ControlMessage.getCapabilities.rawValue,
                 value: 0,
                 index: UInt16(activeInterface?.index ?? 0),
                 data: Data(count: 24),
