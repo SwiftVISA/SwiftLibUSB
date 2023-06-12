@@ -23,7 +23,7 @@ public class AltSetting: Hashable {
         // Fill the endpoint array with each endpoint defined
         endpoints = []
         for i in 0..<setting.numEndpoints {
-            endpoints.append(Endpoint(altSetting: setting, index: i))
+            endpoints.append(Endpoint(altSetting: setting, index: Int(i)))
         }
     }
     
@@ -37,46 +37,20 @@ public class AltSetting: Hashable {
     ///
     /// This requires the device to be open.
     public var displayName: String {
-        get {
-            // If the index is 0 this is an unnamed alt setting
-            if setting.interfaceName == 0 {
-                return "(\(index)) unnamed alt setting"
-            }
-            
-            // Return a default value if the device is closed
-            guard let handle = setting.raw_handle else {
-                return "\(index) alt setting on closed device"
-            }
-            
-            // Make a buffer for the name of the alt setting
-            let size = 256;
-            var buffer: [UInt8] = Array(repeating: 0, count: size)
-            let returnCode = libusb_get_string_descriptor_ascii(
-                handle,
-                UInt8(setting.interfaceName),
-                &buffer,
-                Int32(size))
-            
-            // Check if there is an error when filling the buffer with the name
-            if returnCode <= 0 {
-                return "\(index) error getting name: \(USBError.from(code: returnCode).localizedDescription)"
-            }
-            
-            return String(bytes: buffer, encoding: .ascii) ?? ("(\(index)) unnamed alt setting")
-        }
+        setting.getStringDescriptor(index: setting.interfaceName) ?? ""
     }
     
     /// The number of this interface
     public var interfaceIndex: Int {
         get {
-            setting.interfaceNumber
+            Int(setting.interfaceNumber)
         }
     }
     
     /// The value used to select this alternate setting for this interface
     public var index: Int {
         get {
-            setting.index
+            Int(setting.index)
         }
     }
     
@@ -90,14 +64,14 @@ public class AltSetting: Hashable {
     /// If the `interfaceClass` has subtypes, this gives that type.
     public var interfaceSubClass: Int {
         get {
-            setting.interfaceSubClass
+            Int(setting.interfaceSubClass)
         }
     }
     
     /// If the `interfaceClass` and `interfaceSubClass` have protocols, this gives the protocol
     public var interfaceProtocol: Int {
         get {
-            setting.interfaceProtocol
+            Int(setting.interfaceProtocol)
         }
     }
     
@@ -142,6 +116,10 @@ internal class AltSettingRef {
         altSetting = interface.altsetting + index
     }
     
+    func getStringDescriptor(index: UInt8) -> String? {
+        interface.getStringDescriptor(index: index)
+    }
+    
     var raw_device: OpaquePointer {
         get {
             interface.raw_device
@@ -154,21 +132,21 @@ internal class AltSettingRef {
         }
     }
     
-    var index: Int {
+    var index: UInt8 {
         get {
-            Int(altSetting.pointee.bAlternateSetting)
+            altSetting.pointee.bAlternateSetting
         }
     }
     
-    var interfaceNumber: Int {
+    var interfaceNumber: UInt8 {
         get {
-            Int(altSetting.pointee.bInterfaceNumber)
+            altSetting.pointee.bInterfaceNumber
         }
     }
     
-    var interfaceProtocol: Int {
+    var interfaceProtocol: UInt8 {
         get {
-            Int(altSetting.pointee.bInterfaceProtocol)
+            altSetting.pointee.bInterfaceProtocol
         }
     }
     
@@ -184,21 +162,21 @@ internal class AltSettingRef {
         }
     }
     
-    var interfaceName: Int {
+    var interfaceName: UInt8 {
         get {
-            Int(altSetting.pointee.iInterface)
+            altSetting.pointee.iInterface
         }
     }
     
-    var bInterfaceProtocol: Int {
+    var bInterfaceProtocol: UInt8 {
         get {
-            Int(altSetting.pointee.bInterfaceProtocol)
+            altSetting.pointee.bInterfaceProtocol
         }
     }
     
-    var numEndpoints: Int {
+    var numEndpoints: UInt8 {
         get {
-            Int(altSetting.pointee.bNumEndpoints)
+            altSetting.pointee.bNumEndpoints
         }
     }
     

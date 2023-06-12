@@ -57,14 +57,14 @@ public class Configuration: Hashable {
     /// The index used to get a string descriptor of this configuration
     public var index: Int {
         get {
-            config.index
+            Int(config.index)
         }
     }
     
     /// The number used to identify this configuration
     public var value: Int {
         get {
-            config.value
+            Int(config.value)
         }
     }
     
@@ -73,31 +73,7 @@ public class Configuration: Hashable {
     /// This requires the device to be open.
     public var displayName: String {
         get {
-            // If the index is 0 this is an unnamed configuration
-            if config.index == 0 {
-                return "(\(index)) unnamed configuration"
-            }
-            
-            // Return a default value if the device is closed
-            guard let handle = config.raw_handle else {
-                return "\(index) configuration on closed device"
-            }
-
-            // Make a buffer for the name of the configuration
-            let size = 256;
-            var buffer: [UInt8] = Array(repeating: 0, count: size)
-            let returnCode = libusb_get_string_descriptor_ascii(
-                handle,
-                UInt8(config.index),
-                &buffer,
-                Int32(size))
-            
-            // Check if there is an error when filling the buffer with the name
-            if returnCode <= 0 {
-                return "(\(index)) unknown configuration"
-            }
-            
-            return String(bytes: buffer, encoding: .ascii) ?? ("(\(index)) unnamed configuration")
+            config.getStringDescriptor(index: config.index) ?? ("(\(index)) unnamed configuration")
         }
     }
     
@@ -142,6 +118,10 @@ internal class ConfigurationRef {
         self.descriptor = descriptor
     }
     
+    func getStringDescriptor(index: UInt8) -> String? {
+        device.getStringDescriptor(index: index)
+    }
+    
     var raw_handle: OpaquePointer? {
         get {
             device.raw_handle
@@ -154,21 +134,21 @@ internal class ConfigurationRef {
         }
     }
     
-    var numInterfaces: Int {
+    var numInterfaces: UInt8 {
         get {
-            Int(descriptor.pointee.bNumInterfaces)
+            descriptor.pointee.bNumInterfaces
         }
     }
     
-    var value: Int {
+    var value: UInt8 {
         get {
-            Int(descriptor.pointee.bConfigurationValue)
+            descriptor.pointee.bConfigurationValue
         }
     }
     
-    var index: Int {
+    var index: UInt8 {
         get {
-            Int(descriptor.pointee.iConfiguration)
+            descriptor.pointee.iConfiguration
         }
     }
     

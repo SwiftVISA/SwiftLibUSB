@@ -103,6 +103,10 @@ internal class InterfaceRef {
         claimed = true
     }
     
+    func getStringDescriptor(index: UInt8) -> String? {
+        config.getStringDescriptor(index: index)
+    }
+    
     deinit {
         if claimed && config.raw_handle != nil {
             libusb_release_interface(config.raw_handle, index)
