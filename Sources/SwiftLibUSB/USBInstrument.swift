@@ -52,7 +52,7 @@ public extension USBInstrument {
         case noDevices
         
         /// Found multiple devices with the same product id, vendor id and serial number.
-        case serialCodeNotUnique
+        case serialNumberNotUnique
         
         /// The requested operation is not supported by the device.
         case notSupported
@@ -71,7 +71,7 @@ public extension USBInstrument.Error {
             return "Identification of USB device was not unique"
         case .noDevices:
             return "No devices were found"
-        case .serialCodeNotUnique:
+        case .serialNumberNotUnique:
             return "Identification of USB devices with serial number was not unique"
         case .notSupported:
             return "The device does not support this operation"

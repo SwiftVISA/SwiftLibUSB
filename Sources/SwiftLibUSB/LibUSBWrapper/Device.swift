@@ -65,52 +65,14 @@ public class Device: Hashable {
     
     /// The serial number of the device. Useful in identifying a device if there are multiple with the same product and vendor ID.
     ///  - Returns: A string representing the serial number of the device, or a blank string if the serial number cannot be found
-    public var serialCode: String {
-        get{
-            if descriptor.iSerialNumber == 0 {
-                return ""
-            }
-            let size = 256;
-            var buffer: [UInt8] = Array(repeating: 0, count: size)
-            let returnCode = libusb_get_string_descriptor_ascii(
-                device.raw_handle,
-                descriptor.iSerialNumber,
-                &buffer,
-                Int32(size))
-            if returnCode <= 0 {
-                return ""
-            }
-            // Buffer is now filled with the bytes of the serial code. Convert to string
-            let asciiBuffer = String(bytes: buffer, encoding: .ascii) ?? ""
-            // If we cannot encode, we use a blank string, we then remove all extra bytes on the end
-            return String(asciiBuffer.prefix(Int(returnCode)))
-            
-        }
+    public var serialNumber: String {
+        device.getStringDescriptor(index: descriptor.iSerialNumber) ?? ""
     }
     
     /// Get a human readable version descriptor of a device by indicating both its vendor and product IDs. Together they form a primary key that can uniquely indentify the connected device.
     /// - Returns: A string in the format "Vendor: [vendorID] Product: [productID]"
     public var displayName: String {
-        // If the index is 0 give the name as indicated
-        if descriptor.iProduct == 0 {
-            return "Vendor: \(vendorId) Product: \(productId)"
-        }
-        
-        // Make a buffer for the name of the device
-        let size = 256;
-        var buffer: [UInt8] = Array(repeating: 0, count: size)
-        let returnCode = libusb_get_string_descriptor_ascii(
-            device.raw_handle,
-            descriptor.iProduct,
-            &buffer,
-            Int32(size))
-        
-        // Check if there is an error when filling the buffer with the name
-        if returnCode <= 0 {
-            return "error getting name: \(USBError.from(code: returnCode).localizedDescription)"
-        }
-        
-        return String(bytes: buffer, encoding: .ascii) ?? "Vendor: \(vendorId) Product: \(productId)"
+        device.getStringDescriptor(index: descriptor.iProduct) ?? "Vendor: \(vendorId) Product: \(productId)"
     }
     
     /// Close the connection to the device
@@ -249,6 +211,28 @@ internal class DeviceRef {
             }
             open = raw_handle != nil
         }
+    }
+    
+    func getStringDescriptor(index: UInt8) -> String? {
+        if index == 0 {
+            return nil
+        }
+        
+        let size = 256;
+        var buffer: [UInt8] = Array(repeating: 0, count: size)
+        let returnValue = libusb_get_string_descriptor_ascii(
+            raw_handle,
+            index,
+            &buffer,
+            Int32(size))
+        
+        // If the return value is negative, there was an error. If positive, it's the number
+        // of bytes in the string.
+        if returnValue <= 0 {
+            return nil
+        }
+        
+        return String(bytes: buffer[..<Int(returnValue)], encoding: .ascii)
     }
     
     deinit {
