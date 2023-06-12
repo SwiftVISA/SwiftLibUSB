@@ -33,10 +33,7 @@ public class USBSession {
     /// This appears as the fourth field in a VISA identification string.
     public private(set) var serialNumber: String?
     
-    /// Stores the internal ``Context`` used by the wrapper classes for libUSB
-    public private(set) var context: Context
-    
-    ///stores the internal ``Device`` used by the wrapper classes for libUSB
+    /// The lower-level connection to the device.
     public private(set) var device: Device
     
     typealias Error = USBInstrument.Error
@@ -56,12 +53,11 @@ public class USBSession {
         self.vendorID = vendorID
         self.productID = productID
         self.serialNumber = serialNumber
-        try context = Context()
         try device = Self.rawFindDevice(
             vendorID: vendorID,
             productID: productID,
             serialNumber: serialNumber,
-            context: context)
+            context: Context())
     }
 }
 
