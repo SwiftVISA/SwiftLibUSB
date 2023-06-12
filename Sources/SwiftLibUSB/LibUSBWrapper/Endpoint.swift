@@ -56,11 +56,8 @@ public class Endpoint {
     /// See ``Direction`` for more information on how directions work
     public var direction: Direction {
         get {
-            switch descriptor.pointee.bEndpointAddress >> 7 {
-            case 1: return .In
-            case 0: return .Out
-            default: return .Out
-            }
+            // Shifting a UInt8 by seven bits can only leave 1 or 0, so we can force unwrap.
+            Direction(rawValue: descriptor.pointee.bEndpointAddress >> 7)!
         }
     }
     
@@ -109,7 +106,7 @@ public class Endpoint {
     ///   - timeout: The time, in millisecounds, to wait before timeout. This is by default one second
     public func sendBulkTransfer(data: inout Data, timeout: Int = 1000) throws -> Int {
         // Only work if we are the right kind of endpoint
-        if transferType != .bulk || direction != .Out {
+        if transferType != .bulk || direction != .out {
             throw USBError.notSupported
         }
 
@@ -155,7 +152,7 @@ public class Endpoint {
     ///   - timeout: The amount of time, in milliseconds to wait before timing out of the message. The default is 1000(1 second)
     public func receiveBulkTransfer(length: Int = 1024, timeout: Int = 1000) throws -> Data {
         // Throw an error if this is the wrong kind of endpoint
-        if transferType != .bulk || direction != .In {
+        if transferType != .bulk || direction != .in {
             throw USBError.notSupported
         }
         

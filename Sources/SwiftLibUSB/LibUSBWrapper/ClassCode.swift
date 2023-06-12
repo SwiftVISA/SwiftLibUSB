@@ -14,27 +14,28 @@ import Usb
 ///
 /// Lab equipment commonly implements the *Test and Measurement Class* interface, which is identified by the `.application` class
 /// and subclass `3`.
-public enum ClassCode {
-    case perInterface
-    case audio
-    case communications
-    case humanInterfaceDevice
-    case physical
-    case image
-    case printer
-    case massStorage
-    case hub
-    case data
-    case smartCard
-    case contentSecurity
-    case video
-    case personalHealthcare
-    case diagnosticDevice
-    case wireless
-    case miscellaneous
-    case application
-    case vendorSpecific
-    case other
+public enum ClassCode: UInt8 {
+    case perInterface = 0
+    case audio = 1
+    case communications = 2
+    case humanInterfaceDevice = 3
+    case physical = 5
+    case image = 6
+    case printer = 7
+    case massStorage = 8
+    case hub = 9
+    case data = 10
+    case smartCard = 11
+    case contentSecurity = 13
+    case video = 14
+    case personalHealthcare = 15
+    case diagnosticDevice = 0xdc
+    case wireless = 0xe0
+    case miscellaneous = 0xef
+    case application = 0xfe
+    case vendorSpecific = 0xff
+    // Unallocated number used for unknown classes
+    case other = 16
 }
 
 public extension ClassCode {

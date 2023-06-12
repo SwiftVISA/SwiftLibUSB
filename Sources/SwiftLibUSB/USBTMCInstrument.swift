@@ -82,15 +82,15 @@ extension USBTMCInstrument {
     private static let readLengthEndIndex = 8
     
     /// Message types defined by USBTMC specification, table 15
-    private enum ControlMessages {
-        case initiateAbortBulkOut
-        case checkAbortBulkOutStatus
-        case initiateAbortBulkIn
-        case checkAbortBulkInStatus
-        case initiateClear
-        case checkClearStatus
-        case getCapabilities
-        case indicatorPulse
+    private enum ControlMessage: UInt8 {
+        case initiateAbortBulkOut = 1
+        case checkAbortBulkOutStatus = 2
+        case initiateAbortBulkIn = 3
+        case checkAbortBulkInStatus = 4
+        case initiateClear = 5
+        case checkClearStatus = 6
+        case getCapabilities = 7
+        case indicatorPulse = 64
         
         /// Convert a ControlMessage to a byte
         /// - Returns: The control message as a byte
@@ -151,8 +151,8 @@ extension USBTMCInstrument {
         try interface.claim()
         try altSetting.setActive()
         activeInterface = altSetting
-        inEndpoint = try getEndpoint(endpoints: altSetting.endpoints,direction: Direction.In)
-        outEndpoint = try getEndpoint(endpoints: altSetting.endpoints,direction: Direction.Out)
+        inEndpoint = try getEndpoint(endpoints: altSetting.endpoints,direction: Direction.in)
+        outEndpoint = try getEndpoint(endpoints: altSetting.endpoints,direction: Direction.out)
     }
     
     
@@ -200,9 +200,9 @@ extension USBTMCInstrument {
         do {
             // These arguments are defined by the USBTMC specification, table 36
             let capabilities: Data = try _session.usbDevice.sendControlTransfer(
-                direction: .In,
-                type: .Class,
-                recipient: .Interface,
+                direction: .in,
+                type: .class,
+                recipient: .interface,
                 request: ControlMessages.getCapabilities.toByte(),
                 value: 0,
                 index: UInt16(activeInterface?.index ?? 0),
