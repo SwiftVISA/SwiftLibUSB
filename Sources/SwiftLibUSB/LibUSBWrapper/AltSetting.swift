@@ -171,7 +171,7 @@ internal class AltSettingRef {
     
     var interfaceClass: ClassCode {
         get {
-            ClassCode.from(code: UInt32(altSetting.pointee.bInterfaceClass))
+            ClassCode(rawValue: altSetting.pointee.bInterfaceClass) ?? ClassCode.other
         }
     }
     

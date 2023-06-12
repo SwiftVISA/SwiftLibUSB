@@ -66,12 +66,9 @@ public class Endpoint {
     /// For more information on what different transfertypes mean, see ``TransferType``
     public var transferType: TransferType {
         get {
-            switch libusb_endpoint_transfer_type(UInt32(descriptor.pointee.bmAttributes & 3)) {
-            case LIBUSB_ENDPOINT_TRANSFER_TYPE_BULK: return .bulk
-            case LIBUSB_ENDPOINT_TRANSFER_TYPE_ISOCHRONOUS: return .isochronous
-            case LIBUSB_ENDPOINT_TRANSFER_TYPE_INTERRUPT: return .interrupt
-            default: return .control
-            }
+            // Bitwise ANDing with 3 always results in a number 0-3, all of which are
+            // defined TransferTypes, so we can force unwrap.
+            TransferType(rawValue: descriptor.pointee.bmAttributes & 3)!
         }
     }
     
