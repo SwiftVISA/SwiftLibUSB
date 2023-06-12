@@ -8,17 +8,29 @@
 import Foundation
 import CoreSwiftVISA
 
-/// USBSessions represent a connection made over USB to a USB device.
-/// Designed to be held by USBInstrument class.
-/// - Note: Complies with ``Session`` as defined in CoreSwiftVisa
+/// A wrapper around the connection to a USB device.
+///
+/// This manages most of the details of finding and connecting to a device. Instrument classes such as
+/// ``USBTMCInstrument`` are responsible for verifying support for the intended protocol and communicating with the device.
 public class USBSession {
-    /// Stores the product ID. Each vendor assigns each type of device a product ID which is used in identification
-    public private(set) var productID: Int
-    
-    /// Stores the vendor ID. Each vendor is given an ID used to identify their products. Forms part of the primary key
+    /// A number uniquely identifying the manufacturer of a device.
+    ///
+    /// As an example, devices made by Keysight Technologies have the vendor ID 10893.
+    ///
+    /// This appears as the second field (after `USB`) in a VISA identification string.
     public private(set) var vendorID: Int
     
-    /// Stores the serial number, if defined. This must be specified if more than one device has the same vendor and product id
+    /// A number uniquely identifying the kind of device, qualified by the vendor ID.
+    ///
+    /// As an example, Keysight E36103B oscilloscopes have the product ID 5634. This is unique among Keysight devices,
+    /// but not among all USB devices.
+    ///
+    /// This appears as the third field in a VISA identification string.
+    public private(set) var productID: Int
+    
+    /// A string uniquely identifying a single device.
+    ///
+    /// This appears as the fourth field in a VISA identification string.
     public private(set) var serialNumber: String?
     
     /// Stores the internal ``Context`` used by the wrapper classes for libUSB
@@ -29,14 +41,17 @@ public class USBSession {
     
     typealias Error = USBInstrument.Error
     
-    /// To initalize a session. Sessions that are initalized should eventually be closed.
-    /// Sessions are defined uniquly by a combination of their vendorID, productID and Serial Number
-    /// - Note: Serial number can be passed as null. This will only work if there is only one device of the specified product and vendorID given. If there are multiple devices with the same product and vendor ID's, then the SerialNumber must be specified
+    /// Attempt to establish a connection to a device.
+    ///
     /// - Parameters:
-    ///   - vendorID: Each device has a device ID. This identifies who makes the device. Part of primary identifying key
-    ///   - productID: Help define which product this device is and is more specific than vendorID. Part of primary identifying key
-    ///   - SerialNumber: This string value represents the "Serial number" of the device. If there are multiple of the same product attached this is used to identify the product.
+    ///   - vendorID: Number identifying the manufacturer of the device.
+    ///   - productID: Number identifying the product of the device.
+    ///   - serialNumber: If provided, this will only connect to a device with the provided serial number.
     /// - Throws: ``USBInstrument/Error`` if there is an error initalizing the session. ``USBError`` if libUSB encounted an error
+    ///   * ``USBInstrument/Error/noDevices`` if no connected devices were found
+    ///   * ``USBInstrument/Error/couldNotFind`` if no matching device was found
+    ///   * ``USBInstrument/Error/identificationNotUnique`` if multiple devices matching the vendor ID and product ID were found and no serial number was provided
+    ///   * ``USBInstrument/Error/serialCodeNotUnique`` if multiple matching devices with the given serial number were found (this indicates buggy devices)
     public init(vendorID: Int, productID: Int, serialNumber: String?) throws {
         self.vendorID = vendorID
         self.productID = productID

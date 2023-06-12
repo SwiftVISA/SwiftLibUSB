@@ -9,16 +9,10 @@ import Foundation
 import CoreSwiftVISA
 
 
-/// A common type of instrument connected over USB.
-/// This class controlls USB Test and Measurement Class Devices. [The specification for which can be found here](https://www.usb.org/document-library/test-measurement-class-specification).
+/// A USB instrument communicating using USBTMC.
+///
+/// This class controlls [USB Test and Measurement Class Devices](https://www.usb.org/document-library/test-measurement-class-specification).
 /// This classification of devices is used for VISA-compatible instruments. If you need to connect to a USB device that does not support this protocol, you will need a new class to communicate with it.
-///
-/// A USBTMCInstrument is a USBInstrument, meaning it holds a USB session. The USBSession handles the connection and finding the device
-/// This class a Message Based Instrument meaning it can read and write messages
-///
-/// A USBTMCInstrument can be created using either identifiying characteristics(vendorID,productID,serialNumber) or by the devices Visa String. For more detail on constructing, see the initlisers
-///
-/// Instruments are automatically found and connected to, and prepepared for communication on inilitisation. They can be written to and read from immedietly. If a problem is encountered, a ``USBTMCInstrument/USBTMCError`` is thrown
 public class USBTMCInstrument: USBInstrument {
     // USB instruments are required to have various attributes, we use the defaults
     public var attributes = MessageBasedInstrumentAttributes()
@@ -30,14 +24,14 @@ public class USBTMCInstrument: USBInstrument {
     
     /// Attempts to connect to a USB device with the given identification.
     ///
+    /// The product ID, vendor ID, and serial number can be found from the VISA identification string in the following format:
+    ///
+    /// `USB::<vendor ID>::<product ID>::<serial number>::...`
+    ///
     /// - Parameters:
     ///    - vendorID: The number assigned to the manufacturer of the device
     ///    - productID: The number assigned to this type of device
     ///    - serialNumber: An optional string assigned uniquely to this device. This is needed if multiple of the same type of device are connected.
-    ///
-    ///- note: The productID, vendorID, and serialNumber can be found from the VISA identification string in the following format:
-    ///
-    /// `USB::<vendorID>::<productID>::<SerialNumber>::...`
     ///
     /// - Throws: ``USBInstrument/Error`` if there is an error establishing the instrument, ``USBError`` if the libUSB library encounters an error and ``USBTMCInstrument/USBTMCError`` if there is any other problem.
     public override init(vendorID: Int, productID: Int, serialNumber: String? = nil) throws {
@@ -51,14 +45,10 @@ public class USBTMCInstrument: USBInstrument {
         getCapabilities()
     }
     
-    /// An alternarte initalizer for creating a USB Test and Measurment Class Device
-    ///
-    /// This initliser uses a raw Visa String instead of the individual parameters. An example is:
-    ///
-    /// `USB0::10893::5634::MY59001442::0::INSTR`
+    /// Attempt to connect to a device described by a VISA identifier.
     ///
     /// - Parameters:
-    ///     - visaString: A properly formatted visa string that corresponds to a physically connected device
+    ///     - visaString: A properly formatted VISA string that corresponds to a physically connected device
     /// - Throws: ``USBInstrument/Error`` if there is an error establishing the instrument, ``USBError`` if the libUSB library encounters an error, and ``USBTMCInstrument/USBTMCError`` if there is any other problem.
     public convenience init(visaString: String) throws {
         let sections = visaString.components(separatedBy: "::")
@@ -442,8 +432,7 @@ extension USBTMCInstrument: MessageBasedInstrument {
 }
 
 extension USBTMCInstrument {
-    /// An error associated with a  USB Instrument.
-    ///
+    /// An error associated with a  USBTMC Instrument.
     public enum USBTMCError: Swift.Error {
         /// When looking for USB endpoints to send messages through, no alternative setting could be found that has compliant endpoints
         /// Or an altsetting claims to have endpoints it doesn't have.

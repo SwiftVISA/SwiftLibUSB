@@ -12,15 +12,21 @@ import CoreSwiftVISA
 ///
 /// This does nothing on its own; use ``USBTMCInstrument`` or another subclass to communicate with a device.
 public class USBInstrument {
-    ///Holds a ``USBSession`` internally
+    /// We use an internal property so we can use USBSession-specific methods. This is exposed
+    /// publicly as a Session through the Instrument.session property.
     public private(set) var _session: USBSession
     
-    /// Initalize a usb instrument with a vendorID productID and serial number
+    /// Attempts to establish a connection to a USB instrument.
+    ///
     /// - Parameters:
-    ///   - vendorID: The vendorID of the device
-    ///   - productID: The productID of the device
+    ///   - vendorID: The vendor ID of the device
+    ///   - productID: The product ID of the device
     ///   - serialNumber: The serial number of the device
-    ///- Throws: ``Error`` if there is an error initalizing the session. ``USBError`` if libUSB encounted an error
+    /// - Throws: ``Error`` if there is an error initalizing the session. ``USBError`` if libUSB encounted an error
+    ///   * ``Error/couldNotFind`` if no matching device was found
+    ///   * ``Error/noDevices`` if no devices were found at all
+    ///   * ``Error/identificationNotUnique`` if multiple devices with the given vendor ID and product ID were found and serialNumber was not given
+    ///   * ``Error/serialCodeNotUnique`` if multiple devices were found with the given vendor ID, product ID, and serial number (this indicates buggy devices that share a serial number)
     public init(vendorID: Int, productID: Int, serialNumber: String?) throws {
         _session = try USBSession(
             vendorID: vendorID,
@@ -36,10 +42,10 @@ public extension USBInstrument {
         /// Unknown error occured resulting in failed operation.
         case operationFailed
         
-        /// Could not find a device with the specified vendorID and productID and Serial Number(If not null).
+        /// Could not find a device with the specified vendor ID, product ID and serial number (if provided).
         case couldNotFind
         
-        /// Found multiple devices with the same vendor and product ID, but Serial Number was not specified. Serial number **must** be specified if there can be multiple devices with the same product ID and vendor ID.
+        /// Found multiple devices with the same vendor and product ID, but serial number was not specified. Serial number **must** be specified if there can be multiple devices with the same product ID and vendor ID.
         case identificationNotUnique
         
         /// Found no devices when searching.
@@ -54,7 +60,7 @@ public extension USBInstrument {
 }
 
 public extension USBInstrument.Error {
-    /// A more descritive explanation of what each error associated with a USB Instrument is.
+    /// A more descriptive explanation of what each error associated with a USB Instrument is.
     var localizedDescription: String {
         switch self {
         case .operationFailed:
@@ -75,7 +81,7 @@ public extension USBInstrument.Error {
 
 extension USBInstrument: Instrument {
     public var session: CoreSwiftVISA.Session {
-        get{
+        get {
             return _session
         }
     }
