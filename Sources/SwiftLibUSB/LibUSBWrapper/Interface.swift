@@ -13,7 +13,7 @@ import Usb
 /// An ``AltSetting`` determines what functions these endpoints have.
 public class Interface: Hashable {
     public static func == (lhs: Interface, rhs: Interface) -> Bool {
-        return lhs.interface.raw_device == rhs.interface.raw_device && lhs.interface.index == rhs.interface.index
+        return lhs.interface.rawDevice == rhs.interface.rawDevice && lhs.interface.index == rhs.interface.index
     }
     
     public var altSettings: [AltSetting]
@@ -47,7 +47,7 @@ public class Interface: Hashable {
     
     /// A hash representation of the interface
     public func hash(into hasher: inout Hasher) {
-        interface.raw_device.hash(into: &hasher)
+        interface.rawDevice.hash(into: &hasher)
         interface.index.hash(into: &hasher)
     }
 }
@@ -73,15 +73,15 @@ internal class InterfaceRef {
         }
     }
     
-    var raw_device: OpaquePointer {
+    var rawDevice: OpaquePointer {
         get {
-            config.raw_device
+            config.rawDevice
         }
     }
     
-    var raw_handle: OpaquePointer? {
+    var rawHandle: OpaquePointer? {
         get {
-            config.raw_handle
+            config.rawHandle
         }
     }
     
@@ -93,7 +93,7 @@ internal class InterfaceRef {
     }
     
     func claim() throws {
-        guard let handle = config.raw_handle else {
+        guard let handle = config.rawHandle else {
             throw USBError.connectionClosed
         }
         let error = libusb_claim_interface(handle, Int32(index))
@@ -108,8 +108,8 @@ internal class InterfaceRef {
     }
     
     deinit {
-        if claimed && config.raw_handle != nil {
-            libusb_release_interface(config.raw_handle, index)
+        if claimed && config.rawHandle != nil {
+            libusb_release_interface(config.rawHandle, index)
         }
     }
 }

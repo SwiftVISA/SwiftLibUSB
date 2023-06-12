@@ -27,7 +27,7 @@ public class Device: Hashable {
         try device = DeviceRef(context: context, device: pointer)
         
         descriptor = libusb_device_descriptor()
-        let error = libusb_get_device_descriptor(device.raw_device, &descriptor)
+        let error = libusb_get_device_descriptor(device.rawDevice, &descriptor)
         if error < 0 {
             throw USBError.from(code: error)
         }
@@ -42,7 +42,7 @@ public class Device: Hashable {
     
     /// Compare devices by their internal pointer. Two device classes that point to the same libUSB device are considered the same
     public static func == (lhs: Device, rhs: Device) -> Bool {
-        lhs.device.raw_device == rhs.device.raw_device
+        lhs.device.rawDevice == rhs.device.rawDevice
     }
     
     /// The product ID of the device.
@@ -116,7 +116,7 @@ public class Device: Hashable {
     ) throws -> Data {
         var charArrayData = [UInt8](data)
         let returnVal = libusb_control_transfer(
-            device.raw_handle,
+            device.rawHandle,
             requestType,
             request,
             value,
@@ -172,7 +172,7 @@ public class Device: Hashable {
     
     /// A hash representation of the device
     public func hash(into hasher: inout Hasher) {
-        device.raw_device.hash(into: &hasher)
+        device.rawDevice.hash(into: &hasher)
     }
 }
 
@@ -181,35 +181,35 @@ public class Device: Hashable {
 /// This ensures the libUSB context is not freed until all the devices have been closed.
 internal class DeviceRef {
     let context: ContextRef
-    let raw_device: OpaquePointer
-    var raw_handle: OpaquePointer?
+    let rawDevice: OpaquePointer
+    var rawHandle: OpaquePointer?
     var open: Bool
     
     init(context: ContextRef, device: OpaquePointer) throws {
         self.context = context
-        raw_device = device
-        raw_handle = nil
-        let error = libusb_open(device, &raw_handle)
+        rawDevice = device
+        rawHandle = nil
+        let error = libusb_open(device, &rawHandle)
         if error < 0 {
             throw USBError.from(code: error)
         }
-        open = raw_handle != nil
+        open = rawHandle != nil
     }
     
     func close() {
         if open {
-            libusb_close(raw_handle)
+            libusb_close(rawHandle)
             open = false
         }
     }
     
     func reopen() throws {
         if !open {
-            let error = libusb_open(raw_device, &raw_handle)
+            let error = libusb_open(rawDevice, &rawHandle)
             if error < 0 {
                 throw USBError.from(code: error)
             }
-            open = raw_handle != nil
+            open = rawHandle != nil
         }
     }
     
@@ -221,7 +221,7 @@ internal class DeviceRef {
         let size = 256;
         var buffer: [UInt8] = Array(repeating: 0, count: size)
         let returnValue = libusb_get_string_descriptor_ascii(
-            raw_handle,
+            rawHandle,
             index,
             &buffer,
             Int32(size))
@@ -237,7 +237,7 @@ internal class DeviceRef {
     
     deinit {
         if open {
-            libusb_close(raw_handle)
+            libusb_close(rawHandle)
         }
     }
 }

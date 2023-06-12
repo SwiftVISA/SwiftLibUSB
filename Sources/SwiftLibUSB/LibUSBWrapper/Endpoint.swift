@@ -82,7 +82,7 @@ public class Endpoint {
     /// * ``USBError/connectionClosed`` if the device was closed using ``Device/close()``
     /// * ``USBError/noDevice`` if the device was disconnected
     public func clearHalt() throws {
-        guard let handle = altSetting.raw_handle else {
+        guard let handle = altSetting.rawHandle else {
             throw USBError.connectionClosed
         }
         let error = libusb_clear_halt(handle, descriptor.pointee.bEndpointAddress)
@@ -113,7 +113,7 @@ public class Endpoint {
         }
 
         // Make sure the device is open
-        guard let handle = altSetting.raw_handle else {
+        guard let handle = altSetting.rawHandle else {
             throw USBError.connectionClosed
         }
 
@@ -165,7 +165,7 @@ public class Endpoint {
         }
         
         // Make sure the device is open
-        guard let handle = altSetting.raw_handle else {
+        guard let handle = altSetting.rawHandle else {
             throw USBError.connectionClosed
         }
         

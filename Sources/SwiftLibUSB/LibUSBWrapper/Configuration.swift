@@ -22,7 +22,7 @@ public class Configuration: Hashable {
     /// * `.notFound` if the index is invalid.
     init(_ device: DeviceRef, index: UInt8) throws {
         var desc: UnsafeMutablePointer<libusb_config_descriptor>? = nil
-        let error = libusb_get_config_descriptor(device.raw_device, index, &desc)
+        let error = libusb_get_config_descriptor(device.rawDevice, index, &desc)
         if error < 0 {
             throw USBError.from(code: error)
         }
@@ -37,7 +37,7 @@ public class Configuration: Hashable {
     /// * `.notFound` if the device is not configured
     init(_ device: DeviceRef) throws {
         var desc: UnsafeMutablePointer<libusb_config_descriptor>? = nil
-        let error = libusb_get_active_config_descriptor(device.raw_device, &desc)
+        let error = libusb_get_active_config_descriptor(device.rawDevice, &desc)
         if error < 0 {
             throw USBError.from(code: error)
         }
@@ -93,7 +93,7 @@ public class Configuration: Hashable {
     /// * `.noDevice` if the device has been unplugged
     /// * `.connectionClosed` if the device was closed using ``Device/close()``
     public func setActive() throws {
-        guard let handle = config.raw_handle else {
+        guard let handle = config.rawHandle else {
             throw USBError.connectionClosed
         }
         libusb_set_configuration(handle, // The handle we are configuring ourselves with
@@ -122,15 +122,15 @@ internal class ConfigurationRef {
         device.getStringDescriptor(index: index)
     }
     
-    var raw_handle: OpaquePointer? {
+    var rawHandle: OpaquePointer? {
         get {
-            device.raw_handle
+            device.rawHandle
         }
     }
     
-    var raw_device: OpaquePointer {
+    var rawDevice: OpaquePointer {
         get {
-            device.raw_device
+            device.rawDevice
         }
     }
     

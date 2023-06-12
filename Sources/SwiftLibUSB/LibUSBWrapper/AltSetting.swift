@@ -28,7 +28,7 @@ public class AltSetting: Hashable {
     }
     
     public static func == (lhs: AltSetting, rhs: AltSetting) -> Bool {
-        lhs.setting.raw_device == rhs.setting.raw_device &&
+        lhs.setting.rawDevice == rhs.setting.rawDevice &&
           lhs.index == rhs.index &&
           lhs.interfaceIndex == rhs.interfaceIndex
     }
@@ -84,7 +84,7 @@ public class AltSetting: Hashable {
     /// * `.noDevice` if the device was disconnected
     /// * `.connectionClosed` if the connection was closed using ``Device/close()``.
     public func setActive() throws {
-        guard let handle = setting.raw_handle else {
+        guard let handle = setting.rawHandle else {
             throw USBError.connectionClosed
         }
         let error = libusb_set_interface_alt_setting(
@@ -98,7 +98,7 @@ public class AltSetting: Hashable {
     
     /// A hash representation of the altSetting
     public func hash(into hasher: inout Hasher) {
-        setting.raw_device.hash(into: &hasher)
+        setting.rawDevice.hash(into: &hasher)
         interfaceIndex.hash(into: &hasher)
         index.hash(into: &hasher)
     }
@@ -120,15 +120,15 @@ internal class AltSettingRef {
         interface.getStringDescriptor(index: index)
     }
     
-    var raw_device: OpaquePointer {
+    var rawDevice: OpaquePointer {
         get {
-            interface.raw_device
+            interface.rawDevice
         }
     }
     
-    var raw_handle: OpaquePointer? {
+    var rawHandle: OpaquePointer? {
         get {
-            interface.raw_handle
+            interface.rawHandle
         }
     }
     
