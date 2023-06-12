@@ -34,10 +34,10 @@ public class USBSession {
     public private(set) var serialNumber: String?
     
     /// Stores the internal ``Context`` used by the wrapper classes for libUSB
-    public private(set) var usbContext: Context
+    public private(set) var context: Context
     
     ///stores the internal ``Device`` used by the wrapper classes for libUSB
-    public private(set) var usbDevice: Device
+    public private(set) var device: Device
     
     typealias Error = USBInstrument.Error
     
@@ -56,12 +56,12 @@ public class USBSession {
         self.vendorID = vendorID
         self.productID = productID
         self.serialNumber = serialNumber
-        try usbContext = Context()
-        try usbDevice = Self.rawFindDevice(
+        try context = Context()
+        try device = Self.rawFindDevice(
             vendorID: vendorID,
             productID: productID,
             serialNumber: serialNumber,
-            context: usbContext)
+            context: context)
     }
 }
 
@@ -112,7 +112,7 @@ private extension USBSession {
 extension USBSession: Session {
     /// Closes the session. The instrument owning this session will no longer be able to read or write data.
     public func close() {
-        usbDevice.close()
+        device.close()
     }
     
     /// Tries to reestablish the session's connection.
@@ -120,6 +120,6 @@ extension USBSession: Session {
     ///  - timeout: The amount of time in milliseconds to attempt to reconnect. A timeout of 0 will try forever
     /// - Throws: ``USBInstrument/Error`` if the session cannot be reconnected
     public func reconnect(timeout: TimeInterval) throws {
-        try usbDevice.reopen()
+        try device.reopen()
     }
 }

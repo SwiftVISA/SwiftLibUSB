@@ -53,7 +53,7 @@ public class USBTMCInstrument: USBInstrument {
     public convenience init(visaString: String) throws {
         let sections = visaString.components(separatedBy: "::")
         if sections.count < 4 {
-            throw USBTMCError.invalidVisa
+            throw Error.invalidVisa
         }
         
         let vID = Int(sections[1])
@@ -61,7 +61,7 @@ public class USBTMCInstrument: USBInstrument {
         let serialNumber = sections[3]
         
         guard let vendorID = vID, let productID = pID else {
-            throw USBTMCError.invalidVisa
+            throw Error.invalidVisa
         }
         
         try self.init(
@@ -111,7 +111,7 @@ extension USBTMCInstrument {
     /// Looks through the available configurations and interfaces for an AltSetting that supports USBTMC
     /// - throws: A ``USBTMCError`` if no endpoints can be found that fit the requiements of USBTMC
     private func findEndpoints() throws {
-        let device = self._session.usbDevice
+        let device = self._session.device
         
         for config in device.configurations {
             for interface in config.interfaces {
@@ -126,7 +126,7 @@ extension USBTMCInstrument {
             }
         }
         // If the loop finishes without finding endpoints that meet our requirements, we must throw
-        throw USBTMCError.couldNotFindEndpoint
+        throw Error.couldNotFindEndpoint
     }
     
     /// Checks if an ``AltSetting`` supports USBTMC
@@ -171,7 +171,7 @@ extension USBTMCInstrument {
                 return endpoint
             }
         }
-        throw USBTMCError.couldNotFindEndpoint
+        throw Error.couldNotFindEndpoint
     }
     
     /// Increment the message index such that it remains in the range [1-255] inclusive
@@ -202,7 +202,7 @@ extension USBTMCInstrument {
     private func getCapabilities() {
         do {
             // These arguments are defined by the USBTMC specification, table 36
-            let capabilities: Data = try _session.usbDevice.sendControlTransfer(
+            let capabilities: Data = try _session.device.sendControlTransfer(
                 direction: .In,
                 type: .Class,
                 recipient: .Interface,
@@ -291,7 +291,7 @@ extension USBTMCInstrument: MessageBasedInstrument {
     public func read(until terminator: String, strippingTerminator: Bool, encoding: String.Encoding, chunkSize: Int) throws -> String {
         // Prepare the parameters
         guard let terminatorBytes = terminator.data(using:encoding) else {
-            throw USBTMCError.invalidTerminator
+            throw Error.invalidTerminator
         }
         
         // Make the call to readBytes
@@ -304,7 +304,7 @@ extension USBTMCInstrument: MessageBasedInstrument {
         // Encode the output as a string
         let outputString: String? = String(data: dataRead, encoding: encoding)
         if outputString == nil {
-            throw USBTMCError.cannotEncode
+            throw Error.cannotEncode
         }
         return outputString!
     }
@@ -338,8 +338,8 @@ extension USBTMCInstrument: MessageBasedInstrument {
         chunkSize: Int
     ) throws -> Data {
         //check if terminator is ok
-        if !canUseTerminator { throw Error.notSupported }
-        if terminator.count != 1 { throw USBTMCError.invalidTerminator }
+        if !canUseTerminator { throw USBInstrument.Error.notSupported }
+        if terminator.count != 1 { throw Error.invalidTerminator }
         
         let received: Data = try receiveUntilEndOfMessage(
             headerSuffix: Data([2, terminator[0], 0, 0]),
@@ -368,7 +368,7 @@ extension USBTMCInstrument: MessageBasedInstrument {
     ) throws -> Int {
         let message = string + (terminator ?? "")
         guard let messageData = message.data(using: encoding) else {
-            throw USBTMCError.cannotEncode
+            throw Error.cannotEncode
         }
         return try writeBytes(messageData, appending: nil)
     }
@@ -433,7 +433,7 @@ extension USBTMCInstrument: MessageBasedInstrument {
 
 extension USBTMCInstrument {
     /// An error associated with a  USBTMC Instrument.
-    public enum USBTMCError: Swift.Error {
+    public enum Error: Swift.Error {
         /// When looking for USB endpoints to send messages through, no alternative setting could be found that has compliant endpoints
         /// Or an altsetting claims to have endpoints it doesn't have.
         case couldNotFindEndpoint
@@ -449,7 +449,7 @@ extension USBTMCInstrument {
     }
 }
 
-extension USBTMCInstrument.USBTMCError {
+extension USBTMCInstrument.Error {
     public var localizedDescription: String {
         switch self {
         case .couldNotFindEndpoint:
