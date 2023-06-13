@@ -8,14 +8,16 @@
 import Foundation
 import Usb
 
-/// A group of endpoints.
+/// A group of endpoints intended to be used together. An ``AltSetting`` determines what functions these endpoints have.
 ///
-/// An ``AltSetting`` determines what functions these endpoints have.
+/// An `Interface` should be claimed before using an `AltSetting` within it. Each `Interface` is independent, so
+/// multiple `Interface`s can be claimed simultaneously.
 public class Interface: Hashable {
     public static func == (lhs: Interface, rhs: Interface) -> Bool {
         return lhs.interface.rawDevice == rhs.interface.rawDevice && lhs.interface.index == rhs.interface.index
     }
     
+    /// The alternate settings offered for how to use these endpoints.
     public var altSettings: [AltSetting]
     private var interface: InterfaceRef
     
@@ -27,6 +29,7 @@ public class Interface: Hashable {
         }
     }
     
+    /// The number identifying this interface for ``Interface/claim()`` and similar functions.
     public var index: Int {
         get {
             Int(interface.index)

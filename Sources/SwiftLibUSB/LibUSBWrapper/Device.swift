@@ -9,7 +9,8 @@ import Foundation
 import Usb
 
 /// Class representing an available USB device.
-/// Communicating with the device requires opening the device.
+///
+/// Communicating with the device requires configuring a ``Configuration``, ``Interface``, and ``AltSetting``.
 public class Device: Hashable {
     /// The device as libUSB understands it. It is managed as a pointer
     private var device: DeviceRef
@@ -19,6 +20,9 @@ public class Device: Hashable {
     public var configurations: [Configuration]
     
     /// Contruct a device from a context and a pointer to the device
+    ///
+    /// This is called internally by the ``Context``.
+    ///
     /// - Parameters:
     ///   - context: The associated context class
     ///   - pointer: The pointer to the device
@@ -46,8 +50,8 @@ public class Device: Hashable {
     }
     
     /// The product ID of the device.
-    /// Can be accessed prior to a connection.
-    ///  - Returns: An integer representing the product ID
+    ///
+    /// This, along with the vendor ID and serial number, uniquely identify a device.
     public var productId: Int {
         get {
             Int(descriptor.idProduct)
@@ -55,22 +59,24 @@ public class Device: Hashable {
     }
     
     /// The vendor ID of the device.
-    /// Can be accessed prior to connection.
-    ///  - Returns: An integer representing the vendor ID
+    ///
+    /// This, along with the product ID and serial number, uniquely identify a device.
     public var vendorId: Int {
         get {
             Int(descriptor.idVendor)
         }
     }
     
-    /// The serial number of the device. Useful in identifying a device if there are multiple with the same product and vendor ID.
-    ///  - Returns: A string representing the serial number of the device, or a blank string if the serial number cannot be found
+    /// The serial number of the device.
+    ///
+    /// This, along with the vendor ID and product ID, uniquely identifies a device. It is only needed when there are
+    /// multiple connected devices of the same model, which have the same vendor and product IDs but different
+    /// serial numbers.
     public var serialNumber: String {
         device.getStringDescriptor(index: descriptor.iSerialNumber) ?? ""
     }
     
-    /// Get a human readable version descriptor of a device by indicating both its vendor and product IDs. Together they form a primary key that can uniquely indentify the connected device.
-    /// - Returns: A string in the format "Vendor: [vendorID] Product: [productID]"
+    /// The name of the device, or its vendor and product IDs if the device does not give a name.
     public var displayName: String {
         device.getStringDescriptor(index: descriptor.iProduct) ?? "Vendor: \(vendorId) Product: \(productId)"
     }

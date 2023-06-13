@@ -8,8 +8,14 @@
 import Foundation
 import Usb
 
-/// A setting that controls how endpoints behave. Each alternate estting has the information that describes how the endpoints are arranged and it holds the endpoints itself.
-/// This must be activated using ``AltSetting/setActive()`` before sending or receiving data through any of the ``Endpoint`` objects it contains.
+/// A setting that controls how the endpoints in an ``Interface`` behave.
+///
+/// This must be activated using ``AltSetting/setActive()`` before sending or receiving data through any of
+/// the ``Endpoint`` objects it contains.
+///
+/// The endpoints in an ``AltSetting`` each have the same address numbers as the other ``AltSettings``
+/// in the ``Interface``, but the ``AltSetting/interfaceClass`` and ``Endpoint/transferType``
+/// can be different. Making the setting active determines how the device will communicate.
 public class AltSetting: Hashable {
     /// The endpoints defined by this alternate setting
     public var endpoints: [Endpoint]
@@ -35,7 +41,8 @@ public class AltSetting: Hashable {
     
     /// The name of the AltSetting to be displayed
     ///
-    /// This requires the device to be open.
+    /// This gets the name from the device, which requires the device to be open. Not all devices provide names for alternate
+    /// settings.
     public var displayName: String {
         setting.getStringDescriptor(index: setting.interfaceName) ?? ""
     }

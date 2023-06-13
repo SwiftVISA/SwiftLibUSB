@@ -8,20 +8,18 @@
 import Foundation
 import Usb
 
-/// All libUSB calls exist in some "context".
+/// An independent session for managing devices
 ///
-/// This class handles both the initialization and closing of contexts automatically. It also automatically allocates and deallocates libUSB's device list.
-///
-/// The main job of the context class is to hold the device list. This is the master list of all connected devices. It is stored in the read-only variable "devices" and stores objects of type ``Device``
-/// - Note: While many libUSB methods allow for using a null context, using a context is preferred. For this reason, all of the events will occur in some given context.
-///
-/// - Throws: ``USBError`` if libUSB encounters an error attempting some task.
+/// Contexts allow different users of libusb to manage devices independently.
 public class Context {
     
     /// The class that manages the pointer to the context. Extra references to this generally should not be made as they may impede deconstruction
     private var context: ContextRef
     
-    /// The device list. Its job is to store all devices that were connected to the device when the context was initialized.
+    /// All devices that were connected to the host when the context was initialized.
+    ///
+    /// Hotplug support is available in libusb, but has not been added to this class. To get an updated list of devices,
+    /// create a new ``Context``.
     public var devices: [Device]
     
     /// Initialize libUSB, and create the device list.

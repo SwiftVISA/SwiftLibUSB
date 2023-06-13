@@ -8,10 +8,11 @@
 import Foundation
 import Usb
 
-/// Each device has at least one configuration, often more. LibUSB keeps track of these with `libusb_config_descriptor`s.
-/// Each instance manages one of these descriptors, including managing the getting and freeing of this descriptor.
+/// A top-level setting for how a device communicates.
+///
+/// Configurations determine the maximum power a device can draw and which interfaces are available.
 public class Configuration: Hashable {
-    /// An array of Interfaces
+    /// The interfaces exposed by this Configuration
     public var interfaces: [Interface]
     /// An internal class to manage the lifetime of the configuration
     private var config: ConfigurationRef
@@ -47,7 +48,9 @@ public class Configuration: Hashable {
     }
     
     /// Get the interfces of the configuration.
-    public func getInterfaces(){
+    ///
+    /// This exists to reduce code duplication between the two constructors.
+    private func getInterfaces(){
         let size = Int(config.numInterfaces)
         for i in 0..<size {
             interfaces.append(Interface(config: config, index: i))
@@ -83,8 +86,6 @@ public class Configuration: Hashable {
     }
     
     /// Make this configuration active, if possible.
-    ///
-    /// The device should have been opened with `device.open` first.
     ///
     /// Activating the configuration should be done before claiming an interface or sending data.
     ///
