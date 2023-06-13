@@ -84,8 +84,3 @@ as `InstrumentManager.shared.instrumentAt(vendorID:productID:serialNumber:)`: it
 for a matching device, connect to it, and throw an error if no matching device was found or
 if multiple matching devices were found. Instrument classes are responsible for examining the
 returned device to see if it supports the intended communication protocol.
-
-### USBInstrument
-
-This is a base class for instruments connected over USB. It is not meant to be used directly.
-See `USBTMCInstrument`.
