@@ -86,7 +86,7 @@ public class Device: Hashable {
     /// Retrieved from the iManufacturer index
     public var manufacturerName: String {
         get {
-            return ""
+            device.getStringDescriptor(index: descriptor.iManufacturer) ?? ""
         }
     }
     
@@ -94,7 +94,7 @@ public class Device: Hashable {
     /// If this description was not provided by the device, this string is empty
     public var productName: String {
         get {
-            return ""
+            device.getStringDescriptor(index: descriptor.iProduct) ?? ""
         }
     }
     
