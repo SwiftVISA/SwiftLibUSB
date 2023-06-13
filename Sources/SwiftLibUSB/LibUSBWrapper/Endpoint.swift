@@ -103,11 +103,8 @@ public class Endpoint {
     /// See ``Direction`` for more information on how directions work
     public var direction: Direction {
         get {
-            switch descriptor.pointee.bEndpointAddress >> 7 {
-            case 1: return .In
-            case 0: return .Out
-            default: return .Out
-            }
+            // Shifting a UInt8 by seven bits can only leave 1 or 0, so we can force unwrap.
+            Direction(rawValue: descriptor.pointee.bEndpointAddress >> 7)!
         }
     }
     
@@ -118,12 +115,9 @@ public class Endpoint {
     /// For more information on what different transfer types mean, see ``TransferType``
     public var transferType: TransferType {
         get {
-            switch libusb_endpoint_transfer_type(UInt32(descriptor.pointee.bmAttributes & 3)) {
-            case LIBUSB_ENDPOINT_TRANSFER_TYPE_BULK: return .bulk
-            case LIBUSB_ENDPOINT_TRANSFER_TYPE_ISOCHRONOUS: return .isochronous
-            case LIBUSB_ENDPOINT_TRANSFER_TYPE_INTERRUPT: return .interrupt
-            default: return .control
-            }
+            // Bitwise ANDing with 3 always results in a number 0-3, all of which are
+            // defined TransferTypes, so we can force unwrap.
+            TransferType(rawValue: descriptor.pointee.bmAttributes & 3)!
         }
     }
     
@@ -140,7 +134,7 @@ public class Endpoint {
         }
         let error = libusb_clear_halt(handle, descriptor.pointee.bEndpointAddress)
         if error < 0 {
-            throw USBError.from(code: error)
+            throw USBError(rawValue: error) ?? USBError.other
         }
     }
     
@@ -161,7 +155,7 @@ public class Endpoint {
     ///   - timeout: The time, in millisecounds, to wait before timeout. This is by default one second
     public func sendBulkTransfer(data: inout Data, timeout: Int = 1000) throws -> Int {
         // Only work if we are the right kind of endpoint
-        if transferType != .bulk || direction != .Out {
+        if transferType != .bulk || direction != .out {
             throw USBError.notSupported
         }
 
@@ -188,7 +182,7 @@ public class Endpoint {
         
         // Throw if the transfer had any errors. Errors are given by sending back a negative value
         if error < 0 {
-            throw USBError.from(code: error)
+            throw USBError(rawValue: error) ?? USBError.other
         }
         
         // Return the number of bytes send
@@ -213,7 +207,7 @@ public class Endpoint {
     ///   - timeout: The amount of time, in milliseconds to wait before timing out of the message. The default is 1000(1 second)
     public func receiveBulkTransfer(length: Int = 1024, timeout: Int = 1000) throws -> Data {
         // Throw an error if this is the wrong kind of endpoint
-        if transferType != .bulk || direction != .In {
+        if transferType != .bulk || direction != .in {
             throw USBError.notSupported
         }
         
@@ -237,7 +231,7 @@ public class Endpoint {
         
         // Throw if the transfer had any errors
         if error < 0 {
-            throw USBError.from(code: error)
+            throw USBError(rawValue: error) ?? USBError.other
         }
         
         // Turn the returned array into type Data, then return it.

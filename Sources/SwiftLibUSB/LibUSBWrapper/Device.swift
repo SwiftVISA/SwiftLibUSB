@@ -33,7 +33,7 @@ public class Device: Hashable {
         descriptor = libusb_device_descriptor()
         let error = libusb_get_device_descriptor(device.rawDevice, &descriptor)
         if error < 0 {
-            throw USBError.from(code: error)
+            throw USBError(rawValue: error) ?? USBError.other
         }
 
         configurations = []
@@ -209,7 +209,7 @@ public class Device: Hashable {
             length,
             timeout)
         if returnVal < 0 {
-            throw USBError.from(code: returnVal)
+            throw USBError(rawValue: returnVal) ?? USBError.other
         }
         return Data(charArrayData)
     }
@@ -229,8 +229,8 @@ public class Device: Hashable {
     ///- Throws: a ``USBError`` if libUSB encounters and internal error
     public func sendControlTransfer(
         direction: Direction,
-        type: LibUSBControlType,
-        recipient: LibUSBRecipient,
+        type: ControlType,
+        recipient: Recipient,
         request: UInt8,
         value: UInt16,
         index: UInt16,
@@ -239,9 +239,9 @@ public class Device: Hashable {
         timeout: UInt32
     ) throws -> Data {
         // Fill in bits of request Type
-        var requestType : UInt8 = direction.val << 5
-        requestType += type.val << 7
-        requestType += recipient.val << 0
+        var requestType : UInt8 = direction.rawValue << 5
+        requestType += type.rawValue << 7
+        requestType += recipient.rawValue << 0
         
         // Make the control transfer
         return try sendControlTransfer(
@@ -275,7 +275,7 @@ internal class DeviceRef {
         rawHandle = nil
         let error = libusb_open(device, &rawHandle)
         if error < 0 {
-            throw USBError.from(code: error)
+            throw USBError(rawValue: error) ?? USBError.other
         }
         open = rawHandle != nil
     }
@@ -291,7 +291,7 @@ internal class DeviceRef {
         if !open {
             let error = libusb_open(rawDevice, &rawHandle)
             if error < 0 {
-                throw USBError.from(code: error)
+                throw USBError(rawValue: error) ?? USBError.other
             }
             open = rawHandle != nil
         }

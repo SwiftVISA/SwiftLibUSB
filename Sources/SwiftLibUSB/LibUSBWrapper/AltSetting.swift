@@ -44,7 +44,7 @@ public class AltSetting: Hashable {
     /// This gets the name from the device, which requires the device to be open. Not all devices provide names for alternate
     /// settings.
     public var displayName: String {
-        setting.getStringDescriptor(index: setting.interfaceName) ?? ""
+        setting.getStringDescriptor(index: setting.interfaceName) ?? "(\(index)) unnamed alt setting"
     }
     
     /// The number of this interface
@@ -99,7 +99,7 @@ public class AltSetting: Hashable {
             Int32(setting.interfaceNumber),
             Int32(setting.index))
         if error < 0 {
-            throw USBError.from(code: error)
+            throw USBError(rawValue: error) ?? USBError.other
         }
     }
     
@@ -165,7 +165,7 @@ internal class AltSettingRef {
     
     var interfaceClass: ClassCode {
         get {
-            ClassCode.from(code: UInt32(altSetting.pointee.bInterfaceClass))
+            ClassCode(rawValue: altSetting.pointee.bInterfaceClass) ?? ClassCode.other
         }
     }
     

@@ -101,7 +101,7 @@ internal class InterfaceRef {
         }
         let error = libusb_claim_interface(handle, Int32(index))
         if error < 0 {
-            throw USBError.from(code: error)
+            throw USBError(rawValue: error) ?? USBError.other
         }
         claimed = true
     }

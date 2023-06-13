@@ -80,31 +80,15 @@ extension USBTMCInstrument {
     private static let capabilitiesIndex = 5
     
     /// Message types defined by USBTMC specification, table 15
-    private enum ControlMessages {
-        case initiateAbortBulkOut
-        case checkAbortBulkOutStatus
-        case initiateAbortBulkIn
-        case checkAbortBulkInStatus
-        case initiateClear
-        case checkClearStatus
-        case getCapabilities
-        case indicatorPulse
-        
-        /// Convert a ControlMessage to a byte
-        /// - Returns: The control message as a byte
-        func toByte() -> UInt8 {
-            switch self {
-            // 0 is reserved
-            case .initiateAbortBulkOut: return 1
-            case .checkAbortBulkOutStatus: return 2
-            case .initiateAbortBulkIn: return 3
-            case .checkAbortBulkInStatus: return 4
-            case .initiateClear: return 5
-            case .checkClearStatus: return 6
-            case .getCapabilities: return 7
-            case .indicatorPulse: return 64 // This is correct; there is a very large gap here
-            }
-        }
+    private enum ControlMessage: UInt8 {
+        case initiateAbortBulkOut = 1
+        case checkAbortBulkOutStatus = 2
+        case initiateAbortBulkIn = 3
+        case checkAbortBulkInStatus = 4
+        case initiateClear = 5
+        case checkClearStatus = 6
+        case getCapabilities = 7
+        case indicatorPulse = 64
     }
     
     private enum MessageKind: UInt8 {
@@ -158,8 +142,8 @@ extension USBTMCInstrument {
         try interface.claim()
         try altSetting.setActive()
         activeInterface = altSetting
-        inEndpoint = try getEndpoint(endpoints: altSetting.endpoints,direction: Direction.In)
-        outEndpoint = try getEndpoint(endpoints: altSetting.endpoints,direction: Direction.Out)
+        inEndpoint = try getEndpoint(endpoints: altSetting.endpoints,direction: Direction.in)
+        outEndpoint = try getEndpoint(endpoints: altSetting.endpoints,direction: Direction.out)
     }
     
     
@@ -206,11 +190,11 @@ extension USBTMCInstrument {
     private func getCapabilities() {
         do {
             // These arguments are defined by the USBTMC specification, table 36
-            let capabilities: Data = try _session.device.sendControlTransfer(
-                direction: .In,
-                type: .Class,
-                recipient: .Interface,
-                request: ControlMessages.getCapabilities.toByte(),
+            let capabilities: Data = try _session.usbDevice.sendControlTransfer(
+                direction: .in,
+                type: .class,
+                recipient: .interface,
+                request: ControlMessage.getCapabilities.rawValue,
                 value: 0,
                 index: UInt16(activeInterface?.index ?? 0),
                 data: Data(count: 24),
