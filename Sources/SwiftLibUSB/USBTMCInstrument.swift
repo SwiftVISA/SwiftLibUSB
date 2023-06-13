@@ -219,7 +219,7 @@ extension USBTMCInstrument {
     ///   - length: The maximum amount of data to receive
     ///   - chunkSize: The amount of data to receive each time
     /// - Returns: The data read from the device
-    /// - Throws: a ``USBError`` if at any point a data transfer fails
+    /// - Throws: a ``USBError`` if at any point a data transfer fails and ``USBTMCInstrument/Error/transferIncomplete`` if we could not request required information from the device
     func receiveUntilEndOfMessage(
         headerSuffix: Data,
         length: Int?,
@@ -334,7 +334,7 @@ extension USBTMCInstrument: MessageBasedInstrument {
     ///   - chunkSize: The number of bytes to read into a buffer at a time.
     /// - Throws: Error if the device could not be read from.
     /// - Returns: The data read from the device as bytes.
-    /// - Throws: ``USBSession/Error/notSupported`` if the device does not support terminators, ``USBTMCInstrument/Error/invalidTerminator`` if the terminator has more than one byte, or a ``USBError`` if a failure occurs during a data transfer. ``USBTMCInstrument/Error/transferIncomplete`` if we could not request required information from the device
+    /// - Throws: ``USBSession/Error/notSupported`` if the device does not support terminators, ``USBTMCInstrument/Error/invalidTerminator`` if the terminator has more than one byte, or a ``USBError`` if a failure occurs during a data transfer.
     public func readBytes(
         maxLength: Int?,
         until terminator: Data,
@@ -466,20 +466,19 @@ extension USBTMCInstrument.Error {
 extension InstrumentManager {
     /// Finds the specified device by its details
     ///
-    ///
-    /// This finds the instrument with the given vendor ID,product ID and serial number if given.
+    /// A Test and Measurment Class device is a device that follows [the specification for USBTMC devices](https://www.usb.org/document-library/test-measurement-class-specification). This method is designed to find such a device and make it available for communication
+    /// This finds the instrument with the given vendor ID, product ID and serial number if given.
     /// If only vendor ID and product ID are given, it looks for a device using only those metrics. One and only one device that matches the given
-    /// ID's should be connected at a time.
+    /// Devices should be connected during the entirety of operation because "hotswapping" is not supported.
     ///
-    /// - Note: If you cannot find the vendor ID, product ID and serial number, they are part of the visa string. Visa strings take the format `USB::<vendor ID>::<product ID>::<serial number>::...`, alternatively use `instrumentAt(visaString: ...)`
+    /// - Note: You can find the vendor ID, product ID and serial number in the VISA string. VISA strings take the format `USB::<vendor ID>::<product ID>::<serial number>::...`, alternatively use `instrumentAt(visaString: ...)`
     ///
     /// - Parameters:
     ///    - vendorID: The number assigned to the manufacturer of the device
     ///    - productID: The number assigned to this type of device
     ///    - serialNumber: An optional string assigned uniquely to this device. This is needed if multiple of the same type of device are connected.
     ///
-    /// - Returns: A ``USBTMCInstrument`` that has the matching product ID, vendor ID. If the serial number was specified this will match as well.
-    /// The instrument will be prepared for communication and can be communicated with using
+    /// - Returns: A ``USBTMCInstrument`` that has the matching product ID and vendor ID. If the serial number was specified this will match as well. After initilisation the instrument will be ready for communication
     ///
     /// - Throws: Various errors depending on at what level of abstraction the error occured
     ///
@@ -490,7 +489,8 @@ extension InstrumentManager {
     ///  - ``USBSession/Error/noDevices`` occurs if there are no devices connected
     ///
     ///  ``USBTMCInstrument/Error`` if there is a problem that is specific to the Test and Mesurement Class of devices.
-    ///  - ``USBTMCInstrument/Error/couldNotFindEndpoint`` means there is no valid endpoint for communicating, which implies this may not be a USBTMC class device. If you are **not** looking for a USB Test and Measurement Class device, this class will not workgv
+    ///  - ``USBTMCInstrument/Error/couldNotFindEndpoint`` means there is no valid endpoint for communicating, which implies this may not be a USBTMC class device. If you are **not** looking for a USB Test and Measurement Class device, this class will not work
+    ///  - ``USBTMCInstrument/Error/transferIncomplete`` if not all the bytes of the get capabilities request to device were sent.
     ///
     ///  ``USBError`` occurs if the libUSB library encounters an error.
     public func instrumentAt(vendorID: Int, productID: Int, serialNumber: String? = nil) throws -> USBTMCInstrument {
@@ -498,11 +498,12 @@ extension InstrumentManager {
     }
     /// Finds the specified device using a Visa String
     ///
+    /// A Test and Measurment Class device is a device that follows [the specification for USBTMC devices](https://www.usb.org/document-library/test-measurement-class-specification). This method is designed to find such a device and make it available for communication
+    /// 
     /// - Parameters:
     ///    - visaString: The visa string used to identify the device. Each device has one visa string that uniquely identifies it, as [specified by NIVisa](https://www.ni.com/docs/en-US/bundle/ni-visa/page/ni-visa/visaresourcesyntaxandexamples.html)
     ///
-    /// - Returns: A ``USBTMCInstrument`` that has the matching product ID, vendor ID. If the serial number was specified this will match as well.
-    /// The instrument will be prepared for communication and can be communicated with using
+    /// - Returns: A ``USBTMCInstrument`` that has the matching product ID, vendor ID and serial number. After initilisation the instrument will be ready for communication
     ///
     /// - Throws: Various errors depending on at what level of abstraction the error occured
     /// ``USBSession/Error`` if there is an error establishing the instrument
@@ -512,7 +513,8 @@ extension InstrumentManager {
     ///
     ///  ``USBTMCInstrument/Error`` if there is a problem that is specific to the Test and Mesurement Class of devices
     ///  - ``USBTMCInstrument/Error/invalidVisa`` occurs if the given visa could not be parsed. Visa strings should be in the format "`USB::<vendor ID>::<product ID>::<serial number>::...`" if the visa string cannot be formatted, proprly instead specify the vendor ID, product ID and serial number individually using `instrumentAt(vendorID: ..., productID: ..., serialNumber: ...)`
-    ///  - ``USBTMCInstrument/Error/couldNotFindEndpoint`` is thrown if there are no valid endpoint for communicating, which implies this may not be a USBTMC class device. If you are **not** looking for a USB Test and Measurement Class device, this class will not work.
+    ///  - ``USBTMCInstrument/Error/couldNotFindEndpoint`` is thrown if a required endpoint for communicating could not be found. This could be due to hardware error, physical disconnection or because the device does not support the Test and Measurment Class interface.
+    ///  - ``USBTMCInstrument/Error/transferIncomplete`` if not all the bytes of the get capabilities request to device were sent.
     ///
     ///  ``USBError`` occurs if the libUSB library encounters an error.
     public func instrumentAt(visaString: String) throws -> USBTMCInstrument {

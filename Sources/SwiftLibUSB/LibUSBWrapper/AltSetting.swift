@@ -13,7 +13,7 @@ import Usb
 /// This must be activated using ``AltSetting/setActive()`` before sending or receiving data through any of
 /// the ``Endpoint`` objects it contains.
 ///
-/// The endpoints in an ``AltSetting`` each have the same address numbers as the other ``AltSetting``
+/// The endpoints in an ``AltSetting`` each have the same address numbers as the other ``AltSetting``s
 /// in the ``Interface``, but the ``AltSetting/interfaceClass`` and ``Endpoint/transferType``
 /// can be different. Making the setting active determines how the device will communicate.
 public class AltSetting: Hashable {

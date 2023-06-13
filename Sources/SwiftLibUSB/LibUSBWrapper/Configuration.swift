@@ -87,8 +87,8 @@ public class Configuration: Hashable {
     
     /// The maximum power draw of the device in this port used with this configuration
     ///
-    /// Units vary, as high speed devices use units of 2mA and super speed devices use units of 8mA
-    /// - Important: Only matters if busPowered is true
+    /// Units vary, as high speed devices use units of 2mA and super speed devices use units of 8mA.
+    /// This value only matters if busPowered is true
     public var maxPower: Int {
         get {
             config.maxPower
@@ -99,7 +99,7 @@ public class Configuration: Hashable {
     /// In general, it is more useful to use the supporting methods
     ///
     /// - [0,4]: Reserved
-    /// - 5: If remote wakeup is supported. Can also be accessed by ``Configuration/hasRemoveWakeup``
+    /// - 5: If remote wakeup is supported. Can also be accessed by ``Configuration/hasRemoteWakeup``
     /// - 6: This device does not use power from the USB bus. Can also be gotten from ``selfPowered``
     /// - 7: Technically, this denotes if the configuration is powered by the bus but that is outdated. Expect a 1
     public var attributeBitmap: Int {
@@ -111,7 +111,7 @@ public class Configuration: Hashable {
     /// This is true if the device can be woken up remotely, false otherwise
     ///
     /// This bit was set as part of bmAttributes(which is stored as ``attributeBitmap``)
-    public var hasRemoveWakeup: Bool {
+    public var hasRemoteWakeup: Bool {
         get {
             ((attributeBitmap & 0x20) != 0)
         }

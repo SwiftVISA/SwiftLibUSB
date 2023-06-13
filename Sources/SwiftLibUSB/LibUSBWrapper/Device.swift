@@ -125,22 +125,24 @@ public class Device: Hashable {
     }
     
     /// The raw verson value of the USB specifications used by this device
+    ///
     /// This value is not useful practically. For the version in a human readable form, use ``Device/usbVersion``
     /// Represented as a 4 digit hex value where the period of the version lies between the 2nd and 3rd digit
     /// For example,
     /// - 512: is 0x0200 in hex, which is interpreted as USB version 2.0
     /// - 272: is 0x0110 in hex, which is interpreted as USB 1.1
     ///
-    public var usbVersionVal: Int {
+    public var versionVal: Int {
         get {
             Int(descriptor.bcdUSB)
         }
     }
     
     /// The version of the USB specifications used by this device
+    ///
     /// written as a human-readable string in the form "[major version].[minor version][patch]"
     /// The versions do support hex characters. idk why
-    public var usbVersion: String {
+    public var version: String {
         get {
             let hexString = String(NSString(format:"%2X", usbVersionVal))
             if(hexString.count == 1){
