@@ -8,14 +8,16 @@
 import Foundation
 import Usb
 
-/// A group of endpoints.
+/// A group of endpoints intended to be used together. An ``AltSetting`` determines what functions these endpoints have.
 ///
-/// An ``AltSetting`` determines what functions these endpoints have.
-public class Interface : Hashable {
+/// An `Interface` should be claimed before using an `AltSetting` within it. Each `Interface` is independent, so
+/// multiple `Interface`s can be claimed simultaneously.
+public class Interface: Hashable {
     public static func == (lhs: Interface, rhs: Interface) -> Bool {
-        return lhs.interface.raw_device == rhs.interface.raw_device && lhs.interface.index == rhs.interface.index
+        return lhs.interface.rawDevice == rhs.interface.rawDevice && lhs.interface.index == rhs.interface.index
     }
     
+    /// The alternate settings offered for how to use these endpoints.
     public var altSettings: [AltSetting]
     private var interface: InterfaceRef
     
@@ -27,6 +29,7 @@ public class Interface : Hashable {
         }
     }
     
+    /// The number identifying this interface for ``Interface/claim()`` and similar functions.
     public var index: Int {
         get {
             Int(interface.index)
@@ -47,7 +50,7 @@ public class Interface : Hashable {
     
     /// A hash representation of the interface
     public func hash(into hasher: inout Hasher) {
-        interface.raw_device.hash(into: &hasher)
+        interface.rawDevice.hash(into: &hasher)
         interface.index.hash(into: &hasher)
     }
 }
@@ -73,15 +76,15 @@ internal class InterfaceRef {
         }
     }
     
-    var raw_device: OpaquePointer {
+    var rawDevice: OpaquePointer {
         get {
-            config.raw_device
+            config.rawDevice
         }
     }
     
-    var raw_handle: OpaquePointer? {
+    var rawHandle: OpaquePointer? {
         get {
-            config.raw_handle
+            config.rawHandle
         }
     }
     
@@ -93,7 +96,7 @@ internal class InterfaceRef {
     }
     
     func claim() throws {
-        guard let handle = config.raw_handle else {
+        guard let handle = config.rawHandle else {
             throw USBError.connectionClosed
         }
         let error = libusb_claim_interface(handle, Int32(index))
@@ -103,9 +106,13 @@ internal class InterfaceRef {
         claimed = true
     }
     
+    func getStringDescriptor(index: UInt8) -> String? {
+        config.getStringDescriptor(index: index)
+    }
+    
     deinit {
-        if claimed && config.raw_handle != nil {
-            libusb_release_interface(config.raw_handle, index)
+        if claimed && config.rawHandle != nil {
+            libusb_release_interface(config.rawHandle, index)
         }
     }
 }

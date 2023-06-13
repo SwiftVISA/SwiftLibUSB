@@ -31,7 +31,7 @@ public enum TransferType: UInt8 {
     case interrupt = 3
 }
 
-/// Source that describing a control message
+/// Source that defines a control message
 public enum ControlType: UInt8 {
     /// Message defined as part of the core USB specification
     case standard = 0

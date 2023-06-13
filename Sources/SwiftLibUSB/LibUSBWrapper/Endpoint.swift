@@ -8,9 +8,15 @@
 import Foundation
 import Usb
 
-/// A communication channel with the device. Each device may have many endpoints that allow for communication from the host to the device
-/// These endpoints are defined by the specific alternate setting(``AltSetting``) for a specific ``Interface`` in a specific ``Configuration`` for a specific ``Device``.
-/// - Note: Before transferring data, libUSB requires that the configuration be active, the interface be claimed and the alternate setting that contains this endpoint be activated. The configuration can be made active by calling ``Configuration/setActive()`` in the ``Configuration`` object used. The interface is claimed by calling ``Interface/claim()`` in the ``Interface`` used.  The altsetting that this endpoint is a part of can be activated by ``AltSetting/setActive()``
+/// A communication channel with the device.
+///
+/// Endpoints are unidirectional, so they can either only send data out or only receive data in from the device, determined
+/// by the ``Endpoint/direction`` property. The type of data they can transfer is determined by the
+/// ``Endpoint/transferType`` property.
+///
+/// Before sending data on an Endpoint, the ``Configuration``, ``Interface``, and  ``AltSetting`` that contain
+/// it must be activated. This is done by calling `config.set_active()`, `interface.claim()`, and
+/// `setting.setActive()`
 public class Endpoint {
     /// The descriptor of the endpoint is pointed to by this pointer. This is the raw descriptor as given by libUSB, which is hard to use. Getter methods should be used instead of referencing this directly. [It is documented here](https://libusb.sourceforge.io/api-1.0/structlibusb__endpoint__descriptor.html)
     private var descriptor: UnsafePointer<libusb_endpoint_descriptor>
@@ -27,7 +33,8 @@ public class Endpoint {
         descriptor = altSetting.endpoint(index: index)
     }
     
-    /// The address of the endpoint.
+    /// The number identifying the endpoint to the device.
+    ///
     /// It corresponds to the value bEndpointAddress as defined by libUSB
     public var address: Int {
         get {
@@ -35,24 +42,29 @@ public class Endpoint {
         }
     }
     
-    /// The attributes which apply to the endpoint. In general, it is not neccesary to access this directly, instead use ``Endpoint/transferType`` to get the transfer type.
-    /// These attributes are stored as the bits of a single byte. A more detailed description can be found at [the libusb documentation for endpoint descriptor](https://libusb.sourceforge.io/api-1.0/structlibusb__endpoint__descriptor.html#a932b84417c46467f9916ecf7b679160b)
+    /// The attributes which apply to the endpoint.
+    ///
+    /// In general, it is not neccesary to access this directly. Use ``Endpoint/transferType`` to get the transfer type.
+    ///
+    /// These attributes are stored as the bits of a single byte. A more detailed description can be found at [the libusb documentation for endpoint descriptors](https://libusb.sourceforge.io/api-1.0/structlibusb__endpoint__descriptor.html#a932b84417c46467f9916ecf7b679160b).
     ///
     /// To quote the libUSB documentation:
     /// - Bits 0:1 Determine the transfer type and correspond to libusb_endpoint_transfer_type.
     /// - Bits 2:3 are only used for isochronous endpoints and correspond to libusb_iso_sync_type.
     /// - Bits 4:5 are also only used for isochronous endpoints and correspond to libusb_iso_usage_type.
     /// - Bits 6:7 are reserved.
-    /// We st
     public var attributes: Int {
         get {
             Int(descriptor.pointee.bmAttributes)
         }
     }
     
-    /// The direction of the data transfer of the endpoint. This is determined by the last bit of the endpoint address
+    /// The direction of the data transfer of the endpoint.
+    ///
+    /// This is determined by the last bit of the endpoint address.
     /// - In denotes LIBUSB_ENDPOINT_IN which is the host recieving data from the device.
     /// - Out denotes LIBUSB_ENDPOINT_OUT which is sending data to the device from the host.
+    ///
     /// See ``Direction`` for more information on how directions work
     public var direction: Direction {
         get {
@@ -62,8 +74,10 @@ public class Endpoint {
     }
     
     /// The type of the data transfer the endpoint can send.
+    ///
     /// This is determiend by the bmAttributes value of the endpoint stored in ``Endpoint/attributes``
-    /// For more information on what different transfertypes mean, see ``TransferType``
+    ///
+    /// For more information on what different transfer types mean, see ``TransferType``
     public var transferType: TransferType {
         get {
             // Bitwise ANDing with 3 always results in a number 0-3, all of which are
@@ -72,12 +86,15 @@ public class Endpoint {
         }
     }
     
-    /// Clear halts or stalls for the endpoint. If a device does not like the inputs it was sent, it halts. Before more messages can proceed the halt to the endpoint must be cleared. For consistant operation through errors, an endpoint should be cleared of halts before it should be used
+    /// Clear halts or stalls for the endpoint.
+    ///
+    /// If a device reports an error based on inputs it was sent, it halts the offending endpoint. Before more messages can
+    /// proceed the halt to the endpoint must be cleared.
     /// - Throws:
     /// * ``USBError/connectionClosed`` if the device was closed using ``Device/close()``
     /// * ``USBError/noDevice`` if the device was disconnected
     public func clearHalt() throws {
-        guard let handle = altSetting.raw_handle else {
+        guard let handle = altSetting.rawHandle else {
             throw USBError.connectionClosed
         }
         let error = libusb_clear_halt(handle, descriptor.pointee.bEndpointAddress)
@@ -108,7 +125,7 @@ public class Endpoint {
         }
 
         // Make sure the device is open
-        guard let handle = altSetting.raw_handle else {
+        guard let handle = altSetting.rawHandle else {
             throw USBError.connectionClosed
         }
 
@@ -120,7 +137,13 @@ public class Endpoint {
         let length: Int32 = Int32(data.count)
         
         // Attempt to perform a bulk out transfer
-        let error = libusb_bulk_transfer(handle, descriptor.pointee.bEndpointAddress, &data, length, &sent, UInt32(timeout))
+        let error = libusb_bulk_transfer(
+            handle,
+            descriptor.pointee.bEndpointAddress,
+            &data,
+            length,
+            &sent,
+            UInt32(timeout))
         
         // Throw if the transfer had any errors. Errors are given by sending back a negative value
         if error < 0 {
@@ -154,7 +177,7 @@ public class Endpoint {
         }
         
         // Make sure the device is open
-        guard let handle = altSetting.raw_handle else {
+        guard let handle = altSetting.rawHandle else {
             throw USBError.connectionClosed
         }
         
@@ -163,8 +186,13 @@ public class Endpoint {
         var innerData = [UInt8](repeating: 0, count: Int(length))
         
         // Attempt to perform a bulk in transfer
-        let error = libusb_bulk_transfer(handle, descriptor.pointee.bEndpointAddress,
-                                         &innerData, Int32(length), &sent, UInt32(timeout))
+        let error = libusb_bulk_transfer(
+            handle,
+            descriptor.pointee.bEndpointAddress,
+            &innerData,
+            Int32(length),
+            &sent,
+            UInt32(timeout))
         
         // Throw if the transfer had any errors
         if error < 0 {
