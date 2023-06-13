@@ -1,4 +1,4 @@
-module Usb {
+module CUsb {
     umbrella header "usb.h"
     link "usb-1.0"
 }

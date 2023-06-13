@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import Usb
+import CUsb
 
 /// A setting that controls how endpoints behave. Each alternate estting has the information that describes how the endpoints are arranged and it holds the endpoints itself.
 /// This must be activated using ``AltSetting/setActive()`` before sending or receiving data through any of the ``Endpoint`` objects it contains.

@@ -7,6 +7,7 @@
 
 import Foundation
 import CoreSwiftVISA
+import Usb
 
 
 /// A common type of instrument connected over USB.

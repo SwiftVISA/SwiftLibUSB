@@ -7,6 +7,7 @@
 
 import Foundation
 import CoreSwiftVISA
+import Usb
 
 /// USBSessions represent a connection made over USB to a USB device.
 /// Designed to be held by USBInstrument class.

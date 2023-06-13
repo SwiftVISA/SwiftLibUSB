@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import Usb
+import CUsb
 
 /// A group of endpoints.
 ///

@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import Usb
+import CUsb
 
 /// A description used by ``AltSetting``s to describe the communication method for the interface.
 ///

@@ -14,9 +14,12 @@ let package = Package(
     ],
     targets: [
         .systemLibrary(
-            name: "Usb",
+            name: "CUsb",
             pkgConfig: "libusb-1.0",
             providers: [.brew(["libusb"])]),
+        .target(
+            name: "Usb",
+            dependencies: ["CUsb"]),
         .target(
             name: "SwiftLibUSB",
             dependencies: ["CoreSwiftVISA", "Usb"]),

@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import Usb
+import CUsb
 
 /// A communication channel with the device. Each device may have many endpoints that allow for communication from the host to the device
 /// These endpoints are defined by the specific alternate setting(``AltSetting``) for a specific ``Interface`` in a specific ``Configuration`` for a specific ``Device``.
