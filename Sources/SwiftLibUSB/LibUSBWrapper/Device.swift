@@ -33,7 +33,7 @@ public class Device: Hashable {
         descriptor = libusb_device_descriptor()
         let error = libusb_get_device_descriptor(device.rawDevice, &descriptor)
         if error < 0 {
-            throw USBError.from(code: error)
+            throw USBError(rawValue: error) ?? USBError.other
         }
 
         configurations = []
@@ -66,7 +66,7 @@ public class Device: Hashable {
             Int(descriptor.idVendor)
         }
     }
-    
+
     /// The serial number of the device.
     ///
     /// This, along with the vendor ID and product ID, uniquely identifies a device. It is only needed when there are
@@ -79,6 +79,84 @@ public class Device: Hashable {
     /// The name of the device, or its vendor and product IDs if the device does not give a name.
     public var displayName: String {
         device.getStringDescriptor(index: descriptor.iProduct) ?? "Vendor: \(vendorId) Product: \(productId)"
+    }
+    
+    /// Name of the manufacturer of the device
+    /// If no name can be found, the name is blank
+    /// Retrieved from the iManufacturer index
+    public var manufacturerName: String {
+        get {
+            device.getStringDescriptor(index: descriptor.iManufacturer) ?? ""
+        }
+    }
+    
+    /// A string description of this product.
+    /// If this description was not provided by the device, this string is empty
+    public var productName: String {
+        get {
+            device.getStringDescriptor(index: descriptor.iProduct) ?? ""
+        }
+    }
+    
+    /// The device's class, broadly describes what type of device this is
+    /// These classes are described in more detail in the ``ClassCode`` enumerable
+    /// This is derived from the bDeviceClass value
+    public var deviceClass: ClassCode {
+        get {
+            return ClassCode.from(code: UInt32(descriptor.bDeviceClass))
+        }
+    }
+    
+    /// Each class has a variety of subclasses that describe the device's purpose in more detail.
+    /// These codes are specific to the class of the device, which is stored in the ``deviceClass`` value
+    /// This is derived from the bDeviceSubClass value
+    public var deviceSubclass: Int {
+        get {
+            Int(descriptor.bDeviceClass)
+        }
+    }
+    
+    /// Each class can be described by their class (``deviceClass``), Sub class (``deviceSubclass``) and their protocol.
+    /// The protocol is specific to the subclass of the device.
+    public var deviceProtocol: Int {
+        get {
+            Int(descriptor.bDeviceProtocol)
+        }
+    }
+    
+    /// The raw verson value of the USB specifications used by this device
+    /// This value is not useful practically. For the version in a human readable form, use ``version``
+    /// Represented as a 4 digit hex value where the period of the version lies between the 2nd and 3rd digit
+    /// For example,
+    /// - 512: is 0x0200 in hex, which is interpreted as USB version 2.0
+    /// - 272: is 0x0110 in hex, which is interpreted as USB 1.1
+    ///
+    public var usbVersionVal: Int {
+        get {
+            Int(descriptor.bcdUSB)
+        }
+    }
+    
+    /// The version of the USB specifications used by this device
+    /// written as a human-readable string in the form "[major version].[minor version][patch]"
+    /// The versions do support hex characters. idk why
+    public var usbVersion: String {
+        get {
+            let hexString = String(NSString(format:"%2X", usbVersionVal))
+            if(hexString.count == 1){
+                return "0.0"+hexString
+            }
+            return hexString.prefix(hexString.count-2) + "." + hexString.suffix(2)
+        }
+    }
+    
+    /// The maximum size of packets for the 0th endpoint.
+    /// The endpoint at index 0 is treated seperatly and managed by the device
+    /// This is measured in bytes
+    public var packetSizeEndpoint0: Int {
+        get {
+            Int(descriptor.bMaxPacketSize0)
+        }
     }
     
     /// Close the connection to the device
@@ -131,7 +209,7 @@ public class Device: Hashable {
             length,
             timeout)
         if returnVal < 0 {
-            throw USBError.from(code: returnVal)
+            throw USBError(rawValue: returnVal) ?? USBError.other
         }
         return Data(charArrayData)
     }
@@ -151,8 +229,8 @@ public class Device: Hashable {
     ///- Throws: a ``USBError`` if libUSB encounters and internal error
     public func sendControlTransfer(
         direction: Direction,
-        type: LibUSBControlType,
-        recipient: LibUSBRecipient,
+        type: ControlType,
+        recipient: Recipient,
         request: UInt8,
         value: UInt16,
         index: UInt16,
@@ -161,9 +239,9 @@ public class Device: Hashable {
         timeout: UInt32
     ) throws -> Data {
         // Fill in bits of request Type
-        var requestType : UInt8 = direction.val << 5
-        requestType += type.val << 7
-        requestType += recipient.val << 0
+        var requestType : UInt8 = direction.rawValue << 5
+        requestType += type.rawValue << 7
+        requestType += recipient.rawValue << 0
         
         // Make the control transfer
         return try sendControlTransfer(
@@ -197,7 +275,7 @@ internal class DeviceRef {
         rawHandle = nil
         let error = libusb_open(device, &rawHandle)
         if error < 0 {
-            throw USBError.from(code: error)
+            throw USBError(rawValue: error) ?? USBError.other
         }
         open = rawHandle != nil
     }
@@ -213,7 +291,7 @@ internal class DeviceRef {
         if !open {
             let error = libusb_open(rawDevice, &rawHandle)
             if error < 0 {
-                throw USBError.from(code: error)
+                throw USBError(rawValue: error) ?? USBError.other
             }
             open = rawHandle != nil
         }

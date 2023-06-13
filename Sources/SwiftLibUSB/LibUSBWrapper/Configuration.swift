@@ -25,7 +25,7 @@ public class Configuration: Hashable {
         var desc: UnsafeMutablePointer<libusb_config_descriptor>? = nil
         let error = libusb_get_config_descriptor(device.rawDevice, index, &desc)
         if error < 0 {
-            throw USBError.from(code: error)
+            throw USBError(rawValue: error) ?? USBError.other
         }
         config = ConfigurationRef(device: device, descriptor: desc!)
         interfaces = []
@@ -40,7 +40,7 @@ public class Configuration: Hashable {
         var desc: UnsafeMutablePointer<libusb_config_descriptor>? = nil
         let error = libusb_get_active_config_descriptor(device.rawDevice, &desc)
         if error < 0 {
-            throw USBError.from(code: error)
+            throw USBError(rawValue: error) ?? USBError.other
         }
         config = ConfigurationRef(device: device, descriptor: desc!)
         interfaces = []
@@ -83,6 +83,44 @@ public class Configuration: Hashable {
     /// Compare configurations by their internal pointer. Two configuration classes that point to the same `libUSB_config_descriptor` are considered the same
     public static func == (lhs: Configuration, rhs: Configuration) -> Bool {
         lhs.config.descriptor == rhs.config.descriptor
+    }
+    
+    /// The maximum power draw of the device in this port used with this configuration
+    /// Units vary, as high speed devices use units of 2mA and super speed devices use units of 8mA
+    /// only matters if busPowered is true
+    public var maxPower: Int {
+        get {
+            config.maxPower
+        }
+    }
+    
+    /// The attributes of this configuration. This is a low level method
+    /// In general, it is more useful to use the supporting methods
+    ///
+    /// - [0,4]: Reserved
+    /// - 5: If remote wakeup is supported. Can also be accessed by ``hasRemoteWakeup``
+    /// - 6: This device does not use power from the USB bus. Can also be gotten from ``selfPowered``
+    /// - 7: Technically, this denotes if the configuration is powered by the bus but that is outdated. Expect a 1
+    public var attributeBitmap: Int {
+        get {
+            config.bmAttributes
+        }
+    }
+    
+    /// This is true if the device can be woken up remotely, false otherwise
+    /// This bit was set as part of bmAttributes(which is stored as ``attributeBitmap``)
+    public var hasRemoveWakeup: Bool {
+        get {
+            ((attributeBitmap & 0x20) != 0)
+        }
+    }
+    
+    /// This is true if the device can power itself, false otherwise
+    /// This bit was set as part of bmAttributes(which is stored as ``attributeBitmap``)
+    public var selfPowered: Bool {
+        get {
+            ((attributeBitmap & 0x40) != 0)
+        }
     }
     
     /// Make this configuration active, if possible.
@@ -152,6 +190,20 @@ internal class ConfigurationRef {
             descriptor.pointee.iConfiguration
         }
     }
+    
+    var maxPower: Int {
+        get {
+            Int(descriptor.pointee.MaxPower)
+        }
+    }
+    
+    var bmAttributes: Int {
+        get {
+            Int(descriptor.pointee.bmAttributes)
+        }
+    }
+    
+    
     
     deinit {
         libusb_free_config_descriptor(descriptor)
