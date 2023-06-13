@@ -460,6 +460,7 @@ extension InstrumentManager {
     /// This finds the instrument with the given vendor ID,product ID and serial number if given.
     /// If only vendor ID and product ID are given, it looks for a device using only those metrics. One and only one device that matches the given
     /// ID's should be connected at a time.
+    ///
     /// - Note: If you cannot find the vendor ID, product ID and serial number, they are part of the visa string. Visa strings take the format `USB::<vendor ID>::<product ID>::<serial number>::...`, alternatively use `instrumentAt(visaString: ...)`
     ///
     /// - Parameters:
@@ -470,9 +471,16 @@ extension InstrumentManager {
     /// - Returns: A ``USBTMCInstrument`` that has the matching product ID, vendor ID. If the serial number was specified this will match as well.
     /// The instrument will be prepared for communication and can be communicated with using
     ///
-    /// - Throws: ``USBSession/Error`` if there is an error establishing the instrument. This includes ``USBSession/Error/couldNotFind`` if there was no device that matched the given vendorID, productID and serialNumber(if specified), ``USBSession/Error/identificationNotUnique`` if you did not specify the serial number and multiple devices were found with the same vendor and product ID. This can be resolved by specifying the serial Number. ``USBSession/Error/serialNumberNotUnique`` occurs if two devices have the same product ID, vendor ID and serial number making them indistinguishable. ``USBSession/Error/noDevices`` occurs if there are no devices connected
+    /// - Throws: Various errors depending on at what level of abstraction the error occured
     ///
-    ///  ``USBTMCInstrument/Error`` if there is a problem that is specific to the Test and Mesurement Class of devices. ``USBTMCInstrument/Error/couldNotFindEndpoint`` means there is no valid endpoint for communicating, which implies this may not be a USBTMC class device. If you are not looking for a USB Test and Measurement Class device, this class will not workz
+    ///  ``USBSession/Error`` if there is an error establishing the instrument.
+    ///  - ``USBSession/Error/couldNotFind`` if there was no device that matched the given vendorID, productID and serialNumber(if specified)
+    ///  - ``USBSession/Error/identificationNotUnique`` if you did not specify the serial number and multiple devices were found with the same vendor and product ID. This can be resolved by specifying the serial Number
+    ///  - ``USBSession/Error/serialNumberNotUnique`` occurs if two devices have the same product ID, vendor ID and serial number making them indistinguishable.
+    ///  - ``USBSession/Error/noDevices`` occurs if there are no devices connected
+    ///
+    ///  ``USBTMCInstrument/Error`` if there is a problem that is specific to the Test and Mesurement Class of devices.
+    ///  - ``USBTMCInstrument/Error/couldNotFindEndpoint`` means there is no valid endpoint for communicating, which implies this may not be a USBTMC class device. If you are **not** looking for a USB Test and Measurement Class device, this class will not workg
     ///
     ///  ``USBError`` occurs if the libUSB library encounters an error.
     public func instrumentAt(vendorID: Int, productID: Int, serialNumber: String? = nil) throws -> USBTMCInstrument {
@@ -486,9 +494,15 @@ extension InstrumentManager {
     /// - Returns: A ``USBTMCInstrument`` that has the matching product ID, vendor ID. If the serial number was specified this will match as well.
     /// The instrument will be prepared for communication and can be communicated with using
     ///
-    /// - Throws: ``USBSession/Error`` if there is an error establishing the instrument. This includes ``USBSession/Error/couldNotFind`` if there was no device that matched the given visa string, ``USBSession/Error/serialNumberNotUnique`` occurs if two devices have the same identifiers such that they are iindistinguishable, ``USBSession/Error/noDevices`` occurs if there are no devices connected
+    /// - Throws: Various errors depending on at what level of abstraction the error occured
+    /// ``USBSession/Error`` if there is an error establishing the instrument
+    /// - ``USBSession/Error/couldNotFind`` if there was no device that matched the given visa string
+    /// - ``USBSession/Error/serialNumberNotUnique`` occurs if two devices have the same identifiers such that they are iindistinguishable
+    /// - ``USBSession/Error/noDevices`` occurs if there are no devices connected
     ///
-    ///  ``USBTMCInstrument/Error`` if there is a problem that is specific to the Test and Mesurement Class of devices. ``USBTMCInstrument/Error/invalidVisa`` occurs if the given visa could not be parsed. Visa strings should be in the format "`USB::<vendor ID>::<product ID>::<serial number>::...`" if the visa string cannot be formatted, proprly instead specify the vendor ID, product ID and serial number individually using `instrumentAt(vendorID: ..., productID: ..., serialNumber: ...)`. In addition, ``USBTMCInstrument/Error/couldNotFindEndpoint`` is thrown if there are no valid endpoint for communicating, which implies this may not be a USBTMC class device. If you are not looking for a USB Test and Measurement Class device, this class will not work.
+    ///  ``USBTMCInstrument/Error`` if there is a problem that is specific to the Test and Mesurement Class of devices
+    ///  - ``USBTMCInstrument/Error/invalidVisa`` occurs if the given visa could not be parsed. Visa strings should be in the format "`USB::<vendor ID>::<product ID>::<serial number>::...`" if the visa string cannot be formatted, proprly instead specify the vendor ID, product ID and serial number individually using `instrumentAt(vendorID: ..., productID: ..., serialNumber: ...)`
+    ///  - ``USBTMCInstrument/Error/couldNotFindEndpoint`` is thrown if there are no valid endpoint for communicating, which implies this may not be a USBTMC class device. If you are **not** looking for a USB Test and Measurement Class device, this class will not work.
     ///
     ///  ``USBError`` occurs if the libUSB library encounters an error.
     public func instrumentAt(visaString: String) throws -> USBTMCInstrument {
