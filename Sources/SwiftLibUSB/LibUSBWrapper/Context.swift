@@ -10,7 +10,16 @@ import Usb
 
 /// An independent session for managing devices
 ///
-/// Contexts allow different users of libusb to manage devices independently.
+/// Creating a `Context` should be the first thing a user of this library does. A `Context` manages the list of ``Device``s,
+/// which can then be searched to find the one you want to communicate with.
+///
+/// Once an appropriate ``Device`` has been found, it is safe to drop the reference to the `Context`. The ``Device``
+/// will that resources are cleaned up properly. (This is true of all classes in the hierarchy; they don't need to be kept beyond
+/// where they are used.)
+///
+/// A Context stores the list of devices connected to the host at the time it was created. Hotplug detection is not yet supported.
+/// Multiple Contexts can be created, and they will each have their own copy of the ``Device`` object for each physical device.
+/// Communicating with a device that is already being used by a ``Device`` from another Context is likely to cause issues.
 public class Context {
     
     /// The class that manages the pointer to the context. Extra references to this generally should not be made as they may impede deconstruction
@@ -22,8 +31,10 @@ public class Context {
     /// create a new ``Context``.
     public var devices: [Device]
     
-    /// Initialize libUSB, and create the device list.
-    /// - throws: A ``USBError`` if creating the context fails
+    /// Creates a Context and builds the list of ``devices``.
+    ///
+    /// This list contains the devices that are connected at the time it is created.
+    /// - throws: A ``USBError`` if creating the context fails of if opening any device fails.
     public init() throws {
         // Create the class that holds the reference to the context pointer
         try context = ContextRef()
