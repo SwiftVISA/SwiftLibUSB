@@ -13,13 +13,20 @@ import CoreSwiftVISA
 ///
 /// This class controlls [USB Test and Measurement Class Devices](https://www.usb.org/document-library/test-measurement-class-specification).
 /// This classification of devices is used for VISA-compatible instruments. If you need to connect to a USB device that does not support this protocol, you will need a new class to communicate with it.
-public class USBTMCInstrument: USBInstrument {
+public class USBTMCInstrument: Instrument {
+    // We use an internal session property so we can use the USBSession methods.
+    private var _session: USBSession
+    
+    public var session: Session {
+        _session
+    }
+    
     // USB instruments are required to have various attributes, we use the defaults
     public var attributes = MessageBasedInstrumentAttributes()
     private var messageIndex: UInt8
-    private var inEndpoint: Endpoint?
-    private var outEndpoint: Endpoint?
-    private var activeInterface: AltSetting?
+    private var inEndpoint: Endpoint
+    private var outEndpoint: Endpoint
+    private var activeInterface: AltSetting
     private var canUseTerminator: Bool
     
     /// Attempts to connect to a USB device with the given identification.
@@ -33,15 +40,12 @@ public class USBTMCInstrument: USBInstrument {
     ///    - productID: The number assigned to this type of device
     ///    - serialNumber: An optional string assigned uniquely to this device. This is needed if multiple of the same type of device are connected.
     ///
-    /// - Throws: ``USBInstrument/Error`` if there is an error establishing the instrument, ``USBError`` if the libUSB library encounters an error and ``Error`` if there is any other problem.
-    public override init(vendorID: Int, productID: Int, serialNumber: String? = nil) throws {
+    /// - Throws: ``USBSession/Error`` if there is an error establishing the instrument, ``USBError`` if the libUSB library encounters an error and ``USBTMCInstrument/USBTMCError`` if there is any other problem.
+    public init(vendorID: Int, productID: Int, serialNumber: String? = nil) throws {
         messageIndex = 1
-        inEndpoint = nil
-        outEndpoint = nil
-        activeInterface = nil
         canUseTerminator = false
-        try super.init(vendorID: vendorID, productID: productID, serialNumber: serialNumber)
-        try findEndpoints()
+        try _session = USBSession(vendorID: vendorID, productID: productID, serialNumber: serialNumber)
+        try (activeInterface, inEndpoint, outEndpoint) = Self.findEndpoints(device: _session.device)
         getCapabilities()
     }
     
@@ -49,8 +53,8 @@ public class USBTMCInstrument: USBInstrument {
     ///
     /// - Parameters:
     ///     - visaString: A properly formatted VISA string that corresponds to a physically connected device
-    /// - Throws: ``USBInstrument/Error`` if there is an error establishing the instrument, ``USBError`` if the libUSB library encounters an error, and ``Error`` if there is any other problem.
-    public convenience init(visaString: String) throws {
+    /// - Throws: ``USBSession/Error`` if there is an error establishing the instrument, ``USBError`` if the libUSB library encounters an error, and ``USBTMCInstrument/USBTMCError`` if there is any other problem.
+    public convenience init (visaString: String) throws {
         let sections = visaString.components(separatedBy: "::")
         if sections.count < 4 {
             throw Error.invalidVisa
@@ -98,18 +102,15 @@ extension USBTMCInstrument {
     
     /// Looks through the available configurations and interfaces for an AltSetting that supports USBTMC
     /// - throws: An ``Error`` if no endpoints can be found that fit the requiements of USBTMC
-    private func findEndpoints() throws {
-        let device = self._session.device
-        
+    private static func findEndpoints(device: Device) throws -> (AltSetting, Endpoint, Endpoint) {
         for config in device.configurations {
             for interface in config.interfaces {
                 for altSetting in interface.altSettings where isTMC(altSetting: altSetting) {
-                    try setupEndpoints(
+                    // Stop looking after the first USBTMC interface we find
+                    return try setupEndpoints(
                         config: config,
                         interface: interface,
                         altSetting: altSetting)
-                    // Stop looking after the first USBTMC interface we find
-                    return
                 }
             }
         }
@@ -120,7 +121,7 @@ extension USBTMCInstrument {
     /// Checks if an ``AltSetting`` supports USBTMC
     /// - Parameter altSetting: The ``AltSetting`` whose endpoints to check
     /// - Returns: True if the endpoint is compatible false otherwise
-    private func isTMC(altSetting: AltSetting) -> Bool {
+    private static func isTMC(altSetting: AltSetting) -> Bool {
         return altSetting.interfaceClass == .application &&
             altSetting.interfaceSubClass == 0x03 &&
             (altSetting.interfaceProtocol == 0 || altSetting.interfaceProtocol == 1)
@@ -133,17 +134,17 @@ extension USBTMCInstrument {
     ///   - interface: The chosen ``Interface``
     ///   - altSetting: The chosen ``AltSetting``
     /// - Throws: An ``Error`` if no suitable endpoint could be found
-    private func setupEndpoints(
+    private static func setupEndpoints(
         config: Configuration,
         interface: Interface,
         altSetting: AltSetting
-    ) throws {
+    ) throws -> (AltSetting, Endpoint, Endpoint) {
         try config.setActive()
         try interface.claim()
         try altSetting.setActive()
-        activeInterface = altSetting
-        inEndpoint = try getEndpoint(endpoints: altSetting.endpoints,direction: Direction.in)
-        outEndpoint = try getEndpoint(endpoints: altSetting.endpoints,direction: Direction.out)
+        let inEndpoint = try getEndpoint(endpoints: altSetting.endpoints, direction: Direction.in)
+        let outEndpoint = try getEndpoint(endpoints: altSetting.endpoints, direction: Direction.out)
+        return (altSetting, inEndpoint, outEndpoint)
     }
     
     
@@ -153,7 +154,7 @@ extension USBTMCInstrument {
     ///   - direction: The intended ``Direction``
     /// - Returns: The first bulk transfer ``Endpoint`` with the requested ``Direction``
     /// - Throws: An ``Error`` if no suitable endpoint can be found in the array
-    private func getEndpoint(endpoints: [Endpoint], direction: Direction) throws -> Endpoint {
+    private static func getEndpoint(endpoints: [Endpoint], direction: Direction) throws -> Endpoint {
         for endpoint in endpoints {
             if endpoint.direction == direction && endpoint.transferType == .bulk {
                 return endpoint
@@ -190,13 +191,13 @@ extension USBTMCInstrument {
     private func getCapabilities() {
         do {
             // These arguments are defined by the USBTMC specification, table 36
-            let capabilities: Data = try _session.usbDevice.sendControlTransfer(
+            let capabilities: Data = try _session.device.sendControlTransfer(
                 direction: .in,
                 type: .class,
                 recipient: .interface,
                 request: ControlMessage.getCapabilities.rawValue,
                 value: 0,
-                index: UInt16(activeInterface?.index ?? 0),
+                index: UInt16(activeInterface.index),
                 data: Data(count: 24),
                 length: 24,
                 timeout: UInt32(Int(attributes.operationDelay * 1000))
@@ -241,15 +242,15 @@ extension USBTMCInstrument {
             message += headerSuffix
             
             // Clear halt for the in endpoint
-            try inEndpoint!.clearHalt()
+            try inEndpoint.clearHalt()
             
             // Send the request message to a bulk out endpoint
-            try outEndpoint!.sendBulkTransfer(
+            try outEndpoint.sendBulkTransfer(
                 data: &message,
                 timeout: Int(attributes.operationDelay * 1000))
             
             // Get the response message from a bulk in endpoint
-            let data = try inEndpoint!.receiveBulkTransfer(
+            let data = try inEndpoint.receiveBulkTransfer(
                 length: chunkSize + Self.headerSize + 3,
                 timeout: Int(attributes.operationDelay * 1000))
             
@@ -333,7 +334,7 @@ extension USBTMCInstrument: MessageBasedInstrument {
         chunkSize: Int
     ) throws -> Data {
         //check if terminator is ok
-        if !canUseTerminator { throw USBInstrument.Error.notSupported }
+        if !canUseTerminator { throw USBSession.Error.notSupported }
         if terminator.count != 1 { throw Error.invalidTerminator }
         
         let received: Data = try receiveUntilEndOfMessage(
@@ -379,7 +380,7 @@ extension USBTMCInstrument: MessageBasedInstrument {
 
         let writeSize = min(data.count,1024)
 
-        try outEndpoint!.clearHalt()
+        try outEndpoint.clearHalt()
 
         var lastMessage = false
         var lowerBound = 0
@@ -404,7 +405,7 @@ extension USBTMCInstrument: MessageBasedInstrument {
             let paddingLength = (4 - dataSlice.count % 4) % 4
             dataToSend.append(Data(Array(repeating: 0, count: paddingLength)))
             
-            let numSent = try outEndpoint!.sendBulkTransfer(
+            let numSent = try outEndpoint.sendBulkTransfer(
                 data: &dataToSend,
                 timeout: Int(attributes.operationDelay * 1000))
             

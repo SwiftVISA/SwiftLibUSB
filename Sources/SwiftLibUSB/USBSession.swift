@@ -36,8 +36,6 @@ public class USBSession {
     /// The lower-level connection to the device.
     public private(set) var device: Device
     
-    typealias Error = USBInstrument.Error
-    
     /// Attempt to establish a connection to a device.
     ///
     /// - Parameters:
@@ -104,6 +102,50 @@ private extension USBSession {
         return foundDevice!
     }
 }
+
+public extension USBSession {
+    /// An error associated with a USB Instrument.
+    enum Error: Swift.Error {
+        /// Unknown error occured resulting in failed operation.
+        case operationFailed
+        
+        /// Could not find a device with the specified vendorID and productID and Serial Number(If not null).
+        case couldNotFind
+        
+        /// Found multiple devices with the same vendor and product ID, but Serial Number was not specified. Serial number **must** be specified if there can be multiple devices with the same product ID and vendor ID.
+        case identificationNotUnique
+        
+        /// Found no devices when searching.
+        case noDevices
+        
+        /// Found multiple devices with the same product id, vendor id and serial number.
+        case serialNumberNotUnique
+        
+        /// The requested operation is not supported by the device.
+        case notSupported
+    }
+}
+
+public extension USBSession.Error {
+    /// A more descritive explanation of what each error associated with a USB Instrument is.
+    var localizedDescription: String {
+        switch self {
+        case .operationFailed:
+            return "An unknown error occured causing the operation to fail"
+        case .couldNotFind:
+            return "Could not find device with given IDs"
+        case .identificationNotUnique:
+            return "Identification of USB device was not unique"
+        case .noDevices:
+            return "No devices were found"
+        case .serialNumberNotUnique:
+            return "Identification of USB devices with serial number was not unique"
+        case .notSupported:
+            return "The device does not support this operation"
+        }
+    }
+}
+
 
 extension USBSession: Session {
     /// Closes the session. The instrument owning this session will no longer be able to read or write data.
