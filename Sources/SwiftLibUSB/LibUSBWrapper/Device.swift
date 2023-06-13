@@ -103,7 +103,7 @@ public class Device: Hashable {
     /// This is derived from the bDeviceClass value
     public var deviceClass: ClassCode {
         get {
-            return ClassCode.from(code: UInt32(descriptor.bDeviceClass))
+            return ClassCode(rawValue: descriptor.bDeviceClass) ?? ClassCode.other
         }
     }
     

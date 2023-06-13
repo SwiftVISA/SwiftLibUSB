@@ -191,7 +191,7 @@ extension USBTMCInstrument {
     private func getCapabilities() {
         do {
             // These arguments are defined by the USBTMC specification, table 36
-            let capabilities: Data = try _session.usbDevice.sendControlTransfer(
+            let capabilities: Data = try _session.device.sendControlTransfer(
                 direction: .in,
                 type: .class,
                 recipient: .interface,
