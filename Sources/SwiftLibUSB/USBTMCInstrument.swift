@@ -464,3 +464,9 @@ extension USBTMCInstrument.Error {
         }
     }
 }
+
+extension InstrumentManager {
+    public func instrumentAt(vendorID: Int, productID: Int, serialNumber: String?) throws -> USBTMCInstrument {
+        try USBTMCInstrument(vendorID: vendorID, productID: productID, serialNumber: serialNumber)
+    }
+}
