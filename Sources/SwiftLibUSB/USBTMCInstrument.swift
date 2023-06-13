@@ -334,7 +334,7 @@ extension USBTMCInstrument: MessageBasedInstrument {
     ///   - chunkSize: The number of bytes to read into a buffer at a time.
     /// - Throws: Error if the device could not be read from.
     /// - Returns: The data read from the device as bytes.
-    /// - Throws: ``USBSession/Error/notSupported`` if the device does not support terminators, ``USBTMCInstrument/Error/invalidTerminator`` if the terminator has more than one byte, or a ``USBError`` if a failure occurs during a data transfer
+    /// - Throws: ``USBSession/Error/notSupported`` if the device does not support terminators, ``USBTMCInstrument/Error/invalidTerminator`` if the terminator has more than one byte, or a ``USBError`` if a failure occurs during a data transfer. ``USBTMCInstrument/Error/transferIncomplete`` if we could not request required information from the device
     public func readBytes(
         maxLength: Int?,
         until terminator: Data,
