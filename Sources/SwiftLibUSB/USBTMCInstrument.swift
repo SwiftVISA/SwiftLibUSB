@@ -33,7 +33,7 @@ public class USBTMCInstrument: USBInstrument {
     ///    - productID: The number assigned to this type of device
     ///    - serialNumber: An optional string assigned uniquely to this device. This is needed if multiple of the same type of device are connected.
     ///
-    /// - Throws: ``USBInstrument/Error`` if there is an error establishing the instrument, ``USBError`` if the libUSB library encounters an error and ``USBTMCInstrument/USBTMCError`` if there is any other problem.
+    /// - Throws: ``USBInstrument/Error`` if there is an error establishing the instrument, ``USBError`` if the libUSB library encounters an error and ``Error`` if there is any other problem.
     public override init(vendorID: Int, productID: Int, serialNumber: String? = nil) throws {
         messageIndex = 1
         inEndpoint = nil
@@ -49,7 +49,7 @@ public class USBTMCInstrument: USBInstrument {
     ///
     /// - Parameters:
     ///     - visaString: A properly formatted VISA string that corresponds to a physically connected device
-    /// - Throws: ``USBInstrument/Error`` if there is an error establishing the instrument, ``USBError`` if the libUSB library encounters an error, and ``USBTMCInstrument/USBTMCError`` if there is any other problem.
+    /// - Throws: ``USBInstrument/Error`` if there is an error establishing the instrument, ``USBError`` if the libUSB library encounters an error, and ``Error`` if there is any other problem.
     public convenience init(visaString: String) throws {
         let sections = visaString.components(separatedBy: "::")
         if sections.count < 4 {
@@ -113,7 +113,7 @@ extension USBTMCInstrument {
     }
     
     /// Looks through the available configurations and interfaces for an AltSetting that supports USBTMC
-    /// - throws: A ``USBTMCError`` if no endpoints can be found that fit the requiements of USBTMC
+    /// - throws: An ``Error`` if no endpoints can be found that fit the requiements of USBTMC
     private func findEndpoints() throws {
         let device = self._session.device
         
@@ -148,7 +148,7 @@ extension USBTMCInstrument {
     ///   - config: The chosen device ``Configuration``
     ///   - interface: The chosen ``Interface``
     ///   - altSetting: The chosen ``AltSetting``
-    /// - Throws: A ``USBTMCError`` if no suitable endpoint could be found
+    /// - Throws: An ``Error`` if no suitable endpoint could be found
     private func setupEndpoints(
         config: Configuration,
         interface: Interface,
@@ -168,7 +168,7 @@ extension USBTMCInstrument {
     ///   - endpoints: An array of ``Endpoint`` to check
     ///   - direction: The intended ``Direction``
     /// - Returns: The first bulk transfer ``Endpoint`` with the requested ``Direction``
-    /// - Throws: A ``USBTMCError`` if no suitable endpoint can be found in the array
+    /// - Throws: An ``Error`` if no suitable endpoint can be found in the array
     private func getEndpoint(endpoints: [Endpoint], direction: Direction) throws -> Endpoint {
         for endpoint in endpoints {
             if endpoint.direction == direction && endpoint.transferType == .bulk {
@@ -293,7 +293,7 @@ extension USBTMCInstrument: MessageBasedInstrument {
     ///   - encoding: The encoding for the returned string and the terminator
     ///   - chunkSize: The number of bytes to read into a buffer at a time.
     /// - Returns: The data received as a string with the specified encoding
-    /// - Throws: A ``USBError`` if a failure occurs during a data transfer or a ``USBTMCError`` if the data cannot be encoded
+    /// - Throws: A ``USBError`` if a failure occurs during a data transfer or a ``Error`` if the data cannot be encoded
     public func read(
         until terminator: String,
         strippingTerminator: Bool,
