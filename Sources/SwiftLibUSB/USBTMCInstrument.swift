@@ -248,9 +248,14 @@ extension USBTMCInstrument {
             try inEndpoint.clearHalt()
             
             // Send the request message to a bulk out endpoint
-            try outEndpoint.sendBulkTransfer(
+            let bytesSent = try outEndpoint.sendBulkTransfer(
                 data: &message,
                 timeout: Int(attributes.operationDelay * 1000))
+            
+            // Throw if not all bytes were sent
+            if bytesSent != message.count {
+                throw Error.transferIncomplete
+            }
             
             // Get the response message from a bulk in endpoint
             let data = try inEndpoint.receiveBulkTransfer(
@@ -329,7 +334,7 @@ extension USBTMCInstrument: MessageBasedInstrument {
     ///   - chunkSize: The number of bytes to read into a buffer at a time.
     /// - Throws: Error if the device could not be read from.
     /// - Returns: The data read from the device as bytes.
-    /// - Throws: ``USBInstrument/Error/notSupported`` if the device does not support terminators, ``USBTMCInstrument/Error/invalidTerminator`` if the terminator has more than one byte, or a ``USBError`` if a failure occurs during a data transfer
+    /// - Throws: ``USBSession/Error/notSupported`` if the device does not support terminators, ``USBTMCInstrument/Error/invalidTerminator`` if the terminator has more than one byte, or a ``USBError`` if a failure occurs during a data transfer
     public func readBytes(
         maxLength: Int?,
         until terminator: Data,
@@ -427,7 +432,7 @@ extension USBTMCInstrument {
         /// Or an altsetting claims to have endpoints it doesn't have.
         case couldNotFindEndpoint
         
-        ///The terminator given could not be accepted by the device
+        /// The terminator given could not be accepted by the device
         case invalidTerminator
         
         /// When attempting to encode a user given string with a user given encoding, an error occurs
@@ -435,6 +440,9 @@ extension USBTMCInstrument {
         
         /// The given VISA string was not understood
         case invalidVisa
+        
+        /// Not all bytes of the transfer were send, but no error was thrown by libUSB.
+        case transferIncomplete
     }
 }
 
@@ -449,6 +457,8 @@ extension USBTMCInstrument.Error {
             return "Could not encode given string with given encoding"
         case .invalidVisa:
             return "The given visa string could not be interpreted"
+        case .transferIncomplete:
+            return "The amount of bytes actually sent did not match expectations"
         }
     }
 }
@@ -480,7 +490,7 @@ extension InstrumentManager {
     ///  - ``USBSession/Error/noDevices`` occurs if there are no devices connected
     ///
     ///  ``USBTMCInstrument/Error`` if there is a problem that is specific to the Test and Mesurement Class of devices.
-    ///  - ``USBTMCInstrument/Error/couldNotFindEndpoint`` means there is no valid endpoint for communicating, which implies this may not be a USBTMC class device. If you are **not** looking for a USB Test and Measurement Class device, this class will not workg
+    ///  - ``USBTMCInstrument/Error/couldNotFindEndpoint`` means there is no valid endpoint for communicating, which implies this may not be a USBTMC class device. If you are **not** looking for a USB Test and Measurement Class device, this class will not workgv
     ///
     ///  ``USBError`` occurs if the libUSB library encounters an error.
     public func instrumentAt(vendorID: Int, productID: Int, serialNumber: String? = nil) throws -> USBTMCInstrument {

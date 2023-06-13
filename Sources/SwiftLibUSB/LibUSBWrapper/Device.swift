@@ -125,7 +125,7 @@ public class Device: Hashable {
     }
     
     /// The raw verson value of the USB specifications used by this device
-    /// This value is not useful practically. For the version in a human readable form, use ``version``
+    /// This value is not useful practically. For the version in a human readable form, use ``Device/usbVersion``
     /// Represented as a 4 digit hex value where the period of the version lies between the 2nd and 3rd digit
     /// For example,
     /// - 512: is 0x0200 in hex, which is interpreted as USB version 2.0
