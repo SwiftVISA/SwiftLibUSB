@@ -8,11 +8,12 @@
 import Foundation
 import CUsb
 
-/// Each device has at least one configuration, often more. LibUSB keeps track of these with `libusb_config_descriptor`s.
-/// Each instance manages one of these descriptors, including managing the getting and freeing of this descriptor.
-public class Configuration: Hashable{
-    /// An array of Interfaces
-    public var interfaces : [Interface]
+/// A top-level setting for how a device communicates.
+///
+/// Configurations determine the maximum power a device can draw and which interfaces are available.
+public class Configuration: Hashable {
+    /// The interfaces exposed by this Configuration
+    public var interfaces: [Interface]
     /// An internal class to manage the lifetime of the configuration
     private var config: ConfigurationRef
     
@@ -22,7 +23,7 @@ public class Configuration: Hashable{
     /// * `.notFound` if the index is invalid.
     init(_ device: DeviceRef, index: UInt8) throws {
         var desc: UnsafeMutablePointer<libusb_config_descriptor>? = nil
-        let error = libusb_get_config_descriptor(device.raw_device, index, &desc)
+        let error = libusb_get_config_descriptor(device.rawDevice, index, &desc)
         if error < 0 {
             throw USBError.from(code: error)
         }
@@ -37,7 +38,7 @@ public class Configuration: Hashable{
     /// * `.notFound` if the device is not configured
     init(_ device: DeviceRef) throws {
         var desc: UnsafeMutablePointer<libusb_config_descriptor>? = nil
-        let error = libusb_get_active_config_descriptor(device.raw_device, &desc)
+        let error = libusb_get_active_config_descriptor(device.rawDevice, &desc)
         if error < 0 {
             throw USBError.from(code: error)
         }
@@ -47,7 +48,9 @@ public class Configuration: Hashable{
     }
     
     /// Get the interfces of the configuration.
-    public func getInterfaces(){
+    ///
+    /// This exists to reduce code duplication between the two constructors.
+    private func getInterfaces(){
         let size = Int(config.numInterfaces)
         for i in 0..<size {
             interfaces.append(Interface(config: config, index: i))
@@ -57,14 +60,14 @@ public class Configuration: Hashable{
     /// The index used to get a string descriptor of this configuration
     public var index: Int {
         get {
-            config.index
+            Int(config.index)
         }
     }
     
     /// The number used to identify this configuration
     public var value: Int {
         get {
-            config.value
+            Int(config.value)
         }
     }
     
@@ -73,27 +76,7 @@ public class Configuration: Hashable{
     /// This requires the device to be open.
     public var displayName: String {
         get {
-            // If the index is 0 this is an unnamed configuration
-            if(config.index == 0){
-                return "(\(index)) unnamed configuration"
-            }
-            
-            // Return a default value if the device is closed
-            guard let handle = config.raw_handle else {
-                return "\(index) configuration on closed device"
-            }
-
-            // Make a buffer for the name of the configuration
-            let size = 256;
-            var buffer: [UInt8] = Array(repeating: 0, count: size)
-            let returnCode = libusb_get_string_descriptor_ascii(handle, UInt8(config.index), &buffer, Int32(size))
-            
-            // Check if there is an error when filling the buffer with the name
-            if(returnCode <= 0){
-                return "(\(index)) unknown configuration"
-            }
-            
-            return String(bytes: buffer, encoding: .ascii) ?? ("(\(index)) unnamed configuration")
+            config.getStringDescriptor(index: config.index) ?? ("(\(index)) unnamed configuration")
         }
     }
     
@@ -102,9 +85,45 @@ public class Configuration: Hashable{
         lhs.config.descriptor == rhs.config.descriptor
     }
     
-    /// Make this configuration active, if possible.
+    /// The maximum power draw of the device in this port used with this configuration
+    /// Units vary, as high speed devices use units of 2mA and super speed devices use units of 8mA
+    /// only matters if busPowered is true
+    public var maxPower: Int {
+        get {
+            config.maxPower
+        }
+    }
+    
+    /// The attributes of this configuration. This is a low level method
+    /// In general, it is more useful to use the supporting methods
     ///
-    /// The device should have been opened with `device.open` first.
+    /// - [0,4]: Reserved
+    /// - 5: If remote wakeup is supported. Can also be accessed by ``hasRemoteWakeup``
+    /// - 6: This device does not use power from the USB bus. Can also be gotten from ``selfPowered``
+    /// - 7: Technically, this denotes if the configuration is powered by the bus but that is outdated. Expect a 1
+    public var attributeBitmap: Int {
+        get {
+            config.bmAttributes
+        }
+    }
+    
+    /// This is true if the device can be woken up remotely, false otherwise
+    /// This bit was set as part of bmAttributes(which is stored as ``attributeBitmap``)
+    public var hasRemoveWakeup: Bool {
+        get {
+            ((attributeBitmap & 0x20) != 0)
+        }
+    }
+    
+    /// This is true if the device can power itself, false otherwise
+    /// This bit was set as part of bmAttributes(which is stored as ``attributeBitmap``)
+    public var selfPowered: Bool {
+        get {
+            ((attributeBitmap & 0x40) != 0)
+        }
+    }
+    
+    /// Make this configuration active, if possible.
     ///
     /// Activating the configuration should be done before claiming an interface or sending data.
     ///
@@ -113,7 +132,7 @@ public class Configuration: Hashable{
     /// * `.noDevice` if the device has been unplugged
     /// * `.connectionClosed` if the device was closed using ``Device/close()``
     public func setActive() throws {
-        guard let handle = config.raw_handle else {
+        guard let handle = config.rawHandle else {
             throw USBError.connectionClosed
         }
         libusb_set_configuration(handle, // The handle we are configuring ourselves with
@@ -138,35 +157,53 @@ internal class ConfigurationRef {
         self.descriptor = descriptor
     }
     
-    var raw_handle: OpaquePointer? {
+    func getStringDescriptor(index: UInt8) -> String? {
+        device.getStringDescriptor(index: index)
+    }
+    
+    var rawHandle: OpaquePointer? {
         get {
-            device.raw_handle
+            device.rawHandle
         }
     }
     
-    var raw_device: OpaquePointer {
+    var rawDevice: OpaquePointer {
         get {
-            device.raw_device
+            device.rawDevice
         }
     }
     
-    var numInterfaces: Int {
+    var numInterfaces: UInt8 {
         get {
-            Int(descriptor.pointee.bNumInterfaces)
+            descriptor.pointee.bNumInterfaces
         }
     }
     
-    var value: Int {
+    var value: UInt8 {
         get {
-            Int(descriptor.pointee.bConfigurationValue)
+            descriptor.pointee.bConfigurationValue
         }
     }
     
-    var index: Int {
+    var index: UInt8 {
         get {
-            Int(descriptor.pointee.iConfiguration)
+            descriptor.pointee.iConfiguration
         }
     }
+    
+    var maxPower: Int {
+        get {
+            Int(descriptor.pointee.MaxPower)
+        }
+    }
+    
+    var bmAttributes: Int {
+        get {
+            Int(descriptor.pointee.bmAttributes)
+        }
+    }
+    
+    
     
     deinit {
         libusb_free_config_descriptor(descriptor)

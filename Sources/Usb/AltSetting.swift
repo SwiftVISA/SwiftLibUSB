@@ -8,9 +8,15 @@
 import Foundation
 import CUsb
 
-/// A setting that controls how endpoints behave. Each alternate estting has the information that describes how the endpoints are arranged and it holds the endpoints itself.
-/// This must be activated using ``AltSetting/setActive()`` before sending or receiving data through any of the ``Endpoint`` objects it contains.
-public class AltSetting : Hashable{
+/// A setting that controls how the endpoints in an ``Interface`` behave.
+///
+/// This must be activated using ``AltSetting/setActive()`` before sending or receiving data through any of
+/// the ``Endpoint`` objects it contains.
+///
+/// The endpoints in an ``AltSetting`` each have the same address numbers as the other ``AltSettings``
+/// in the ``Interface``, but the ``AltSetting/interfaceClass`` and ``Endpoint/transferType``
+/// can be different. Making the setting active determines how the device will communicate.
+public class AltSetting: Hashable {
     /// The endpoints defined by this alternate setting
     public var endpoints: [Endpoint]
     /// An internal class to manage the lifetime of the AltSetting
@@ -23,54 +29,35 @@ public class AltSetting : Hashable{
         // Fill the endpoint array with each endpoint defined
         endpoints = []
         for i in 0..<setting.numEndpoints {
-            endpoints.append(Endpoint(altSetting: setting, index: i))
+            endpoints.append(Endpoint(altSetting: setting, index: Int(i)))
         }
     }
     
     public static func == (lhs: AltSetting, rhs: AltSetting) -> Bool {
-        lhs.setting.raw_device == rhs.setting.raw_device && lhs.index == rhs.index && lhs.interfaceIndex == rhs.interfaceIndex
+        lhs.setting.rawDevice == rhs.setting.rawDevice &&
+          lhs.index == rhs.index &&
+          lhs.interfaceIndex == rhs.interfaceIndex
     }
     
     /// The name of the AltSetting to be displayed
     ///
-    /// This requires the device to be open.
+    /// This gets the name from the device, which requires the device to be open. Not all devices provide names for alternate
+    /// settings.
     public var displayName: String {
-        get {
-            // If the index is 0 this is an unnamed alt setting
-            if(setting.interfaceName == 0){
-                return "(\(index)) unnamed alt setting"
-            }
-            
-            // Return a default value if the device is closed
-            guard let handle = setting.raw_handle else {
-                return "\(index) alt setting on closed device"
-            }
-            
-            // Make a buffer for the name of the alt setting
-            let size = 256;
-            var buffer: [UInt8] = Array(repeating: 0, count: size)
-            let returnCode = libusb_get_string_descriptor_ascii(handle, UInt8(setting.interfaceName), &buffer, Int32(size))
-            
-            // Check if there is an error when filling the buffer with the name
-            if(returnCode <= 0){
-                return "\(index) error getting name: \(USBError.from(code: returnCode).localizedDescription)"
-            }
-            
-            return String(bytes: buffer, encoding: .ascii) ?? ("(\(index)) unnamed alt setting")
-        }
+        setting.getStringDescriptor(index: setting.interfaceName) ?? ""
     }
     
     /// The number of this interface
     public var interfaceIndex: Int {
         get {
-            setting.interfaceNumber
+            Int(setting.interfaceNumber)
         }
     }
     
     /// The value used to select this alternate setting for this interface
     public var index: Int {
         get {
-            setting.index
+            Int(setting.index)
         }
     }
     
@@ -84,14 +71,14 @@ public class AltSetting : Hashable{
     /// If the `interfaceClass` has subtypes, this gives that type.
     public var interfaceSubClass: Int {
         get {
-            setting.interfaceSubClass
+            Int(setting.interfaceSubClass)
         }
     }
     
     /// If the `interfaceClass` and `interfaceSubClass` have protocols, this gives the protocol
     public var interfaceProtocol: Int {
         get {
-            setting.interfaceProtocol
+            Int(setting.interfaceProtocol)
         }
     }
     
@@ -104,10 +91,13 @@ public class AltSetting : Hashable{
     /// * `.noDevice` if the device was disconnected
     /// * `.connectionClosed` if the connection was closed using ``Device/close()``.
     public func setActive() throws {
-        guard let handle = setting.raw_handle else {
+        guard let handle = setting.rawHandle else {
             throw USBError.connectionClosed
         }
-        let error = libusb_set_interface_alt_setting(handle, Int32(setting.interfaceNumber), Int32(setting.index))
+        let error = libusb_set_interface_alt_setting(
+            handle,
+            Int32(setting.interfaceNumber),
+            Int32(setting.index))
         if error < 0 {
             throw USBError.from(code: error)
         }
@@ -115,7 +105,7 @@ public class AltSetting : Hashable{
     
     /// A hash representation of the altSetting
     public func hash(into hasher: inout Hasher) {
-        setting.raw_device.hash(into: &hasher)
+        setting.rawDevice.hash(into: &hasher)
         interfaceIndex.hash(into: &hasher)
         index.hash(into: &hasher)
     }
@@ -133,33 +123,37 @@ internal class AltSettingRef {
         altSetting = interface.altsetting + index
     }
     
-    var raw_device: OpaquePointer {
+    func getStringDescriptor(index: UInt8) -> String? {
+        interface.getStringDescriptor(index: index)
+    }
+    
+    var rawDevice: OpaquePointer {
         get {
-            interface.raw_device
+            interface.rawDevice
         }
     }
     
-    var raw_handle: OpaquePointer? {
+    var rawHandle: OpaquePointer? {
         get {
-            interface.raw_handle
+            interface.rawHandle
         }
     }
     
-    var index: Int {
+    var index: UInt8 {
         get {
-            Int(altSetting.pointee.bAlternateSetting)
+            altSetting.pointee.bAlternateSetting
         }
     }
     
-    var interfaceNumber: Int {
+    var interfaceNumber: UInt8 {
         get {
-            Int(altSetting.pointee.bInterfaceNumber)
+            altSetting.pointee.bInterfaceNumber
         }
     }
     
-    var interfaceProtocol: Int {
+    var interfaceProtocol: UInt8 {
         get {
-            Int(altSetting.pointee.bInterfaceProtocol)
+            altSetting.pointee.bInterfaceProtocol
         }
     }
     
@@ -175,21 +169,21 @@ internal class AltSettingRef {
         }
     }
     
-    var interfaceName: Int {
+    var interfaceName: UInt8 {
         get {
-            Int(altSetting.pointee.iInterface)
+            altSetting.pointee.iInterface
         }
     }
     
-    var bInterfaceProtocol: Int {
+    var bInterfaceProtocol: UInt8 {
         get {
-            Int(altSetting.pointee.bInterfaceProtocol)
+            altSetting.pointee.bInterfaceProtocol
         }
     }
     
-    var numEndpoints: Int {
+    var numEndpoints: UInt8 {
         get {
-            Int(altSetting.pointee.bNumEndpoints)
+            altSetting.pointee.bNumEndpoints
         }
     }
     

@@ -46,7 +46,7 @@ public enum TransferType {
 /// `Class` is for the type of device.
 /// `Vendor` is for commands made by the vendor of the device.
 /// `Reserved` should never be used.
-public enum LibUSBControlType{
+public enum LibUSBControlType {
     case Standard
     case Class
     case Vendor
@@ -70,7 +70,7 @@ public enum LibUSBControlType{
 /// Describes what is receiving the request.
 ///
 /// A ``Device``, ``Interface``, ``Endpoint``, or something else (`Other`) could be receiving the request.
-public enum LibUSBRecipient{
+public enum LibUSBRecipient {
     case Device
     case Interface
     case Endpoint
