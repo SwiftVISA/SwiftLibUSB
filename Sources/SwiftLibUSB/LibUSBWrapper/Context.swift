@@ -8,24 +8,33 @@
 import Foundation
 import Usb
 
-/// All libUSB calls exist in some "context".
+/// An independent session for managing devices
 ///
-/// This class handles both the initialization and closing of contexts automatically. It also automatically allocates and deallocates libUSB's device list.
+/// Creating a `Context` should be the first thing a user of this library does. A `Context` manages the list of ``Device``s,
+/// which can then be searched to find the one you want to communicate with.
 ///
-/// The main job of the context class is to hold the device list. This is the master list of all connected devices. It is stored in the read-only variable "devices" and stores objects of type ``Device``
-/// - Note: While many libUSB methods allow for using a null context, using a context is preferred. For this reason, all of the events will occur in some given context.
+/// Once an appropriate ``Device`` has been found, it is safe to drop the reference to the `Context`. The ``Device``
+/// will that resources are cleaned up properly. (This is true of all classes in the hierarchy; they don't need to be kept beyond
+/// where they are used.)
 ///
-/// - Throws: ``USBError`` if libUSB encounters an error attempting some task.
+/// A Context stores the list of devices connected to the host at the time it was created. Hotplug detection is not yet supported.
+/// Multiple Contexts can be created, and they will each have their own copy of the ``Device`` object for each physical device.
+/// Communicating with a device that is already being used by a ``Device`` from another Context is likely to cause issues.
 public class Context {
     
     /// The class that manages the pointer to the context. Extra references to this generally should not be made as they may impede deconstruction
     private var context: ContextRef
     
-    /// The device list. Its job is to store all devices that were connected to the device when the context was initialized.
+    /// All devices that were connected to the host when the context was initialized.
+    ///
+    /// Hotplug support is available in libusb, but has not been added to this class. To get an updated list of devices,
+    /// create a new ``Context``.
     public var devices: [Device]
     
-    /// Initialize libUSB, and create the device list.
-    /// - throws: A ``USBError`` if creating the context fails
+    /// Creates a Context and builds the list of ``devices``.
+    ///
+    /// This list contains the devices that are connected at the time it is created.
+    /// - throws: A ``USBError`` if creating the context fails of if opening any device fails.
     public init() throws {
         // Create the class that holds the reference to the context pointer
         try context = ContextRef()
@@ -68,7 +77,7 @@ internal class ContextRef {
     init() throws {
         var context: OpaquePointer? = nil;
         let error = libusb_init(&context)
-        if (error == 0) {
+        if error == 0 {
             self.context = context!
         } else {
             throw USBError.from(code: error)
