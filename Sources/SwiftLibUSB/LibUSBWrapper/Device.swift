@@ -125,24 +125,25 @@ public class Device: Hashable {
     }
     
     /// The raw verson value of the USB specifications used by this device
-    /// This value is not useful practically. For the version in a human readable form, use ``version``
+    ///
+    /// This value is not useful practically. For the version in a human readable form, use ``Device/version``
     /// Represented as a 4 digit hex value where the period of the version lies between the 2nd and 3rd digit
     /// For example,
     /// - 512: is 0x0200 in hex, which is interpreted as USB version 2.0
     /// - 272: is 0x0110 in hex, which is interpreted as USB 1.1
     ///
-    public var usbVersionVal: Int {
+    public var versionVal: Int {
         get {
             Int(descriptor.bcdUSB)
         }
     }
     
     /// The version of the USB specifications used by this device
-    /// written as a human-readable string in the form "[major version].[minor version][patch]"
-    /// The versions do support hex characters. idk why
-    public var usbVersion: String {
+    ///
+    /// Written as a human-readable string in the form "[major version].[minor version][patch]"
+    public var version: String {
         get {
-            let hexString = String(NSString(format:"%2X", usbVersionVal))
+            let hexString = String(NSString(format:"%2X", versionVal))
             if(hexString.count == 1){
                 return "0.0"+hexString
             }
@@ -150,9 +151,9 @@ public class Device: Hashable {
         }
     }
     
-    /// The maximum size of packets for the 0th endpoint.
-    /// The endpoint at index 0 is treated seperatly and managed by the device
-    /// This is measured in bytes
+    /// The maximum size of packets for the 0th (control) endpoint
+    ///
+    /// This is measured in bytes.
     public var packetSizeEndpoint0: Int {
         get {
             Int(descriptor.bMaxPacketSize0)

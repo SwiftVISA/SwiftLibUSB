@@ -85,11 +85,6 @@ for a matching device, connect to it, and throw an error if no matching device w
 if multiple matching devices were found. Instrument classes are responsible for examining the
 returned device to see if it supports the intended communication protocol.
 
-### USBInstrument
-
-This is a base class for instruments connected over USB. It is not meant to be used directly.
-See `USBTMCInstrument`.
-
 Wrapper Class Summary
 ---------------------
 These classes are all in the LibUSBWrapper folder. They are low level classes for interacting with the libUSB library. 
@@ -135,3 +130,4 @@ Each altsetting describes what role the endpoints in the interface play. This is
 
 ### Endpoint
 The point at which bulk transfers are made is called the endpoint. "Out" direction endpoints send data from the host to the device. "In" direction endpoints recieve data from the device. So long as the altsetting that holds this endpoint has been made active, the interface has been claimed and the configuration containing the interface set active, the endpoint is ready for transfering data. To send data, send the bytes (Including any header or padding bytes) to a bulk out endpoint by calling sendBulkTransfer on the bulk out endpoint with the desired bytes. To recieve data, call receiveBulkTransfer on the bulk in endpoint.
+=======
