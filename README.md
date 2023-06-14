@@ -47,7 +47,7 @@ Once connected, the instrument conforms to the MessageBasedInstrument protocol, 
 can be sent and received using the full functionality of MessageBasedInstruments.
 
 ```
-// Example code interacting with a Keysight E36103B oscilloscope over USB
+// Example code interacting with a Keysight E36103B power supply over USB
 do {
     try let instrument = InstrumentManager.shared.instrumentAt(vendorID: 10893, productID: 5634)
     try instrument.write("VOLTAGE 3.3")
