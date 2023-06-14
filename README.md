@@ -60,13 +60,13 @@ do {
 
 Class Summary
 -------------
+These classes all conform to protocols described in CoreSwiftVisa. These are high level and are the most user friendly
 
 ### USBTMCInstrument
 
 This is the instrument class created by `InstrumentManager.shared.instrumentAt(vendorID:productID:)`.
 It can also be created with its own constructors `USBTMCInstrument(vendorID:productID:)` or
-`USBTMCInstrument(visaString:)` to parse the VISA string for you. Parsing a VISA string for
-USB instruments has not been added to InstrumentManager yet.
+`USBTMCInstrument(visaString:)` to parse the VISA string for you. 
 
 This class is only able to communicate with devices that support the USB Test and Measurement
 Class device protocol. Other Instrument classes may be made to communicate with other types
@@ -89,3 +89,49 @@ returned device to see if it supports the intended communication protocol.
 
 This is a base class for instruments connected over USB. It is not meant to be used directly.
 See `USBTMCInstrument`.
+
+Wrapper Class Summary
+---------------------
+These classes are all in the LibUSBWrapper folder. They are low level classes for interacting with the libUSB library. 
+
+### Context
+
+The first step in interacting with a device using libUSB directly is creating a context. It is from the context that you get the device list. This is how one might do this
+```
+// Create a context and get the devices
+do {
+    try context = Context()
+    let deviceList = context.devices
+} catch {
+    // The context could not be made
+}
+```
+The device list stores Device objects
+
+### Device
+
+A class representing a device. The best way to get the device instance that corresponds to a specific physical device is to look through the "devices" array given by context until you find the desired the device. Devices are identified by their productId, vendorId and serialNumber. The serial number is only required if there are multiple of the same kind of device connected at a time.
+```
+// Example of finding a device with a specific vendor ID and product ID
+// Once found, it requests the name of the device's manufacturer and prints it
+let context = Context()
+for device in context.devices {
+    if device.productId == productID &&
+       device.vendorId == vendorID {
+            print(device.manufacturerName)
+       }
+  }
+```
+Device objects manage both the device and the device handle. Devices are open upon intilizing, but can be closed or reopened with the corresponding methods. Device makes available the sendControlTransfer method for sending USB control transfers. The more common kind of transfer is USB bulk transfers. These are the kind used to send commands to USBTMC devices and other relevant transfers. These are accomplished in the Endpoint Class
+
+### Configuration
+Before a device's endpoints can be used, a configuration containing that endpoint must be made active through setActive(). Each device has configurations. Configurations also describe information like the maximum power the device will draw. Configurations have different interfaces
+
+### Interface
+An interface describes a set of endpoints. An interface must be claimed before any of its endpoints can be used. Each interface might have multiple ways it can be interacted with. These are described by the interface's AltSettings
+
+### AltSetting
+Each altsetting describes what role the endpoints in the interface play. This is described through their class, subclass and protocol. If you want to know which configuration to make active and which interface to claim, look for which one has an altsetting that fits your needs. Before any of the altsettings endpoints can be used, it must be claimed. Each altsettings store their own endpoints
+
+### Endpoint
+The point at which bulk transfers are made is called the endpoint. "Out" direction endpoints send data from the host to the device. "In" direction endpoints recieve data from the device. So long as the altsetting that holds this endpoint has been made active, the interface has been claimed and the configuration containing the interface set active, the endpoint is ready for transfering data. To send data, send the bytes (Including any header or padding bytes) to a bulk out endpoint by calling sendBulkTransfer on the bulk out endpoint with the desired bytes. To recieve data, call receiveBulkTransfer on the bulk in endpoint.
