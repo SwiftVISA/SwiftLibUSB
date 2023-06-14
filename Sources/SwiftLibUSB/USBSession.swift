@@ -42,11 +42,13 @@ public class USBSession {
     ///   - vendorID: Number identifying the manufacturer of the device.
     ///   - productID: Number identifying the product of the device.
     ///   - serialNumber: If provided, this will only connect to a device with the provided serial number.
-    /// - Throws: ``USBInstrument/Error`` if there is an error initalizing the session. ``USBError`` if libUSB encounted an error
-    ///   * ``USBInstrument/Error/noDevices`` if no connected devices were found
-    ///   * ``USBInstrument/Error/couldNotFind`` if no matching device was found
-    ///   * ``USBInstrument/Error/identificationNotUnique`` if multiple devices matching the vendor ID and product ID were found and no serial number was provided
-    ///   * ``USBInstrument/Error/serialCodeNotUnique`` if multiple matching devices with the given serial number were found (this indicates buggy devices)
+    /// - Throws: ``USBSession/Error`` if there is an error initalizing the session. ``USBError`` if libUSB encounted an error
+    ///
+    ///  Common errors are
+    ///   - ``USBSession/Error/noDevices`` if no connected devices were found
+    ///   - ``USBSession/Error/couldNotFind`` if no matching device was found
+    ///   - ``USBSession/Error/identificationNotUnique`` if multiple devices matching the vendor ID and product ID were found and no serial number was provided
+    ///   - ``USBSession/Error/serialNumberNotUnique`` if multiple matching devices with the given serial number were found (this indicates buggy devices)
     public init(vendorID: Int, productID: Int, serialNumber: String?) throws {
         self.vendorID = vendorID
         self.productID = productID
@@ -156,7 +158,7 @@ extension USBSession: Session {
     /// Tries to reestablish the session's connection.
     /// - Parameters:
     ///  - timeout: The amount of time in milliseconds to attempt to reconnect. A timeout of 0 will try forever
-    /// - Throws: ``USBInstrument/Error`` if the session cannot be reconnected
+    /// - Throws: ``USBSession/Error`` if the session cannot be reconnected
     public func reconnect(timeout: TimeInterval) throws {
         try device.reopen()
     }
