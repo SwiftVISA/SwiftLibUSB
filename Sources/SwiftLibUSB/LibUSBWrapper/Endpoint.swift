@@ -15,7 +15,7 @@ import Usb
 /// ``Endpoint/transferType`` property.
 ///
 /// Before sending data on an Endpoint, the ``Configuration``, ``Interface``, and  ``AltSetting`` that contain
-/// it must be activated. This is done by calling `config.set_active()`, `interface.claim()`, and
+/// it must be activated. This is done by calling `config.setActive()`, `interface.claim()`, and
 /// `setting.setActive()`
 public class Endpoint {
     /// The descriptor of the endpoint is pointed to by this pointer. This is the raw descriptor as given by libUSB, which is hard to use. Getter methods should be used instead of referencing this directly. [It is documented here](https://libusb.sourceforge.io/api-1.0/structlibusb__endpoint__descriptor.html)
