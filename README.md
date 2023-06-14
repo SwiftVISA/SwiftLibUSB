@@ -89,6 +89,93 @@ Wrapper Class Summary
 ---------------------
 These classes are all in the LibUSBWrapper folder. They are low level classes for interacting with the libUSB library. 
 
+The general workflow for using these classes is:
+ * Create a `Context`
+ * Find the `Device` you want to communicate with
+ * Select a `Configuration`
+ * Find an `AltSetting` that supports the communication protocol you want,
+   then cmail that `Interface` and set the `AltSetting` active.
+ * Find the `Endpoint`s you will use to transfer data
+ * Send and receive data over the `Endpoint`s.
+
+An example of how this might look is shown below.
+
+```swift
+do {
+    let context = try Context()
+
+    // Find an appropriate device by vendor ID and product ID
+    var device: Device? = nil
+    for dev in context.devices {
+        if dev.vendorID == vendorID && dev.productID == productID {
+            device = dev
+            break
+        }
+    }
+    guard let device = device else {
+        throw USBError.other
+    }
+
+    // Find an AltSetting that supports the USBTMC protocol
+    var altSetting: AltSetting? = nil
+    for config in device.configurations {
+        for interface in config.interfaces {
+            for setting in interface.altSettings {
+                if setting.interfaceClass == .application &&
+                  setting.interfaceSubClass == 3 {
+                    // Set up the configuration settings so we can use them.
+                    try config.setActive()
+                    try interface.claim()
+                    try setting.setActive()
+                    altSetting = setting
+                    break
+                }
+            }
+        }
+    }
+    guard let setting = altSetting else {
+        // No supported AltSetting was found
+        throw USBError.other
+    }
+
+    // Find the in and out endpoints
+    var inEndpoint: Endpoint? = nil
+    var outEndpoint: Endpoint? = nil
+    for endpoint in altSetting.endpoints where endpoint.transferType == .bulk {
+        if endpoint.direction == .in {
+            inEndpoint = endpoint
+        } else if endpoint.direction == .out {
+            outEndpoint = endpoint
+        }
+    }
+    guard let inEndpoint = inEndpoint, let outEndpoint = outEndpoint else {
+        // The required endpoints weren't found
+        throw USBError.other
+    }
+
+    // Communicate with the device
+
+    // Send the bytes for an "OUTPUT ON" command
+    try outEndpoint.sendBulkTransfer(Data([1, 1, 254, 0, 10, 0, 0, 0, 1, 0, 0, 0, 79, 85, 84, 80, 85, 84, 32, 79, 78, 10, 0, 0]))
+
+    // Send the bytes for a "VOLT?" request
+    try outEndpoint.sendBulkTransfer(Data([1, 2, 253, 0, 6, 0, 0, 0, 1, 0, 0, 0, 86, 79, 76, 84, 63, 10, 0, 0]))
+
+    // Send a request to get the response in a 256 byte buffer
+    try outEndpoint.sendBulkTransfer(Data([2, 3, 252, 0, 0, 1, 0, 0, 0, 0, 0, 0]))
+
+    // Get the response
+    let response = try inEndpoint.receiveBulkTransfer(256)
+
+    // Skip the header when printing the response
+    print(String(data: response[12...], encoding: .ascii))
+
+    // No cleanup is necessary
+} catch {
+    // Some error occured
+}
+```
+
 ### Context
 
 The first step in interacting with a device using libUSB directly is creating a context. It is from the context that you get the device list. This is how one might do this
