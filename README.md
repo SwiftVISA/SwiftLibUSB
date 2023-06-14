@@ -105,9 +105,10 @@ do {
     let context = try Context()
 
     // Find an appropriate device by vendor ID and product ID
+    // vendorId and productId must have been defined previously
     var device: Device? = nil
     for dev in context.devices {
-        if dev.vendorID == vendorID && dev.productID == productID {
+        if dev.vendorId == vendorId && dev.productId == productId {
             device = dev
             break
         }
@@ -133,7 +134,7 @@ do {
             }
         }
     }
-    guard let setting = altSetting else {
+    guard let altSetting = altSetting else {
         // No supported AltSetting was found
         throw USBError.other
     }
@@ -156,13 +157,16 @@ do {
     // Communicate with the device
 
     // Send the bytes for an "OUTPUT ON" command
-    try outEndpoint.sendBulkTransfer(Data([1, 1, 254, 0, 10, 0, 0, 0, 1, 0, 0, 0, 79, 85, 84, 80, 85, 84, 32, 79, 78, 10, 0, 0]))
+    var outputOn = Data([1, 1, 254, 0, 10, 0, 0, 0, 1, 0, 0, 0, 79, 85, 84, 80, 85, 84, 32, 79, 78, 10, 0, 0])
+    try outEndpoint.sendBulkTransfer(data: &outputOn)
 
     // Send the bytes for a "VOLT?" request
-    try outEndpoint.sendBulkTransfer(Data([1, 2, 253, 0, 6, 0, 0, 0, 1, 0, 0, 0, 86, 79, 76, 84, 63, 10, 0, 0]))
+    var volt = Data([1, 2, 253, 0, 6, 0, 0, 0, 1, 0, 0, 0, 86, 79, 76, 84, 63, 10, 0, 0])
+    try outEndpoint.sendBulkTransfer(data: &volt)
 
     // Send a request to get the response in a 256 byte buffer
-    try outEndpoint.sendBulkTransfer(Data([2, 3, 252, 0, 0, 1, 0, 0, 0, 0, 0, 0]))
+    var responseRequest = Data([2, 3, 252, 0, 0, 1, 0, 0, 0, 0, 0, 0])
+    try outEndpoint.sendBulkTransfer(data: &responseRequest)
 
     // Get the response
     let response = try inEndpoint.receiveBulkTransfer(256)
@@ -173,6 +177,7 @@ do {
     // No cleanup is necessary
 } catch {
     // Some error occured
+    print("Couldn't connect to device.")
 }
 ```
 
