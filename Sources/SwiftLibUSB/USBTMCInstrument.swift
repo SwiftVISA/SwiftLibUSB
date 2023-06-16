@@ -249,7 +249,7 @@ extension USBTMCInstrument {
             
             // Send the request message to a bulk out endpoint
             let bytesSent = try outEndpoint.sendBulkTransfer(
-                data: &message,
+                data: message,
                 timeout: Int(attributes.operationDelay * 1000))
             
             // Throw if not all bytes were sent
@@ -414,7 +414,7 @@ extension USBTMCInstrument: MessageBasedInstrument {
             dataToSend.append(Data(Array(repeating: 0, count: paddingLength)))
             
             let numSent = try outEndpoint.sendBulkTransfer(
-                data: &dataToSend,
+                data: dataToSend,
                 timeout: Int(attributes.operationDelay * 1000))
             
             lowerBound += numSent - Self.headerSize - paddingLength // Move up by the amount sent
