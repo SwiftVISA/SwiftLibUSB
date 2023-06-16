@@ -60,7 +60,7 @@ do {
 
 Class Summary
 -------------
-These classes all conform to protocols described in CoreSwiftVisa. These are high level and are the most user friendly
+These classes all conform to protocols described in CoreSwiftVisa. These are high level and are the most user friendly.
 
 ### USBTMCInstrument
 
@@ -87,7 +87,7 @@ returned device to see if it supports the intended communication protocol.
 
 Wrapper Class Summary
 ---------------------
-These classes are all in the LibUSBWrapper folder. They are low level classes for interacting with the libUSB library. 
+These classes are all in the LibUSBWrapper folder. They are low level classes for interacting with the [libUSB](https://libusb.sourceforge.io/api-1.0/index.html) library. They are only needed when implementing new instruments or writing very low-level drivers; for communicating with typical lab equipment see the `USBTMCInstrument` class.
 
 The general workflow for using these classes is:
  * Create a `Context`
@@ -183,7 +183,8 @@ do {
 
 ### Context
 
-The first step in interacting with a device using libUSB directly is creating a context. It is from the context that you get the device list. This is how one might do this
+The first step in interacting with a device using libUSB directly is creating a `Context`. The `Context` creates a list of all devices connected to the host when it is created, and these devices can be accessed using the `devices` property.
+
 ```
 // Create a context and get the devices
 do {
@@ -193,11 +194,11 @@ do {
     // The context could not be made
 }
 ```
-The device list stores Device objects
 
 ### Device
 
-A class representing a device. The best way to get the device instance that corresponds to a specific physical device is to look through the "devices" array given by context until you find the desired the device. Devices are identified by their productId, vendorId and serialNumber. The serial number is only required if there are multiple of the same kind of device connected at a time.
+The `Context.devices` array contains one `Device` object for each physical device libUSB identifies when the `Context` is created. They can be identified using the `vendorID`, `productID`, and `serialNumber` properties. The `displayName` property can also be useful if the device provides a name.
+
 ```
 // Example of finding a device with a specific vendor ID and product ID
 // Once found, it requests the name of the device's manufacturer and prints it
@@ -209,16 +210,26 @@ for device in context.devices {
        }
   }
 ```
-Device objects manage both the device and the device handle. Devices are open upon intilizing, but can be closed or reopened with the corresponding methods. Device makes available the sendControlTransfer method for sending USB control transfers. The more common kind of transfer is USB bulk transfers. These are the kind used to send commands to USBTMC devices and other relevant transfers. These are accomplished in the Endpoint Class
+
+Devices are opened for communication upon creation; they can be closed or reopened using the `close` and `reopen` methods. Before communication can actually happen, a `Configuration` must also be made active, one or more `Interface`s must be claimed, and an `AltSetting` for each `Interface` must be made active.
+
+Control messages can be sent to a device using the `sendControlTransfer` method.
+This should only be used for messages defined by device classes, such as the USBTMC GET_CAPABILITIES message. Messages used for getting device descriptors and configuration are handle by libUSB.
 
 ### Configuration
-Before a device's endpoints can be used, a configuration containing that endpoint must be made active through setActive(). Each device has configurations. Configurations also describe information like the maximum power the device will draw. Configurations have different interfaces
+
+Before a device's endpoints can be used, a `Configuration` containing that endpoint must be made active through `setActive()`. Each device lists offered `Configurations` in the `configurations` property. Configurations describe information like the maximum power the device will draw. Configurations contain an array of `Interface`s in the `interfaces` property.
 
 ### Interface
-An interface describes a set of endpoints. An interface must be claimed before any of its endpoints can be used. Each interface might have multiple ways it can be interacted with. These are described by the interface's AltSettings
+
+An `Interface` describes an independent set of endpoints intended to be used together. An interface must be claimed before any of its endpoints can be used. Each interface might support multiple ommunication protocols. These are described by the interface's `AltSetting`s, listed in the `altSettings` property.
 
 ### AltSetting
-Each altsetting describes what role the endpoints in the interface play. This is described through their class, subclass and protocol. If you want to know which configuration to make active and which interface to claim, look for which one has an altsetting that fits your needs. Before any of the altsettings endpoints can be used, it must be claimed. Each altsettings store their own endpoints
+
+Each `AltSetting` describes what role the endpoints in the interface play. This is described through their `interfaceClass`, `interfaceSubClass` and `interfaceProtocol`. `AltSetting`s contain a list of the `Endpoint`s contained in the interface in the `endpoints` property. `AltSetting`s in the same `Interface` have the same endpoint numbers, but the transfer types may not be the same.
 
 ### Endpoint
-The point at which bulk transfers are made is called the endpoint. "Out" direction endpoints send data from the host to the device. "In" direction endpoints recieve data from the device. So long as the altsetting that holds this endpoint has been made active, the interface has been claimed and the configuration containing the interface set active, the endpoint is ready for transfering data. To send data, send the bytes (Including any header or padding bytes) to a bulk out endpoint by calling sendBulkTransfer on the bulk out endpoint with the desired bytes. To recieve data, call receiveBulkTransfer on the bulk in endpoint.
+
+`Endpoint`s send and receive messages from the device. "Out" direction endpoints send data from the host to the device. "In" direction endpoints recieve data from the device. So long as the altsetting that holds this endpoint has been made active, the interface has been claimed and the configuration containing the interface set active, the endpoint is ready for transfering data. The methods `sendBulkTransfer` and `receiveBulkTransfer` can be used to send messages on bulk endpoints. Interrupt and isochronous transfers are not yet supported.
+
+When sending messages, be aware that device classes may require specific formatting or encoding of the data. This class does not make any modifications to the data provided; it is the user's responsibility to ensure the bytes given are formatted correctly for the device.
