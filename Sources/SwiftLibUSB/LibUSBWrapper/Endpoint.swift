@@ -153,7 +153,7 @@ public class Endpoint {
     /// - Parameters:
     ///   - data: the raw bytes to send unaltered to the device through this endpoint
     ///   - timeout: The time, in millisecounds, to wait before timeout. This is by default one second
-    public func sendBulkTransfer(data: inout Data, timeout: Int = 1000) throws -> Int {
+    public func sendBulkTransfer(data: Data, timeout: Int = 1000) throws -> Int {
         // Only work if we are the right kind of endpoint
         if transferType != .bulk || direction != .out {
             throw USBError.notSupported
