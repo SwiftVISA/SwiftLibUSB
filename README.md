@@ -222,14 +222,16 @@ Before a device's endpoints can be used, a `Configuration` containing that endpo
 
 ### Interface
 
-An `Interface` describes an independent set of endpoints intended to be used together. An interface must be claimed before any of its endpoints can be used. Each interface might support multiple ommunication protocols. These are described by the interface's `AltSetting`s, listed in the `altSettings` property.
+An `Interface` describes an independent set of endpoints intended to be used together. An `Interface` must be claimed before any of its endpoints can be used. Each `Interface` might support multiple communication protocols. These are described by the `Interface`'s `AltSetting`s, listed in the `altSettings` property.
 
 ### AltSetting
 
-Each `AltSetting` describes what role the endpoints in the interface play. This is described through their `interfaceClass`, `interfaceSubClass` and `interfaceProtocol`. `AltSetting`s contain a list of the `Endpoint`s contained in the interface in the `endpoints` property. `AltSetting`s in the same `Interface` have the same endpoint numbers, but the transfer types may not be the same.
+Each `AltSetting` describes what role the endpoints in the `Interface` play. This is described through their `interfaceClass`, `interfaceSubClass` and `interfaceProtocol`. `AltSetting`s contain a list of the `Endpoint`s contained in the interface in the `endpoints` property. `AltSetting`s in the same `Interface` have the same endpoint numbers, but the transfer types may not be the same.
 
 ### Endpoint
 
-`Endpoint`s send and receive messages from the device. "Out" direction endpoints send data from the host to the device. "In" direction endpoints recieve data from the device. So long as the altsetting that holds this endpoint has been made active, the interface has been claimed and the configuration containing the interface set active, the endpoint is ready for transfering data. The methods `sendBulkTransfer` and `receiveBulkTransfer` can be used to send messages on bulk endpoints. Interrupt and isochronous transfers are not yet supported.
+`Endpoint`s send and receive messages from the device. The two most important properties are `direction` and `transferType`. `out` direction endpoints send data from the host to the device. `in` direction endpoints recieve data from the device. `bulk` endpoints send single, possibly large, chunks of data. `isochronous` endpoints stream data, such as audio, in many small packets. `interrupt` endpoints send small amounts of data for important events. So far, communication has only been implemented in this class for `bulk` `Endpoint`s.
+
+So long as the `AltSetting` that holds this endpoint has been made active, the `Interface` has been claimed and the `Configuration` containing the `Interface` set active, the endpoint is ready for transfering data. The methods `sendBulkTransfer` and `receiveBulkTransfer` can be used to send messages on bulk endpoints. Interrupt and isochronous transfers are not yet supported.
 
 When sending messages, be aware that device classes may require specific formatting or encoding of the data. This class does not make any modifications to the data provided; it is the user's responsibility to ensure the bytes given are formatted correctly for the device.
